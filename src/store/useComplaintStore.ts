@@ -11,6 +11,7 @@ export interface Complaint {
     project_id: number
     subject: string
     body: string
+    evidence?: string
     status: ComplaintStatus
     admin_note: string
     resolved_at?: string | null
@@ -39,7 +40,7 @@ interface ComplaintStore {
     isSubmitting: boolean
 
     // user-side
-    fileComplaint: (projectId: number, subject: string, body: string) => Promise<boolean>
+    fileComplaint: (projectId: number, subject: string, body: string, evidence?: string) => Promise<boolean>
     fetchMyComplaints: () => Promise<void>
 
     // admin-side
@@ -56,10 +57,11 @@ export const useComplaintStore = create<ComplaintStore>((set, get) => ({
     isLoading: false,
     isSubmitting: false,
 
-    fileComplaint: async (projectId, subject, body) => {
+    fileComplaint: async (projectId, subject, body, evidence) => {
         set({ isSubmitting: true })
         try {
-            await api.post('/complaints', { project_id: projectId, subject, body })
+            // evidence เป็น optional — backend รับเป็น URL เท่านั้น (validate:"omitempty,url") จึงส่งไปเฉพาะตอนมีค่า
+            await api.post('/complaints', { project_id: projectId, subject, body, ...(evidence ? { evidence } : {}) })
             toast.success('ส่งคำร้องเรียนสำเร็จ ทีมงานจะตรวจสอบและติดต่อกลับ')
             return true
         } catch (error) {

@@ -172,6 +172,20 @@ const DetailModal = ({
                     </p>
                 </div>
 
+                {complaint.evidence && (
+                    <div className="mb-4">
+                        <p className="text-[13px] font-semibold text-foreground mb-2">หลักฐานประกอบ</p>
+                        <a
+                            href={complaint.evidence}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline bg-white border border-border rounded-lg px-3 py-2"
+                        >
+                            <ExternalLink size={13} /> เปิดดูหลักฐาน
+                        </a>
+                    </div>
+                )}
+
                 {complaint.admin_note && (
                     <div className="mb-4">
                         <p className="text-[13px] font-semibold text-foreground mb-2">หมายเหตุจากผู้ตรวจ</p>

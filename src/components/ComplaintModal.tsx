@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Loader2, Flag, X } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Loader2, Flag, X, Paperclip, Link2, XCircle } from 'lucide-react'
 import { useComplaintStore } from '../store/useComplaintStore'
+import { useProjectStore } from '../store/useProjectStore'
 
 interface ComplaintModalProps {
     projectId: number
@@ -9,14 +10,62 @@ interface ComplaintModalProps {
     onSuccess?: () => void
 }
 
+const isValidUrl = (value: string) => {
+    try {
+        const u = new URL(value)
+        return u.protocol === 'http:' || u.protocol === 'https:'
+    } catch {
+        return false
+    }
+}
+
 const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: ComplaintModalProps) => {
     const { fileComplaint, isSubmitting } = useComplaintStore()
+    const { uploadFile } = useProjectStore()
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
+    const [evidence, setEvidence] = useState('') // ลิงก์หลักฐาน — ได้จากการอัปโหลดไฟล์ หรือวางลิงก์เอง
+    const [evidenceFileName, setEvidenceFileName] = useState('')
+    const [isUploadingEvidence, setIsUploadingEvidence] = useState(false)
+    const [evidenceError, setEvidenceError] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const handleEvidenceChange = (value: string) => {
+        setEvidence(value)
+        setEvidenceFileName('')
+        setEvidenceError(false)
+    }
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        e.target.value = '' // เคลียร์ input เพื่อให้เลือกไฟล์เดิมซ้ำได้
+        if (!file) return
+        setIsUploadingEvidence(true)
+        setEvidenceError(false)
+        const result = await uploadFile(file)
+        setIsUploadingEvidence(false)
+        if (result?.url) {
+            setEvidence(result.url)
+            setEvidenceFileName(file.name)
+        } else {
+            setEvidenceError(true)
+        }
+    }
+
+    const clearEvidence = () => {
+        setEvidence('')
+        setEvidenceFileName('')
+        setEvidenceError(false)
+    }
 
     const handleSubmit = async () => {
         if (!subject.trim() || body.trim().length < 10) return
-        const ok = await fileComplaint(projectId, subject.trim(), body.trim())
+        const trimmedEvidence = evidence.trim()
+        if (trimmedEvidence && !isValidUrl(trimmedEvidence)) {
+            setEvidenceError(true)
+            return
+        }
+        const ok = await fileComplaint(projectId, subject.trim(), body.trim(), trimmedEvidence || undefined)
         if (ok) {
             onSuccess?.()
             onClose()
@@ -25,7 +74,7 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
 
     const subjectValid = subject.trim().length >= 3
     const bodyValid = body.trim().length >= 10
-    const canSubmit = subjectValid && bodyValid && !isSubmitting
+    const canSubmit = subjectValid && bodyValid && !isSubmitting && !isUploadingEvidence
 
     return (
         <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
@@ -70,6 +119,52 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
                         />
                         <span className="text-[11px] text-muted-foreground">{body.length}/5000</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[13px] font-medium">หลักฐานประกอบ (ถ้ามี)</label>
+                        <p className="text-[11px] text-muted-foreground mb-1">แนบไฟล์ (ภาพหน้าจอ/เอกสาร) หรือวางลิงก์หลักฐานได้โดยตรง</p>
+                        <div className="flex items-center gap-2">
+                            <div className={`flex-1 flex items-center gap-[6px] px-3 py-2 rounded-lg border ${evidenceError ? 'border-error' : 'border-border focus-within:border-primary'}`}>
+                                <Link2 size={14} className="text-muted-foreground shrink-0" />
+                                <input
+                                    type="url"
+                                    value={evidence}
+                                    onChange={(e) => handleEvidenceChange(e.target.value)}
+                                    placeholder="https://..."
+                                    disabled={isUploadingEvidence}
+                                    className="flex-1 text-[14px] outline-none bg-transparent min-w-0"
+                                />
+                                {evidence && !isUploadingEvidence && (
+                                    <button type="button" onClick={clearEvidence} className="text-muted-foreground hover:text-error shrink-0">
+                                        <XCircle size={14} />
+                                    </button>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isUploadingEvidence}
+                                className="shrink-0 flex items-center gap-[6px] border border-border rounded-lg px-3 py-2 text-[13px] font-medium text-foreground hover:bg-gray-50 disabled:opacity-50"
+                            >
+                                {isUploadingEvidence ? <Loader2 size={14} className="animate-spin" /> : <Paperclip size={14} />}
+                                แนบไฟล์
+                            </button>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*,.pdf"
+                                className="hidden"
+                                onChange={handleFileSelect}
+                            />
+                        </div>
+                        {evidenceFileName && !isUploadingEvidence && (
+                            <span className="text-[11px] text-muted-foreground">แนบไฟล์แล้ว: {evidenceFileName}</span>
+                        )}
+                        {evidenceError && (
+                            <span className="text-[11px] text-error">
+                                ลิงก์หลักฐานไม่ถูกต้อง หรืออัปโหลดไฟล์ไม่สำเร็จ กรุณาลองใหม่
+                            </span>
+                        )}
                     </div>
                 </div>
 

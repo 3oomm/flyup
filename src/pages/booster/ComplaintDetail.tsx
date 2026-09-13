@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ArrowLeft, Loader2, MessageSquareWarning } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Loader2, MessageSquareWarning } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 import { useComplaintStore } from '../../store/useComplaintStore';
 
@@ -98,6 +98,16 @@ const ComplaintDetail = () => {
           <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
             {complaint!.body}
           </p>
+          {complaint!.evidence && (
+            <a
+              href={complaint!.evidence}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline mt-4"
+            >
+              <ExternalLink size={14} /> ดูหลักฐานที่แนบ
+            </a>
+          )}
         </div>
 
         {/* Admin Response Box */}
