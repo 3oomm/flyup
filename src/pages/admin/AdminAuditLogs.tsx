@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { FileText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { FileText, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react'
 import PageHeader from '../../components/admin/PageHeader'
 import { useAdminLogStore, type AdminLogItem } from '../../store/useAdminLogStore'
 
@@ -67,7 +67,7 @@ const formatDate = (iso: string) =>
 
 // ─── Row ─────────────────────────────────────────────────────────────────────
 
-const LogRow = ({ log }: { log: AdminLogItem }) => {
+const LogRow = ({ log, sequence, onView }: { log: AdminLogItem; sequence: number; onView: () => void }) => {
     const badgeClass = ACTION_BADGE[log.action] ?? 'bg-gray-50 text-gray-600 border-gray-200'
     const actionLabel = ACTION_LABEL[log.action] ?? log.action
     const targetLabel = TARGET_LABEL[log.target_type] ?? log.target_type
@@ -76,25 +76,34 @@ const LogRow = ({ log }: { log: AdminLogItem }) => {
         : `Admin #${log.admin_id}`
 
     return (
-        <div className="grid grid-cols-[160px_180px_1fr_120px_80px_1fr] px-4 py-3 items-start border-b border-border last:border-0 hover:bg-muted/30 transition-colors text-[13px]">
+        <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] md:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 md:px-4 py-3 items-start border-b border-border last:border-0 hover:bg-muted/30 transition-colors text-[13px]">
+            <div className="text-center text-muted-foreground text-[12px] pt-0.5">{sequence}</div>
             <div className="text-muted-foreground text-[12px] pt-0.5">{formatDate(log.created_at)}</div>
-            <div>
+            <div className="hidden md:block">
                 <p className="font-medium text-foreground">{adminName}</p>
                 {log.admin?.email && (
                     <p className="text-[11px] text-muted-foreground truncate">{log.admin.email}</p>
                 )}
             </div>
-            <div>
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+            <div className="min-w-0 overflow-hidden">
+                <span className={`inline-block max-w-full truncate text-[10px] md:text-[11px] font-semibold px-2 py-0.5 rounded-full border ${badgeClass}`}>
                     {actionLabel}
                 </span>
             </div>
-            <div className="text-muted-foreground">{targetLabel}</div>
-            <div className="text-muted-foreground">
+            <div className="hidden md:block text-muted-foreground">{targetLabel}</div>
+            <div className="hidden md:block text-muted-foreground">
                 {log.target_id ? `#${log.target_id}` : '—'}
             </div>
-            <div className="text-muted-foreground text-[12px] wrap-break-word">
+            <div className="hidden md:block text-muted-foreground text-[12px] wrap-break-word">
                 {log.note ?? '—'}
+            </div>
+            <div className="flex md:hidden justify-center">
+                <button
+                    onClick={onView}
+                    className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                >
+                    ดูรายละเอียด
+                </button>
             </div>
         </div>
     )
@@ -104,6 +113,7 @@ const LogRow = ({ log }: { log: AdminLogItem }) => {
 
 const AdminAuditLogs = () => {
     const { logs, meta, isLoading, filter, setFilter, fetchLogs } = useAdminLogStore()
+    const [selectedLog, setSelectedLog] = useState<AdminLogItem | null>(null)
 
     useEffect(() => { fetchLogs() }, [fetchLogs])
 
@@ -196,13 +206,15 @@ const AdminAuditLogs = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border mx-2.5 overflow-hidden">
                 {/* Header */}
-                <div className="grid grid-cols-[160px_180px_1fr_120px_80px_1fr] px-4 py-3 bg-muted/40 font-medium text-[12px] text-muted-foreground border-b border-border">
+                <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] md:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 md:px-4 py-3 bg-muted/40 font-medium text-[11px] md:text-[12px] text-muted-foreground border-b border-border">
+                    <div className="text-center">ลำดับ</div>
                     <div>วันที่/เวลา</div>
-                    <div>Admin</div>
+                    <div className="hidden md:block">Admin</div>
                     <div>Action</div>
-                    <div>ประเภท</div>
-                    <div>ID</div>
-                    <div>หมายเหตุ</div>
+                    <div className="hidden md:block">ประเภท</div>
+                    <div className="hidden md:block">ID</div>
+                    <div className="hidden md:block">หมายเหตุ</div>
+                    <div className="md:hidden text-center">จัดการ</div>
                 </div>
 
                 {isLoading ? (
@@ -215,9 +227,74 @@ const AdminAuditLogs = () => {
                         <p className="text-[13px]">ไม่มีบันทึก</p>
                     </div>
                 ) : (
-                    logs.map(log => <LogRow key={log.id} log={log} />)
+                    logs.map((log, index) => (
+                        <LogRow
+                            key={log.id}
+                            log={log}
+                            sequence={(filter.page - 1) * meta.page_size + index + 1}
+                            onView={() => setSelectedLog(log)}
+                        />
+                    ))
                 )}
             </div>
+
+            {selectedLog && (
+                <div
+                    className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-40 flex items-center justify-center bg-black/40 p-4"
+                    onClick={() => setSelectedLog(null)}
+                >
+                    <div
+                        className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="mb-5 flex items-start justify-between gap-3">
+                            <div>
+                                <h2 className="text-lg font-bold">รายละเอียดบันทึกการตรวจสอบ</h2>
+                                <p className="mt-1 text-[12px] text-muted-foreground">{formatDate(selectedLog.created_at)}</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedLog(null)}
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="ปิด"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="divide-y divide-border rounded-xl border border-border text-[13px]">
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">Admin</span>
+                                <div className="min-w-0">
+                                    <p className="font-medium">
+                                        {selectedLog.admin
+                                            ? `${selectedLog.admin.first_name} ${selectedLog.admin.last_name}`.trim() || selectedLog.admin.email
+                                            : `Admin #${selectedLog.admin_id}`}
+                                    </p>
+                                    {selectedLog.admin?.email && (
+                                        <p className="break-all text-[11px] text-muted-foreground">{selectedLog.admin.email}</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">Action</span>
+                                <span className="font-medium">{ACTION_LABEL[selectedLog.action] ?? selectedLog.action}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">ประเภท</span>
+                                <span className="font-medium">{TARGET_LABEL[selectedLog.target_type] ?? selectedLog.target_type}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">ID</span>
+                                <span className="font-medium">{selectedLog.target_id ? `#${selectedLog.target_id}` : '—'}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">หมายเหตุ</span>
+                                <span className="wrap-break-word font-medium">{selectedLog.note ?? '—'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (

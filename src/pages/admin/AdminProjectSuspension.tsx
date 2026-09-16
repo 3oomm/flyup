@@ -14,6 +14,7 @@ const STATE_LABEL: Record<string, string> = {
     cancelled:      'ยกเลิกแล้ว',
     suspended:      'ถูกระงับ',
     pending_review: 'รอตรวจสอบ',
+    pending_edit_review: 'รอตรวจสอบการแก้ไข',
     pending_cancel: 'รอยกเลิก',
     draft:          'แบบร่าง',
 }
@@ -25,6 +26,7 @@ const STATE_BADGE: Record<string, string> = {
     cancelled:      'bg-gray-50 text-gray-500 border border-gray-200',
     suspended:      'bg-red-50 text-red-600 border border-red-200',
     pending_review: 'bg-amber-50 text-amber-600 border border-amber-200',
+    pending_edit_review: 'bg-amber-50 text-amber-600 border border-amber-200',
     pending_cancel: 'bg-orange-50 text-orange-600 border border-orange-200',
     draft:          'bg-gray-50 text-gray-400 border border-gray-200',
 }
@@ -34,7 +36,17 @@ const SUSPENDABLE = new Set(['funding', 'executing'])
 // states ที่เป็น terminal (ระงับไม่ได้ และ restore ไม่ได้)
 const TERMINAL = new Set(['cancelled', 'closed'])
 
-type Tab = 'active' | 'terminal'
+type StateFilter =
+    | 'all'
+    | 'funding'
+    | 'executing'
+    | 'pending_review'
+    | 'pending_edit_review'
+    | 'pending_cancel'
+    | 'suspended'
+    | 'closed'
+    | 'cancelled'
+    | 'draft'
 
 const UnsuspendModal = ({
     project, onClose, onConfirm, isSubmitting,
@@ -85,7 +97,7 @@ const SuspendModal = ({
 const AdminProjectSuspension = () => {
     const { allProjects: projects, isAllProjectsLoading: isLoading, fetchAllProjects, updateProjectStatus } = useAdminStore()
     const [search, setSearch] = useState('')
-    const [tab, setTab] = useState<Tab>('active')
+    const [tab, setTab] = useState<StateFilter>('all')
     const [selected, setSelected] = useState<ProjectRow | null>(null)
     const [unsuspendTarget, setUnsuspendTarget] = useState<ProjectRow | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -124,13 +136,7 @@ const AdminProjectSuspension = () => {
         }
     }
 
-    // active tab = ยังไม่ terminal และไม่ใช่ draft
-    // terminal tab = cancelled / closed (ดูประวัติได้อย่างเดียว)
-    const byTab = projects.filter((p) =>
-        tab === 'terminal'
-            ? TERMINAL.has(p.state)
-            : !TERMINAL.has(p.state) && p.state !== 'draft'
-    )
+    const byTab = tab === 'all' ? projects : projects.filter((p) => p.state === tab)
 
     const filtered = byTab.filter((p) => {
         const q = search.toLowerCase()
@@ -138,13 +144,24 @@ const AdminProjectSuspension = () => {
         return p.title.toLowerCase().includes(q) || categoryName.toLowerCase().includes(q)
     })
 
-    const activeCount   = projects.filter((p) => !TERMINAL.has(p.state) && p.state !== 'draft').length
-    const terminalCount = projects.filter((p) => TERMINAL.has(p.state)).length
-
-    const tabs: { key: Tab; label: string; count: number }[] = [
-        { key: 'active',   label: 'โปรเจกต์ที่ใช้งานอยู่', count: activeCount },
-        { key: 'terminal', label: 'ยกเลิก / ปิดแล้ว',      count: terminalCount },
+    const filterStates: StateFilter[] = [
+        'all',
+        'funding',
+        'executing',
+        'pending_review',
+        'pending_edit_review',
+        'pending_cancel',
+        'suspended',
+        'closed',
+        'cancelled',
+        'draft',
     ]
+
+    const tabs = filterStates.map((state) => ({
+        key: state,
+        label: state === 'all' ? 'ทุกสถานะ' : STATE_LABEL[state],
+        count: state === 'all' ? projects.length : projects.filter((project) => project.state === state).length,
+    }))
 
     return (
         <div className="flex flex-col gap-[16px]">
@@ -152,20 +169,21 @@ const AdminProjectSuspension = () => {
 
             <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <SearchBar value={search} onChange={setSearch} placeholder="ค้นหาชื่อโปรเจกต์..." resultCount={filtered.length} />
-                <FilterTabs active={tab} onChange={(k) => setTab(k as Tab)} tabs={tabs} />
+                <FilterTabs active={tab} onChange={(k) => setTab(k as StateFilter)} tabs={tabs} />
             </div>
 
-            {tab === 'terminal' && (
+            {(tab === 'closed' || tab === 'cancelled') && (
                 <p className="text-[12px] text-muted-foreground px-2.5">
                     โปรเจกต์เหล่านี้ถูกยกเลิกหรือปิดแล้ว ไม่สามารถระงับหรือ restore ได้
                 </p>
             )}
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-6 bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
-                    <div className="col-span-2">โปรเจกต์</div>
-                    <div className="text-center">หมวดหมู่</div>
-                    <div className="text-center">เป้าหมาย</div>
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                    <div className="text-center">ลำดับ</div>
+                    <div>โปรเจกต์</div>
+                    <div className="hidden md:block text-center">หมวดหมู่</div>
+                    <div className="hidden md:block text-center">เป้าหมาย</div>
                     <div className="text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
@@ -180,7 +198,7 @@ const AdminProjectSuspension = () => {
                         <p className="text-sm">{search ? 'ไม่พบโปรเจกต์ที่ค้นหา' : 'ไม่มีโปรเจกต์'}</p>
                     </div>
                 ) : (
-                    filtered.map((p) => {
+                    filtered.map((p, index) => {
                         const stateBadge = STATE_BADGE[p.state] ?? 'bg-gray-50 text-gray-500 border border-gray-200'
                         const stateLabel = STATE_LABEL[p.state] ?? p.state
                         const canSuspend   = SUSPENDABLE.has(p.state)
@@ -188,36 +206,42 @@ const AdminProjectSuspension = () => {
                         const isTerminal   = TERMINAL.has(p.state)
 
                         return (
-                            <div key={p.id} className="grid grid-cols-6 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                <div className="col-span-2 h-14 flex flex-col justify-center px-2">
-                                    <span className="font-medium text-[13px] truncate">{p.title}</span>
-                                    <span className="text-[11px] text-muted-foreground">ID: {p.id}</span>
+                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4">
+                                <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:pr-3">
+                                    <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{p.title}</span>
+                                    <span className="hidden md:block text-[11px] text-muted-foreground">ID: {p.id}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center text-[12px] text-muted-foreground">
+                                <div className="hidden md:flex h-14 justify-center items-center text-[12px] text-muted-foreground">
                                     {(typeof p.category === 'string' ? p.category : (p.category as unknown as { name?: string } | null)?.name) ?? '-'}
                                 </div>
-                                <div className="h-14 flex flex-col justify-center items-center text-[12px]">
+                                <div className="hidden md:flex h-14 flex-col justify-center items-center text-[12px]">
                                     <span className="font-semibold text-primary">฿{(p.funding_goal ?? 0).toLocaleString('th-TH')}</span>
                                     <span className="text-muted-foreground text-[11px]">ระดมแล้ว ฿{(p.current_funding ?? 0).toLocaleString('th-TH')}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center">
+                                <div className="h-14 min-w-0 overflow-hidden flex justify-center items-center [&>span]:max-w-full [&>span]:overflow-hidden [&>span]:text-[10px] md:[&>span]:text-[12px]">
                                     <StatusBadge label={stateLabel} className={stateBadge} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
                                     {isSuspended ? (
                                         <button data-testid={`project-unsuspend-open-btn-${p.id}`} onClick={() => setUnsuspendTarget(p)}
-                                            className="flex items-center gap-[5px] px-3 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-[12px] font-medium">
-                                            <ShieldCheck size={13} /> ยกเลิกระงับ
+                                            className="flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-[11px] md:text-[12px] font-medium whitespace-nowrap">
+                                            <ShieldCheck size={13} className="hidden md:block" />
+                                            <span className="md:hidden">ยกเลิก</span>
+                                            <span className="hidden md:inline">ยกเลิกระงับ</span>
                                         </button>
                                     ) : canSuspend ? (
                                         <button data-testid={`project-suspend-open-btn-${p.id}`} onClick={() => setSelected(p)}
-                                            className="flex items-center gap-[5px] px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[12px] font-medium">
-                                            <ShieldBan size={13} /> ระงับ
+                                            className="flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[11px] md:text-[12px] font-medium whitespace-nowrap">
+                                            <ShieldBan size={13} className="hidden md:block" /> ระงับ
                                         </button>
                                     ) : isTerminal ? (
                                         <span className="text-[12px] text-muted-foreground">—</span>
                                     ) : (
-                                        <span className="text-[12px] text-muted-foreground">ไม่สามารถระงับได้</span>
+                                        <span className="text-[12px] text-muted-foreground">
+                                            <span className="md:hidden">—</span>
+                                            <span className="hidden md:inline">ไม่สามารถระงับได้</span>
+                                        </span>
                                     )}
                                 </div>
                             </div>

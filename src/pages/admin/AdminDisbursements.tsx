@@ -27,13 +27,16 @@ const ConfirmModal = ({
 }) => {
     const [transferRef, setTransferRef] = useState('')
     const [note, setNote] = useState('')
+    const isPending = item.status === 'pending'
 
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white rounded-2xl w-full max-w-[480px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-start justify-between mb-4">
                     <div>
-                        <h2 className="text-lg font-bold text-foreground">ยืนยันการโอนเงิน</h2>
+                        <h2 className="text-lg font-bold text-foreground">
+                            {isPending ? 'รายละเอียดการโอนเงิน' : 'รายละเอียดการปล่อยเงิน'}
+                        </h2>
                         <p className="text-[12px] text-muted-foreground mt-1">{item.project_title} — Phase {item.phase_no}</p>
                     </div>
                     <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
@@ -51,37 +54,56 @@ const ConfirmModal = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-error">*</span></label>
-                        <input
-                            value={transferRef}
-                            onChange={(e) => setTransferRef(e.target.value)}
-                            placeholder="เช่น TXN-20260426-001"
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
-                        />
+                {isPending ? (
+                    <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-error">*</span></label>
+                            <input
+                                value={transferRef}
+                                onChange={(e) => setTransferRef(e.target.value)}
+                                placeholder="เช่น TXN-20260426-001"
+                                className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-[13px] font-medium">หมายเหตุ</label>
+                            <textarea
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                rows={3}
+                                className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
+                            />
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">หมายเหตุ</label>
-                        <textarea
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            rows={3}
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
-                        />
+                ) : (
+                    <div className="rounded-xl border border-border divide-y divide-border text-[13px]">
+                        <div className="flex justify-between gap-3 p-3">
+                            <span className="text-muted-foreground">เลขอ้างอิง</span>
+                            <span className="font-medium break-all text-right">{item.transfer_ref || '-'}</span>
+                        </div>
+                        <div className="flex justify-between gap-3 p-3">
+                            <span className="text-muted-foreground">วันที่ยืนยัน</span>
+                            <span className="font-medium">{fmtDate(item.confirmed_at)}</span>
+                        </div>
+                        <div className="flex justify-between gap-3 p-3">
+                            <span className="text-muted-foreground">หมายเหตุ</span>
+                            <span className="font-medium text-right">{item.admin_note || '-'}</span>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <div className="flex gap-2 mt-5 justify-end">
                     <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
-                    <button
-                        onClick={() => onConfirm(transferRef, note)}
-                        disabled={!transferRef.trim() || isConfirming}
-                        className="px-4 py-2 text-[13px] rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center gap-2"
-                    >
-                        {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-                        ยืนยันการโอน
-                    </button>
+                    {isPending && (
+                        <button
+                            onClick={() => onConfirm(transferRef, note)}
+                            disabled={!transferRef.trim() || isConfirming}
+                            className="px-4 py-2 text-[13px] rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center gap-2"
+                        >
+                            {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                            ยืนยันการโอน
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -134,12 +156,13 @@ const AdminDisbursements = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-7 bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
-                    <div className="col-span-2">โปรเจกต์</div>
-                    <div className="text-center">Pioneer</div>
-                    <div className="text-center">Phase</div>
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(160px,1fr)_minmax(140px,1fr)_minmax(140px,1fr)_120px_160px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                    <div className="text-center">ลำดับ</div>
+                    <div>โปรเจกต์</div>
+                    <div className="hidden md:block text-center">Pioneer</div>
+                    <div className="hidden md:block text-center">Phase</div>
                     <div className="text-center">จำนวนเงิน</div>
-                    <div className="text-center">สถานะ</div>
+                    <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -153,38 +176,43 @@ const AdminDisbursements = () => {
                         <p className="text-sm">{search ? 'ไม่พบรายการที่ค้นหา' : 'ไม่มีรายการ'}</p>
                     </div>
                 ) : (
-                    filtered.map((d) => {
+                    filtered.map((d, index) => {
                         const status = STATUS_CONFIG[d.status] ?? STATUS_CONFIG['pending']
                         const isPending = d.status === 'pending'
                         return (
-                            <div key={d.id} className="grid grid-cols-7 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                <div className="col-span-2 h-14 flex flex-col justify-center px-2">
-                                    <span className="font-medium text-[13px] truncate">{d.project_title}</span>
-                                    <span className="text-[11px] text-muted-foreground">สร้าง {fmtDate(d.created_at)}</span>
+                            <div key={d.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(160px,1fr)_minmax(140px,1fr)_minmax(140px,1fr)_120px_160px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4">
+                                <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:pr-3">
+                                    <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{d.project_title}</span>
+                                    <span className="hidden md:block text-[11px] text-muted-foreground">สร้าง {fmtDate(d.created_at)}</span>
                                 </div>
-                                <div className="h-14 flex flex-col justify-center items-center gap-[2px]">
+                                <div className="hidden md:flex h-14 flex-col justify-center items-center gap-[2px]">
                                     <span className="text-[13px]">{d.pioneer_name}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center text-[13px]">
+                                <div className="hidden md:flex h-14 justify-center items-center text-[13px]">
                                     Phase {d.phase_no} ({d.percent_release}%)
                                 </div>
-                                <div className="h-14 flex justify-center items-center font-semibold text-primary text-[14px]">
+                                <div className="h-14 flex justify-center items-center font-semibold text-primary text-[12px] md:text-[14px]">
                                     ฿{d.amount.toLocaleString('th-TH')}
                                 </div>
-                                <div className="h-14 flex justify-center items-center">
+                                <div className="hidden md:flex h-14 justify-center items-center">
                                     <StatusBadge label={status.label} className={status.className} icon={status.icon} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
-                                    {isPending ? (
-                                        <button
-                                            onClick={() => setSelected(d)}
-                                            className="flex items-center gap-[5px] px-[12px] py-[6px] rounded-[8px] bg-green-600 hover:bg-green-700 text-white text-[12px] font-medium cursor-pointer"
-                                        >
-                                            <CheckCircle size={13} /> ยืนยัน
-                                        </button>
-                                    ) : (
-                                        <span className="text-[12px] text-muted-foreground">{fmtDate(d.confirmed_at)}</span>
-                                    )}
+                                    <button
+                                        onClick={() => setSelected(d)}
+                                        className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors ${
+                                            isPending
+                                                ? 'bg-muted hover:bg-muted/70 text-foreground md:bg-green-600 md:hover:bg-green-700 md:text-white'
+                                                : 'bg-muted hover:bg-muted/70 text-foreground'
+                                        }`}
+                                    >
+                                        <span className="md:hidden">ดูรายละเอียด</span>
+                                        <span className="hidden md:flex items-center gap-1">
+                                            {isPending && <CheckCircle size={13} />}
+                                            {isPending ? 'ยืนยัน' : 'ดูรายละเอียด'}
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         )

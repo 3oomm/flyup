@@ -44,12 +44,12 @@ const AdminMilestoneApproval = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
                 {/* Header */}
-                <div className="grid grid-cols-7 bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_76px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(140px,1fr)_120px_160px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
                     <div className="text-center">ลำดับ</div>
-                    <div className="col-span-2">โปรเจกต์</div>
-                    <div className="text-center">Pioneer</div>
+                    <div>โปรเจกต์</div>
+                    <div className="hidden md:block text-center">Pioneer</div>
                     <div className="text-center">Phase</div>
-                    <div className="text-center">สถานะ</div>
+                    <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -82,31 +82,32 @@ const AdminMilestoneApproval = () => {
                         return (
                             <div
                                 key={m.id}
-                                className="grid grid-cols-7 border-b border-border last:border-0 hover:bg-gray-50 transition-colors"
+                                className="grid grid-cols-[44px_minmax(0,1fr)_76px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(140px,1fr)_120px_160px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4"
                             >
                                 <div className="h-14 flex justify-center items-center text-muted-foreground text-[13px]">
                                     {idx + 1}
                                 </div>
-                                <div className="col-span-2 h-14 flex items-center px-2 font-medium truncate">
-                                    {m.project_title}
+                                <div className="h-14 min-w-0 flex items-center pr-2 md:pr-3 font-medium">
+                                    <span className="block min-w-0 truncate">{m.project_title}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center text-[13px]">
+                                <div className="hidden md:flex h-14 justify-center items-center text-[13px]">
                                     {fullname}
                                 </div>
                                 <div className="h-14 flex flex-col justify-center items-center gap-[2px]">
-                                    <span className="text-[13px] font-medium">Phase {m.phase_no}</span>
-                                    <span className="text-[11px] text-muted-foreground truncate max-w-[90px]">{m.title}</span>
+                                    <span className="text-[11px] md:text-[13px] font-medium whitespace-nowrap">Phase {m.phase_no}</span>
+                                    <span className="hidden md:block text-[11px] text-muted-foreground truncate max-w-[90px]">{m.title}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center">
+                                <div className="hidden md:flex h-14 justify-center items-center">
                                     <StatusBadge label={badge.label} className={badge.className} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center gap-[6px]">
-                                    <span className="text-[11px] text-muted-foreground">{dateStr}</span>
+                                    <span className="hidden md:inline text-[11px] text-muted-foreground">{dateStr}</span>
                                     <Link
                                         to={`/admin/milestones/${m.id}`}
-                                        className="px-3 py-1.5 rounded-[6px] bg-primary hover:bg-primary-hover transition-colors text-white text-[12px] font-medium"
+                                        className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground transition-colors text-[11px] font-medium whitespace-nowrap md:px-3 md:rounded-[6px] md:bg-primary md:hover:bg-primary-hover md:text-white md:text-[12px]"
                                     >
-                                        ตรวจสอบ
+                                        <span className="md:hidden">ดูรายละเอียด</span>
+                                        <span className="hidden md:inline">ตรวจสอบ</span>
                                     </Link>
                                 </div>
                             </div>
