@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-    Loader2, TrendingUp, CheckCircle, Clock, X, Plus,
+    Loader2, TrendingUp, CheckCircle, Clock, X,
     ChevronLeft, Users, Banknote, Building2,
 } from 'lucide-react'
 import { useAdminProfitPoolStore, type ProfitPoolDetail, type InvestorPayoutDetail } from '../../store/useAdminProfitPoolStore'
@@ -27,109 +27,6 @@ const STATUS_PAYOUT = {
     confirmed: { label: 'โอนแล้ว', className: 'bg-green-50 text-green-600 border border-green-200', icon: <CheckCircle size={12} /> },
 } as const
 
-// ── Create Pool Modal ─────────────────────────────────────────────────────────
-
-function CreatePoolModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-    const { createPool, isCreating } = useAdminProfitPoolStore()
-    const [projectId, setProjectId] = useState('')
-    const [quarterNo, setQuarterNo] = useState<number>(0)
-    const [totalAmount, setTotalAmount] = useState('')
-    const [transferRef, setTransferRef] = useState('')
-    const [adminNote, setAdminNote] = useState('')
-
-    const handleSubmit = async () => {
-        const ok = await createPool(Number(projectId), Number(totalAmount), transferRef, adminNote, quarterNo)
-        if (ok) { onCreated(); onClose() }
-    }
-
-    const valid = projectId && Number(totalAmount) > 0 && transferRef.trim()
-
-    return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl w-full max-w-[480px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-start justify-between mb-5">
-                    <div>
-                        <h2 className="text-lg font-bold text-foreground">บันทึกกำไรที่รับจาก Pioneer</h2>
-                        <p className="text-xs text-muted-foreground mt-1">ระบบจะคำนวณสัดส่วนให้นักลงทุนอัตโนมัติ</p>
-                    </div>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer"><X size={18} /></button>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">รหัสโปรเจกต์ <span className="text-red-500">*</span></label>
-                        <input
-                            type="number"
-                            value={projectId}
-                            onChange={(e) => setProjectId(e.target.value)}
-                            placeholder="Project ID"
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">ไตรมาส</label>
-                        <div className="flex gap-2">
-                            {[0, 1, 2, 3, 4].map(q => (
-                                <button
-                                    key={q}
-                                    onClick={() => setQuarterNo(q)}
-                                    className={`flex-1 py-1.5 rounded-lg border text-[12px] font-semibold transition-colors cursor-pointer ${
-                                        quarterNo === q
-                                            ? 'bg-primary text-white border-primary'
-                                            : 'border-border text-muted-foreground hover:border-primary hover:text-primary'
-                                    }`}
-                                >
-                                    {q === 0 ? '-' : `Q${q}`}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">ยอดที่รับจาก Pioneer (บาท) <span className="text-red-500">*</span></label>
-                        <input
-                            type="number"
-                            value={totalAmount}
-                            onChange={(e) => setTotalAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">เลขอ้างอิงการโอนจาก Pioneer <span className="text-red-500">*</span></label>
-                        <input
-                            value={transferRef}
-                            onChange={(e) => setTransferRef(e.target.value)}
-                            placeholder="เช่น TXN-20260430-001"
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">หมายเหตุ</label>
-                        <textarea
-                            value={adminNote}
-                            onChange={(e) => setAdminNote(e.target.value)}
-                            rows={2}
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
-                        />
-                    </div>
-                </div>
-
-                <div className="flex gap-2 mt-5 justify-end">
-                    <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50 cursor-pointer">ยกเลิก</button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={!valid || isCreating}
-                        className="px-4 py-2 text-[13px] rounded-lg bg-primary hover:bg-primary/90 text-white disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-                    >
-                        {isCreating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                        สร้างรายการ
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
 // ── Confirm Payout Modal ──────────────────────────────────────────────────────
 
 function ConfirmPayoutModal({
@@ -151,7 +48,7 @@ function ConfirmPayoutModal({
     }
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
+        <div className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white rounded-2xl w-full max-w-[480px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-start justify-between mb-4">
                     <div>
@@ -238,7 +135,15 @@ function ConfirmPayoutModal({
 
 // ── Pool Detail View ──────────────────────────────────────────────────────────
 
-function PoolDetailView({ pool, onBack }: { pool: ProfitPoolDetail; onBack: () => void }) {
+function PoolDetailView({
+    pool,
+    onBack,
+    showBack = true,
+}: {
+    pool: ProfitPoolDetail
+    onBack: () => void
+    showBack?: boolean
+}) {
     const [selectedPayout, setSelectedPayout] = useState<InvestorPayoutDetail | null>(null)
     const { detail } = useAdminProfitPoolStore()
     const current = detail ?? pool
@@ -249,9 +154,11 @@ function PoolDetailView({ pool, onBack }: { pool: ProfitPoolDetail; onBack: () =
 
     return (
         <div className="flex flex-col gap-5">
-            <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground w-fit cursor-pointer">
-                <ChevronLeft size={15} /> กลับ
-            </button>
+            {showBack && (
+                <button onClick={onBack} className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground w-fit cursor-pointer">
+                    <ChevronLeft size={15} /> กลับ
+                </button>
+            )}
 
             {/* pool summary */}
             <div className="bg-white border border-border rounded-2xl p-5 flex flex-col gap-3">
@@ -271,7 +178,7 @@ function PoolDetailView({ pool, onBack }: { pool: ProfitPoolDetail; onBack: () =
                         icon={STATUS_POOL[current.status]?.icon}
                     />
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
                         <p className="text-xs text-muted-foreground mb-0.5">ยอดรวมจาก Pioneer</p>
                         <p className="font-bold text-[15px] text-foreground">{fmtBaht(current.total_amount)}</p>
@@ -295,12 +202,13 @@ function PoolDetailView({ pool, onBack }: { pool: ProfitPoolDetail; onBack: () =
 
             {/* investor table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[2fr_1fr_90px_1fr_100px_80px] bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-[#f8f9fc] px-2 md:px-4 py-3 text-[11px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                    <div className="text-center">ลำดับ</div>
                     <div>นักลงทุน</div>
-                    <div className="text-center">ทุนที่ลงทุน</div>
-                    <div className="text-center">สัดส่วน</div>
+                    <div className="hidden md:block text-center">ทุนที่ลงทุน</div>
+                    <div className="hidden md:block text-center">สัดส่วน</div>
                     <div className="text-center">กำไรที่ได้รับ</div>
-                    <div className="text-center">สถานะ</div>
+                    <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -310,26 +218,27 @@ function PoolDetailView({ pool, onBack }: { pool: ProfitPoolDetail; onBack: () =
                         <p className="text-sm">ไม่มีนักลงทุน</p>
                     </div>
                 ) : (
-                    current.payouts.map((p) => {
+                    current.payouts.map((p, index) => {
                         const payStatus = STATUS_PAYOUT[p.status] ?? STATUS_PAYOUT['pending']
                         return (
-                            <div key={p.id} className="grid grid-cols-[2fr_1fr_90px_1fr_100px_80px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                <div className="h-14 flex flex-col justify-center px-4">
-                                    <span className="font-medium truncate">{p.first_name} {p.last_name}</span>
-                                    <span className="text-[11px] text-muted-foreground truncate">{p.email}</span>
+                            <div key={p.id} className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] px-2 md:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                                <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:px-4">
+                                    <span className="block min-w-0 font-medium truncate">{p.first_name} {p.last_name}</span>
+                                    <span className="block min-w-0 text-[10px] md:text-[11px] text-muted-foreground truncate">{p.email}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center text-foreground">
+                                <div className="hidden md:flex h-14 justify-center items-center text-foreground">
                                     {fmtBaht(p.principal_amount)}
                                 </div>
-                                <div className="h-14 flex justify-center items-center">
+                                <div className="hidden md:flex h-14 justify-center items-center">
                                     <span className="bg-primary/10 text-primary text-[12px] font-semibold px-2 py-0.5 rounded-full">
                                         {p.share_pct.toFixed(2)}%
                                     </span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center font-bold text-primary">
+                                <div className="h-14 flex justify-center items-center font-bold text-primary text-[11px] md:text-[13px]">
                                     {fmtBaht(p.amount)}
                                 </div>
-                                <div className="h-14 flex justify-center items-center">
+                                <div className="hidden md:flex h-14 justify-center items-center">
                                     <StatusBadge label={payStatus.label} className={payStatus.className} icon={payStatus.icon} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
@@ -375,7 +284,6 @@ const AdminProfitDistribution = () => {
     const { pools, isLoading, fetchPools, fetchDetail, detail } = useAdminProfitPoolStore()
     const [search, setSearch] = useState('')
     const [filterTab, setFilterTab] = useState<FilterTab>('all')
-    const [showCreate, setShowCreate] = useState(false)
     const [selectedPoolId, setSelectedPoolId] = useState<number | null>(null)
 
     useEffect(() => { fetchPools() }, [fetchPools])
@@ -390,15 +298,6 @@ const AdminProfitDistribution = () => {
         fetchPools() // refresh list เมื่อกลับจาก detail
     }
 
-    if (selectedPoolId !== null && detail) {
-        return (
-            <div className="flex flex-col gap-4">
-                <PageHeader title="โอนกำไรคืนนักลงทุน" subtitle="ยืนยันการโอนกำไรให้นักลงทุนแต่ละคน" />
-                <PoolDetailView pool={detail} onBack={handleBack} />
-            </div>
-        )
-    }
-
     const filtered = pools.filter((p) => {
         const q = search.toLowerCase()
         const matchSearch = p.project_title.toLowerCase().includes(q) || p.pioneer_name.toLowerCase().includes(q)
@@ -408,15 +307,7 @@ const AdminProfitDistribution = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="flex items-start justify-between">
-                <PageHeader title="โอนกำไรคืนนักลงทุน" subtitle="บริหารการแจกจ่ายกำไรจากโปรเจกต์ที่เสร็จสิ้นแล้วให้นักลงทุน" />
-                <button
-                    onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[13px] font-medium hover:bg-primary/90 shrink-0"
-                >
-                    <Plus size={15} /> บันทึกกำไรใหม่
-                </button>
-            </div>
+            <PageHeader title="โอนกำไรคืนนักลงทุน" subtitle="บริหารการแจกจ่ายกำไรจากโปรเจกต์ที่เสร็จสิ้นแล้วให้นักลงทุน" />
 
             <div className="flex items-center justify-between gap-2 sm:gap-3">
                 <SearchBar value={search} onChange={setSearch} placeholder="ค้นหาโปรเจกต์หรือ Pioneer..." resultCount={filtered.length} />
@@ -431,14 +322,15 @@ const AdminProfitDistribution = () => {
                 />
             </div>
 
-            <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[2fr_1fr_80px_1fr_1fr_100px_80px] bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
+            <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-[#f8f9fc] px-2 md:px-4 py-3 text-[12px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                    <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
-                    <div className="text-center">Pioneer</div>
-                    <div className="text-center">ไตรมาส</div>
+                    <div className="hidden md:block text-center">Pioneer</div>
+                    <div className="hidden md:block text-center">ไตรมาส</div>
                     <div className="text-center">ยอดรวม</div>
-                    <div className="text-center">นักลงทุน</div>
-                    <div className="text-center">สถานะ</div>
+                    <div className="hidden md:block text-center">นักลงทุน</div>
+                    <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -452,40 +344,43 @@ const AdminProfitDistribution = () => {
                         <p className="text-sm">{search ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการ'}</p>
                     </div>
                 ) : (
-                    filtered.map((pool) => {
+                    filtered.map((pool, index) => {
                         const st = STATUS_POOL[pool.status] ?? STATUS_POOL['pending']
                         return (
-                            <div key={pool.id} className="grid grid-cols-[2fr_1fr_80px_1fr_1fr_100px_80px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                <div className="h-14 flex flex-col justify-center px-4">
-                                    <span className="font-medium text-[13px] truncate">{pool.project_title}</span>
-                                    <span className="text-[11px] text-muted-foreground">{fmtDate(pool.created_at)}</span>
+                            <div key={pool.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] px-2 md:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                                <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:px-4">
+                                    <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{pool.project_title}</span>
+                                    <span className="hidden md:block text-[11px] text-muted-foreground">{fmtDate(pool.created_at)}</span>
                                 </div>
-                                <div className="h-14 flex items-center justify-center">
+                                <div className="hidden md:flex h-14 items-center justify-center">
                                     <span className="text-[13px]">{pool.pioneer_name}</span>
                                 </div>
-                                <div className="h-14 flex items-center justify-center">
+                                <div className="hidden md:flex h-14 items-center justify-center">
                                     {pool.quarter_no > 0 ? (
                                         <span className="text-[11px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">Q{pool.quarter_no}</span>
                                     ) : (
                                         <span className="text-[11px] text-muted-foreground">—</span>
                                     )}
                                 </div>
-                                <div className="h-14 flex items-center justify-center font-semibold text-primary">
+                                <div className="h-14 flex items-center justify-center font-semibold text-primary text-[12px] md:text-[13px]">
                                     {fmtBaht(pool.total_amount)}
                                 </div>
-                                <div className="h-14 flex items-center justify-center gap-1 text-[13px]">
+                                <div className="hidden md:flex h-14 items-center justify-center gap-1 text-[13px]">
                                     <Building2 size={13} className="text-muted-foreground" />
                                     {pool.confirmed_count}/{pool.investor_count} คน
                                 </div>
-                                <div className="h-14 flex items-center justify-center">
+                                <div className="hidden md:flex h-14 items-center justify-center">
                                     <StatusBadge label={st.label} className={st.className} icon={st.icon} />
                                 </div>
                                 <div className="h-14 flex items-center justify-center">
                                     <button
                                         onClick={() => handleOpenDetail(pool.id)}
-                                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[12px] font-medium cursor-pointer"
+                                        className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground md:bg-primary/10 md:hover:bg-primary/20 md:text-primary text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap"
                                     >
-                                        <TrendingUp size={12} /> ดู
+                                        <TrendingUp size={12} className="hidden md:block" />
+                                        <span className="md:hidden">ดูรายละเอียด</span>
+                                        <span className="hidden md:inline">ดู</span>
                                     </button>
                                 </div>
                             </div>
@@ -494,12 +389,33 @@ const AdminProfitDistribution = () => {
                 )}
             </div>
 
-            {showCreate && (
-                <CreatePoolModal
-                    onClose={() => setShowCreate(false)}
-                    onCreated={() => fetchPools()}
-                />
+            {selectedPoolId !== null && detail && (
+                <div
+                    className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-40 flex items-center justify-center bg-black/40 p-3 sm:p-4"
+                    onClick={handleBack}
+                >
+                    <div
+                        className="w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-2xl bg-background p-4 sm:p-6 shadow-xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="mb-4 flex items-start justify-between gap-3">
+                            <div>
+                                <h2 className="text-lg font-bold text-foreground">รายละเอียดการโอนกำไร</h2>
+                                <p className="mt-1 text-[12px] text-muted-foreground">ตรวจสอบและยืนยันการโอนกำไรให้นักลงทุน</p>
+                            </div>
+                            <button
+                                onClick={handleBack}
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="ปิด"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <PoolDetailView pool={detail} onBack={handleBack} showBack={false} />
+                    </div>
+                </div>
             )}
+
         </div>
     )
 }

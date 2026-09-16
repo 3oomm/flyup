@@ -45,12 +45,12 @@ const ProjectApproval = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
                 {/* Header */}
-                <div className="grid grid-cols-[40px_1fr_1fr_1fr] md:grid-cols-[48px_2fr_1fr_1fr_1fr_1fr_1fr] bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="hidden md:block text-center">Pioneer</div>
-                    <div className="hidden md:block text-center">เป้าหมาย</div>
-                    <div className="text-center">วันที่ส่ง</div>
+                    <div className="text-center">เป้าหมาย</div>
+                    <div className="hidden md:block text-center">วันที่ส่ง</div>
                     <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
@@ -77,7 +77,7 @@ const ProjectApproval = () => {
                               })
                             : '-'
                         return (
-                            <div key={p.id} className="grid grid-cols-[40px_1fr_1fr_1fr] md:grid-cols-[48px_2fr_1fr_1fr_1fr_1fr_1fr] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-4">
+                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4">
                                 <div className="h-14 flex justify-center items-center text-muted-foreground text-[13px]">
                                     {idx + 1}
                                 </div>
@@ -87,10 +87,10 @@ const ProjectApproval = () => {
                                 <div className="hidden md:flex h-14 justify-center items-center text-[13px] min-w-0 px-1">
                                     <span className="truncate text-center">{fullname}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center text-[13px]">
+                                <div className="flex h-14 justify-center items-center text-[12px] md:text-[13px]">
                                     ฿{p.funding_goal.toLocaleString()}
                                 </div>
-                                <div className="h-14 flex justify-center items-center text-[13px]">{dateStr}</div>
+                                <div className="hidden md:flex h-14 justify-center items-center text-[13px]">{dateStr}</div>
                                 <div className="hidden md:flex h-14 justify-center items-center">
                                     <span className="rounded-full px-2.5 py-0.5 bg-amber-50 text-amber-600 border border-amber-200 text-[12px] font-medium whitespace-nowrap">
                                         <span className="md:hidden">รอ</span>
@@ -100,9 +100,9 @@ const ProjectApproval = () => {
                                 <div className="h-14 flex justify-center items-center">
                                     <Link
                                         to={`/admin/projects/${p.id}`}
-                                        className="px-3 py-1.5 rounded-md bg-primary hover:bg-primary-hover transition-colors text-white text-[12px] font-medium whitespace-nowrap"
+                                        className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground transition-colors text-[11px] font-medium whitespace-nowrap md:px-3 md:rounded-md md:bg-primary md:hover:bg-primary-hover md:text-white md:text-[12px]"
                                     >
-                                        <span className="md:hidden">ดู</span>
+                                        <span className="md:hidden">ดูรายละเอียด</span>
                                         <span className="hidden md:inline">รายละเอียด</span>
                                     </Link>
                                 </div>

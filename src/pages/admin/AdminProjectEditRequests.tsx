@@ -207,10 +207,11 @@ const AdminProjectEditRequests = () => {
             />
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[2fr_1fr_1fr_100px] bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_90px_96px] md:grid-cols-[60px_2fr_1fr_1fr_120px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                    <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="text-center">เจ้าของโปรเจกต์</div>
-                    <div className="text-center">แก้ไขเมื่อ</div>
+                    <div className="hidden md:block text-center">แก้ไขเมื่อ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -226,27 +227,28 @@ const AdminProjectEditRequests = () => {
                         </p>
                     </div>
                 ) : (
-                    filtered.map((r) => (
+                    filtered.map((r, index) => (
                         <div
                             key={r.id}
                             onClick={() => setSelected(r)}
-                            className="grid grid-cols-[2fr_1fr_1fr_100px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors cursor-pointer"
+                            className="grid grid-cols-[44px_minmax(0,1fr)_90px_96px] md:grid-cols-[60px_2fr_1fr_1fr_120px] px-2 md:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors cursor-pointer"
                         >
-                            <div className="h-14 flex flex-col justify-center px-2">
-                                <span className="font-medium text-[13px] truncate">{r.title}</span>
+                            <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
+                            <div className="h-14 min-w-0 flex flex-col justify-center px-1 md:px-2">
+                                <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{r.title}</span>
                             </div>
-                            <div className="h-14 flex justify-center items-center">
-                                <span className="text-[13px] text-muted-foreground">
+                            <div className="h-14 min-w-0 flex justify-center items-center px-1">
+                                <span className="block max-w-full truncate text-center text-[11px] md:text-[13px] text-muted-foreground">
                                     {r.owner ? `${r.owner.first_name} ${r.owner.last_name}`.trim() : `#${r.owner_user_id}`}
                                 </span>
                             </div>
-                            <div className="h-14 flex justify-center items-center">
+                            <div className="hidden md:flex h-14 justify-center items-center">
                                 <span className="text-[13px] text-muted-foreground">{fmtDate(r.UpdatedAt)}</span>
                             </div>
                             <div className="h-14 flex justify-center items-center">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setSelected(r) }}
-                                    className="px-3 py-1.5 rounded-lg bg-[#F1F3F5] hover:bg-[#E9ECEF] text-[12px] font-medium text-foreground cursor-pointer"
+                                    className="px-2.5 md:px-3 py-1.5 rounded-lg bg-[#F1F3F5] hover:bg-[#E9ECEF] text-[11px] md:text-[12px] font-medium text-foreground cursor-pointer whitespace-nowrap"
                                 >
                                     ดูรายละเอียด
                                 </button>

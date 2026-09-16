@@ -77,6 +77,7 @@ const AdminUserManagement = () => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [suspendTarget, setSuspendTarget] = useState<number | null>(null)
+    const [detailUser, setDetailUser] = useState<UserRow | null>(null)
     const [isSuspending, setIsSuspending] = useState(false)
     const [rollingBackId, setRollingBackId] = useState<number | null>(null)
 
@@ -192,12 +193,12 @@ const AdminUserManagement = () => {
 
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-[#f8f9fc] px-4 py-3 font-medium text-gray-500 border-b border-border text-[13px]">
-                    <div className="text-center">ID</div>
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                    <div className="text-center">ลำดับ</div>
                     <div>ชื่อ</div>
-                    <div>อีเมล</div>
+                    <div className="hidden md:block">อีเมล</div>
                     <div className="text-center">Role</div>
-                    <div className="text-center">สถานะ</div>
+                    <div className="hidden md:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -210,54 +211,62 @@ const AdminUserManagement = () => {
                         ไม่พบผู้ใช้
                     </div>
                 ) : (
-                    users.map((u) => (
+                    users.map((u, index) => (
                         <div
                             key={u.id}
-                            className="grid grid-cols-[60px_1fr_1fr_90px_90px_120px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-4"
+                            className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4"
                         >
                             <div className="h-12 flex items-center justify-center text-[12px] text-muted-foreground">
-                                {u.id}
+                                {(page - 1) * pageSize + index + 1}
                             </div>
-                            <div className="h-12 flex items-center text-[13px] font-medium truncate pr-2">
-                                {u.first_name} {u.last_name}
+                            <div className="h-12 min-w-0 flex items-center pr-2 text-[12px] md:text-[13px] font-medium">
+                                <span className="block min-w-0 truncate">{u.first_name} {u.last_name}</span>
                             </div>
-                            <div className="h-12 flex items-center text-[13px] text-muted-foreground truncate pr-2">
+                            <div className="hidden md:flex h-12 items-center text-[13px] text-muted-foreground truncate pr-2">
                                 {u.email}
                             </div>
                             <div className="h-12 flex items-center justify-center">
-                                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[u.role]?.cls ?? 'bg-gray-100 text-gray-600'}`}>
+                                <span className={`max-w-full truncate text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[u.role]?.cls ?? 'bg-gray-100 text-gray-600'}`}>
                                     {ROLE_BADGE[u.role]?.label ?? u.role}
                                 </span>
                             </div>
-                            <div className="h-12 flex items-center justify-center">
+                            <div className="hidden md:flex h-12 items-center justify-center">
                                 <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${STATUS_BADGE[u.status] ?? ''}`}>
                                     {u.status === 'active' ? 'Active' : 'Suspended'}
                                 </span>
                             </div>
                             <div className="h-12 flex items-center justify-center gap-1.5">
-                                {u.status === 'active' ? (
-                                    <button
-                                        data-testid={`user-suspend-open-btn-${u.id}`}
-                                        onClick={() => setSuspendTarget(u.id)}
-                                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                                        title="ระงับบัญชี"
-                                    >
-                                        <UserX size={15} />
-                                    </button>
-                                ) : (
-                                    <button
-                                        data-testid={`user-rollback-btn-${u.id}`}
-                                        onClick={() => handleRollback(u.id)}
-                                        disabled={rollingBackId === u.id}
-                                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer disabled:opacity-50"
-                                        title="คืนสถานะ"
-                                    >
-                                        {rollingBackId === u.id
-                                            ? <Loader2 size={15} className="animate-spin" />
-                                            : <RotateCcw size={15} />
-                                        }
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => setDetailUser(u)}
+                                    className="md:hidden px-2 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[10px] font-medium whitespace-nowrap"
+                                >
+                                    ดูรายละเอียด
+                                </button>
+                                <div className="hidden md:block">
+                                    {u.status === 'active' ? (
+                                        <button
+                                            data-testid={`user-suspend-open-btn-${u.id}`}
+                                            onClick={() => setSuspendTarget(u.id)}
+                                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="ระงับบัญชี"
+                                        >
+                                            <UserX size={15} />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            data-testid={`user-rollback-btn-${u.id}`}
+                                            onClick={() => handleRollback(u.id)}
+                                            disabled={rollingBackId === u.id}
+                                            className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer disabled:opacity-50"
+                                            title="คืนสถานะ"
+                                        >
+                                            {rollingBackId === u.id
+                                                ? <Loader2 size={15} className="animate-spin" />
+                                                : <RotateCcw size={15} />
+                                            }
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))
@@ -286,6 +295,77 @@ const AdminUserManagement = () => {
                     >
                         <ChevronRight size={16} />
                     </button>
+                </div>
+            )}
+
+            {detailUser && (
+                <div
+                    className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-40 flex items-center justify-center bg-black/40 p-4"
+                    onClick={() => setDetailUser(null)}
+                >
+                    <div
+                        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="mb-5 flex items-start justify-between gap-3">
+                            <div>
+                                <h2 className="text-lg font-bold">รายละเอียดผู้ใช้</h2>
+                                <p className="mt-1 text-[12px] text-muted-foreground">บัญชีผู้ใช้ #{detailUser.id}</p>
+                            </div>
+                            <button
+                                onClick={() => setDetailUser(null)}
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="ปิด"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="mb-5 divide-y divide-border rounded-xl border border-border text-[13px]">
+                            <div className="grid grid-cols-[80px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">ชื่อ</span>
+                                <span className="font-medium">{detailUser.first_name} {detailUser.last_name}</span>
+                            </div>
+                            <div className="grid grid-cols-[80px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">อีเมล</span>
+                                <span className="break-all font-medium">{detailUser.email}</span>
+                            </div>
+                            <div className="grid grid-cols-[80px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">Role</span>
+                                <span className="font-medium">{ROLE_BADGE[detailUser.role]?.label ?? detailUser.role}</span>
+                            </div>
+                            <div className="grid grid-cols-[80px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">สถานะ</span>
+                                <span className="font-medium">{detailUser.status === 'active' ? 'Active' : 'Suspended'}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                            {detailUser.status === 'active' ? (
+                                <button
+                                    onClick={() => {
+                                        setDetailUser(null)
+                                        setSuspendTarget(detailUser.id)
+                                    }}
+                                    className="flex items-center gap-1.5 rounded-lg bg-red-50 px-4 py-2 text-[13px] font-medium text-red-600 border border-red-200 hover:bg-red-100"
+                                >
+                                    <UserX size={14} /> ระงับบัญชี
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        const userId = detailUser.id
+                                        setDetailUser(null)
+                                        handleRollback(userId)
+                                    }}
+                                    disabled={rollingBackId === detailUser.id}
+                                    className="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-4 py-2 text-[13px] font-medium text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50"
+                                >
+                                    <RotateCcw size={14} /> คืนสถานะ
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
 

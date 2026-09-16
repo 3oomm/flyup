@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Loader2, Plus, Edit, Trash2, Globe, GraduationCap, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { Loader2, Plus, Edit, Trash2, Globe, GraduationCap, Search, ChevronLeft, ChevronRight, X } from "lucide-react"
 import { AxiosError } from "axios"
 import toast from "react-hot-toast"
 import { useAdminStore } from "../../store/useAdminStore"
@@ -22,6 +22,7 @@ const AdminUniversities = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     
     const [selectedUni, setSelectedUni] = useState<University | null>(null)
+    const [detailUni, setDetailUni] = useState<University | null>(null)
     const [formData, setFormData] = useState<CreateUniversityRequest>({ name_th: "", name_en: "", province: "" })
     const [actionLoading, setActionLoading] = useState(false)
     
@@ -147,15 +148,15 @@ const AdminUniversities = () => {
                 ) : (
                     <>
                         <div className="w-full overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full table-fixed md:table-auto text-left border-collapse">
                                 <thead>
                                     <tr className="bg-[#f8f9fc] text-[13px] font-medium text-gray-500 border-b border-border">
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap w-[60px] text-center">ลำดับ</th>
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (TH)</th>
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (EN)</th>
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap min-w-[120px]">จังหวัด</th>
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap text-center w-[80px]">โดเมน</th>
-                                        <th className="px-[16px] py-[12px] font-medium whitespace-nowrap text-center w-[150px]">จัดการ</th>
+                                        <th className="w-[44px] md:w-[60px] px-2 md:px-4 py-3 font-medium whitespace-nowrap text-center">ลำดับ</th>
+                                        <th className="px-2 md:px-4 py-3 font-medium whitespace-nowrap md:min-w-[200px]">ชื่อมหาวิทยาลัย (TH)</th>
+                                        <th className="hidden md:table-cell px-4 py-3 font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (EN)</th>
+                                        <th className="w-[80px] md:w-auto px-2 md:px-4 py-3 font-medium whitespace-nowrap md:min-w-[120px]">จังหวัด</th>
+                                        <th className="hidden md:table-cell px-4 py-3 font-medium whitespace-nowrap text-center w-[80px]">โดเมน</th>
+                                        <th className="w-[100px] md:w-[150px] px-2 md:px-4 py-3 font-medium whitespace-nowrap text-center">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -171,25 +172,31 @@ const AdminUniversities = () => {
                                     ) : (
                                         paginatedUniversities.map((uni, index) => (
                                         <tr key={uni.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                            <td className="px-[16px] py-[14px] text-center">
+                                            <td className="px-2 md:px-4 py-3.5 text-center text-[12px]">
                                                 <span className="text-muted-foreground">{((currentPage - 1) * itemsPerPage) + index + 1}</span>
                                             </td>
-                                            <td className="px-[16px] py-[14px]">
-                                                <div className="text-[13px] font-medium truncate max-w-[250px]">{uni.name_th ?? '-'}</div>
+                                            <td className="min-w-0 px-2 md:px-4 py-3.5">
+                                                <div className="block max-w-full md:max-w-[250px] truncate text-[12px] md:text-[13px] font-medium">{uni.name_th ?? '-'}</div>
                                             </td>
-                                            <td className="px-[16px] py-[14px]">
+                                            <td className="hidden md:table-cell px-4 py-3.5">
                                                 <div className="text-[13px] text-gray-600 truncate max-w-[250px]">{uni.name_en ?? '-'}</div>
                                             </td>
-                                            <td className="px-[16px] py-[14px]">
-                                                <div className="text-[13px] text-gray-600">{uni.province ?? '-'}</div>
+                                            <td className="min-w-0 px-2 md:px-4 py-3.5">
+                                                <div className="block max-w-full truncate text-[11px] md:text-[13px] text-gray-600">{uni.province ?? '-'}</div>
                                             </td>
-                                            <td className="px-[16px] py-[14px] text-center">
+                                            <td className="hidden md:table-cell px-4 py-3.5 text-center">
                                                 <span className="text-[12px] px-[8px] py-[2px] rounded-full border bg-blue-50 text-blue-600 border-blue-200 font-medium inline-block">
                                                     {uni.domains?.length || 0}
                                                 </span>
                                             </td>
-                                            <td className="px-[16px] py-[14px]">
-                                                <div className="flex justify-center gap-1">
+                                            <td className="px-2 md:px-4 py-3.5">
+                                                <button
+                                                    onClick={() => setDetailUni(uni)}
+                                                    className="md:hidden mx-auto px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                                                >
+                                                    ดูรายละเอียด
+                                                </button>
+                                                <div className="hidden md:flex justify-center gap-1">
                                                     <Link
                                                         to={`/admin/universities/${uni.id}`}
                                                         className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"
@@ -253,6 +260,80 @@ const AdminUniversities = () => {
                     >
                         <ChevronRight size={16} />
                     </button>
+                </div>
+            )}
+
+            {detailUni && (
+                <div
+                    className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-40 flex items-center justify-center bg-black/40 p-4"
+                    onClick={() => setDetailUni(null)}
+                >
+                    <div
+                        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="mb-5 flex items-start justify-between gap-3">
+                            <div>
+                                <h2 className="text-lg font-bold">รายละเอียดมหาวิทยาลัย</h2>
+                                <p className="mt-1 text-[12px] text-muted-foreground">ข้อมูลมหาวิทยาลัยและโดเมนที่อนุญาต</p>
+                            </div>
+                            <button
+                                onClick={() => setDetailUni(null)}
+                                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="ปิด"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <div className="mb-5 divide-y divide-border rounded-xl border border-border text-[13px]">
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">ชื่อ (TH)</span>
+                                <span className="font-medium">{detailUni.name_th ?? '-'}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">ชื่อ (EN)</span>
+                                <span className="font-medium">{detailUni.name_en ?? '-'}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">จังหวัด</span>
+                                <span className="font-medium">{detailUni.province ?? '-'}</span>
+                            </div>
+                            <div className="grid grid-cols-[90px_1fr] gap-3 p-3">
+                                <span className="text-muted-foreground">โดเมน</span>
+                                <span className="font-medium">{detailUni.domains?.length || 0} รายการ</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-end gap-2">
+                            <Link
+                                to={`/admin/universities/${detailUni.id}`}
+                                className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[12px] font-medium text-blue-600 hover:bg-blue-100"
+                            >
+                                <Globe size={14} /> จัดการโดเมน
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    const university = detailUni
+                                    setDetailUni(null)
+                                    openEditModal(university)
+                                }}
+                                className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] font-medium text-amber-600 hover:bg-amber-100"
+                            >
+                                <Edit size={14} /> แก้ไข
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const university = detailUni
+                                    setDetailUni(null)
+                                    openDeleteModal(university)
+                                }}
+                                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] font-medium text-red-600 hover:bg-red-100"
+                            >
+                                <Trash2 size={14} /> ลบ
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

@@ -271,7 +271,8 @@ const AdminComplaints = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 bg-muted/40 font-medium text-[12px] text-muted-foreground border-b border-border">
+                <div className="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 bg-muted/40 font-medium text-[12px] text-muted-foreground border-b border-border">
+                    <div className="text-center">ลำดับ</div>
                     <div>หัวข้อ</div>
                     <div className="hidden sm:block">ผู้ร้องเรียน</div>
                     <div>โปรเจกต์</div>
@@ -290,15 +291,16 @@ const AdminComplaints = () => {
                         <p className="text-sm">{search ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการคำร้องเรียน'}</p>
                     </div>
                 ) : (
-                    filtered.map((c) => {
+                    filtered.map((c, index) => {
                         const status = STATUS_CONFIG[c.status]
                         const fullname = c.complainant ? `${c.complainant.first_name} ${c.complainant.last_name}` : '-'
                         return (
                             <div
                                 key={c.id}
                                 onClick={() => setSelected(c)}
-                                className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 items-center border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                                className="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 items-center border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
                             >
+                                <div className="text-center text-[12px] text-muted-foreground">{index + 1}</div>
                                 <div className="flex flex-col gap-0.5 pr-3">
                                     <span className="font-medium text-[13px] truncate">{c.subject}</span>
                                     <span className="text-[11px] text-muted-foreground">{fmtDate(c.created_at)}</span>
