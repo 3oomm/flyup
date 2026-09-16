@@ -8,7 +8,7 @@ import {
   Rocket, BookOpen, ShieldCheck, Wifi, Gamepad2, Loader2,
   SlidersHorizontal, X, Star, Zap
 } from 'lucide-react';
-import { usePublicProjectStore, type PublicProject } from '../../store/usePublicProjectStore';
+import { usePublicProjectStore } from '../../store/usePublicProjectStore';
 import { getProgress, getDaysLeft, getProjectTimingDisplay } from '../../lib/project';
 
 // ─── Category icon mapping ──────────────────────────────────────────────────
@@ -106,8 +106,6 @@ const Projects = () => {
     }));
     return [allOption, ...apiCategories];
   }, [categories]);
-
-  const daysLeftOf = (p: PublicProject) => getDaysLeft(p, NOW);
 
   const activeFilterCount = [minGoal, maxGoal].filter(v => v !== '').length;
 
