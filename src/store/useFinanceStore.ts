@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import toast from 'react-hot-toast'
 import api from '../services/api'
 
 export interface FinancialSummary {
@@ -47,7 +48,7 @@ export const useFinanceStore = create<FinanceStore>((set) => ({
       const res = await api.get('/admin/financial/summary')
       set({ summary: res.data?.data ?? null })
     } catch {
-      // silent
+      toast.error('โหลดข้อมูลสรุปการเงินไม่สำเร็จ')
     } finally {
       set({ isLoadingSummary: false })
     }
@@ -59,7 +60,7 @@ export const useFinanceStore = create<FinanceStore>((set) => ({
       const res = await api.get('/admin/financial/projects')
       set({ projects: res.data?.data ?? [] })
     } catch {
-      // silent
+      toast.error('โหลดข้อมูลการเงินของโปรเจกต์ไม่สำเร็จ')
     } finally {
       set({ isLoadingProjects: false })
     }

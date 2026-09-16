@@ -9,7 +9,7 @@ import {
   SlidersHorizontal, X, Star, Zap
 } from 'lucide-react';
 import { usePublicProjectStore, type PublicProject } from '../../store/usePublicProjectStore';
-import { getProgress, getDaysLeft } from '../../lib/project';
+import { getProgress, getDaysLeft, getProjectTimingDisplay } from '../../lib/project';
 
 // ─── Category icon mapping ──────────────────────────────────────────────────
 
@@ -355,7 +355,7 @@ const Projects = () => {
                 : (rawCat as { name?: string } | null)?.name ?? null;
               const ProjectCategoryIcon = getCategoryIcon(categoryName);
               const progress = getProgress(project);
-              const daysLeft = daysLeftOf(project);
+              const timing = getProjectTimingDisplay(project, NOW);
               const isHot = progress >= 70;
               const isNew = (NOW - new Date(project.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
@@ -416,8 +416,8 @@ const Projects = () => {
                         <span className="text-sm md:text-base font-bold text-primary">{project.current_funding.toLocaleString()} ฿</span>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-muted-foreground mb-0.5">เหลือเวลา</p>
-                        <span className="text-sm font-medium text-foreground">{daysLeft} วัน</span>
+                        <p className="text-xs text-muted-foreground mb-0.5">{timing.caption}</p>
+                        <span className="text-sm font-medium text-foreground">{timing.label}</span>
                       </div>
                     </div>
                   </div>

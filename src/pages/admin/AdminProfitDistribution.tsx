@@ -418,7 +418,7 @@ const AdminProfitDistribution = () => {
                 </button>
             </div>
 
-            <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center justify-between gap-2 sm:gap-3">
                 <SearchBar value={search} onChange={setSearch} placeholder="ค้นหาโปรเจกต์หรือ Pioneer..." resultCount={filtered.length} />
                 <FilterTabs
                     active={filterTab}

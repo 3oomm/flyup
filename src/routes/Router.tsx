@@ -261,8 +261,36 @@ const Router = () => {
                 </Suspense>
                 <GoogleRoleModal open={showRoleModal} onClose={() => {}} />
                 <Toaster
-                    position='bottom-right'
-                    containerStyle={{ bottom: 24, right: 24 }}
+                    position='top-right'
+                    gutter={10}
+                    containerStyle={{ top: 20, right: 20, zIndex: 100000 }}
+                    toastOptions={{
+                        duration: 4000,
+                        className: 'admin-action-toast',
+                        style: {
+                            maxWidth: 420,
+                            padding: '12px 16px',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: 12,
+                            background: '#ffffff',
+                            color: '#111827',
+                            fontSize: 13,
+                            fontWeight: 500,
+                            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.14)',
+                        },
+                        success: {
+                            duration: 3500,
+                            iconTheme: { primary: '#16a34a', secondary: '#ffffff' },
+                        },
+                        error: {
+                            duration: 5000,
+                            iconTheme: { primary: '#dc2626', secondary: '#ffffff' },
+                        },
+                        loading: {
+                            duration: Infinity,
+                            iconTheme: { primary: '#7c3aed', secondary: '#ffffff' },
+                        },
+                    }}
                 />
             </BrowserRouter>
         </>

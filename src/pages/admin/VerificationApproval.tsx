@@ -75,7 +75,7 @@ const VerificationApproval = () => {
         <div className="flex flex-col gap-[16px]">
             <PageHeader title="ตรวจสอบการยืนยันตัวตน" subtitle="อนุมัติหรือปฏิเสธการยืนยันตัวตนของผู้ใช้งาน (Pioneer และ Booster)" />
 
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <SearchBar
                     value={search}
                     onChange={setSearch}

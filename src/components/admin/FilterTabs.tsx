@@ -1,3 +1,5 @@
+import { ChevronDown } from 'lucide-react'
+
 interface TabItem {
     key: string
     label: string
@@ -11,27 +13,24 @@ interface FilterTabsProps {
 }
 
 const FilterTabs = ({ tabs, active, onChange }: FilterTabsProps) => (
-    <div className="flex items-center gap-2 flex-wrap">
-        {tabs.map(t => (
-            <button
-                key={t.key}
-                onClick={() => onChange(t.key)}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
-                    active === t.key
-                        ? 'bg-primary text-white'
-                        : 'bg-white border border-border text-foreground hover:bg-muted/60'
-                }`}
-            >
-                {t.label}
-                {t.count !== undefined && (
-                    <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none ${
-                        active === t.key ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
-                    }`}>
-                        {t.count}
-                    </span>
-                )}
-            </button>
-        ))}
+    <div className="relative w-[120px] shrink-0 sm:w-auto sm:min-w-[180px]">
+        <select
+            aria-label="เลือกตัวกรอง"
+            value={active}
+            onChange={(event) => onChange(event.target.value)}
+            className="h-10 w-full appearance-none rounded-lg border border-border bg-white pl-4 pr-10 text-[13px] font-medium text-foreground outline-none transition-colors cursor-pointer hover:bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/15"
+        >
+            {tabs.map((tab) => (
+                <option key={tab.key} value={tab.key}>
+                    {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ''}
+                </option>
+            ))}
+        </select>
+        <ChevronDown
+            size={16}
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+        />
     </div>
 )
 

@@ -1,6 +1,14 @@
 import { useState, useRef } from "react";
-import { ShieldCheck, Camera, Phone, Mail } from "lucide-react";
+import { ShieldCheck, Camera, Phone, Mail, MapPin } from "lucide-react";
+import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
+
+const normalizeThaiPhone = (value: string) => {
+  const compact = value.trim().replace(/[^\d+]/g, "").replace(/^\+/, "");
+  return compact.startsWith("66") && compact.length === 11
+    ? `0${compact.slice(2)}`
+    : compact;
+};
 
 const AdminProfileTab = () => {
   const { authUser, uploadAvatar, updateProfile, isUploadingAvatar, isSavingProfile } = useAuthStore();
@@ -8,6 +16,7 @@ const AdminProfileTab = () => {
     first_name: (authUser?.first_name as string) ?? "",
     last_name: (authUser?.last_name as string) ?? "",
     phone: (authUser?.phone as string) ?? "",
+    address: (authUser?.address as string) ?? "",
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -20,6 +29,7 @@ const AdminProfileTab = () => {
       first_name: (authUser.first_name as string) ?? "",
       last_name: (authUser.last_name as string) ?? "",
       phone: (authUser.phone as string) ?? "",
+      address: (authUser.address as string) ?? "",
     });
   }
 
@@ -27,6 +37,11 @@ const AdminProfileTab = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const phone = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm((prev) => ({ ...prev, phone }));
   };
 
   const handlePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,10 +52,29 @@ const AdminProfileTab = () => {
   };
 
   const handleSave = async () => {
+    const firstName = form.first_name.trim();
+    const lastName = form.last_name.trim();
+    const phone = normalizeThaiPhone(form.phone);
+    const address = form.address.trim();
+
+    if (!firstName || !lastName) {
+      toast.error("กรุณากรอกชื่อและนามสกุล");
+      return;
+    }
+    if (!/^0[689]\d{8}$/.test(phone)) {
+      toast.error("กรุณากรอกเบอร์มือถือไทย 10 หลัก เช่น 0812345678");
+      return;
+    }
+    if (!address) {
+      toast.error("กรุณากรอกที่อยู่");
+      return;
+    }
+
     await updateProfile({
-      first_name: form.first_name,
-      last_name: form.last_name,
-      phone: form.phone,
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      address,
     });
   };
 
@@ -131,8 +165,29 @@ const AdminProfileTab = () => {
           <input
             name="phone"
             value={form.phone}
-            onChange={handleChange}
+            onChange={handlePhoneChange}
+            inputMode="tel"
+            autoComplete="tel"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            placeholder="เช่น 0812345678"
             className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors"
+          />
+          <span className="text-[11px] text-muted-foreground">กรอกตัวเลข 10 หลัก ขึ้นต้นด้วย 06, 08 หรือ 09</span>
+        </div>
+
+        <div className="flex flex-col gap-[6px]">
+          <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
+            <MapPin size={14} /> ที่อยู่ <span className="text-error">*</span>
+          </label>
+          <textarea
+            name="address"
+            value={form.address}
+            onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
+            rows={3}
+            autoComplete="street-address"
+            placeholder="เช่น 123 ถนนสุขุมวิท กรุงเทพมหานคร"
+            className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors resize-y"
           />
         </div>
 

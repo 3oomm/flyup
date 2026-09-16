@@ -96,6 +96,22 @@ interface AuthStore {
     changePassword: (oldPassword: string, newPassword: string) => Promise<boolean>;
 }
 
+const profileErrorMessage = (error: unknown) => {
+    if (!(error instanceof AxiosError)) return 'บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่'
+
+    const message = String(error.response?.data?.message ?? error.response?.data?.error ?? '')
+    if (message.includes("ProfileInput.Phone") || message.includes("'thaiphone'")) {
+        return 'เบอร์โทรไม่ถูกต้อง กรุณากรอกเบอร์มือถือไทย 10 หลัก เช่น 0812345678'
+    }
+    if (message.includes("ProfileInput.Address")) {
+        return 'กรุณากรอกที่อยู่'
+    }
+    if (message.includes("ProfileInput.FirstName") || message.includes("ProfileInput.LastName")) {
+        return 'กรุณากรอกชื่อและนามสกุล'
+    }
+    return message || 'บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่'
+}
+
 // เมื่อ refresh token หมดอายุ api.ts จะ dispatch event นี้
 if (typeof window !== 'undefined') {
     window.addEventListener('auth:logout', () => {
@@ -287,8 +303,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             await get().checkAuth()
             toast.success('แก้ไขข้อมูลสำเร็จ')
             return true
-        } catch {
-            toast.error('บันทึกไม่สำเร็จ')
+        } catch (error) {
+            toast.error(profileErrorMessage(error))
             return false
         } finally {
             set({ isSavingProfile: false })

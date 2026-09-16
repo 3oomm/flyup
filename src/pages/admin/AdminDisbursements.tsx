@@ -121,7 +121,7 @@ const AdminDisbursements = () => {
         <div className="flex flex-col gap-[16px]">
             <PageHeader title="การปล่อยเงิน" subtitle="ยืนยันการโอนเงินทุนให้ pioneer ตามแต่ละ milestone" />
 
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <SearchBar value={search} onChange={setSearch} placeholder="ค้นหาโปรเจกต์หรือ Pioneer..." resultCount={filtered.length} />
                 <FilterTabs
                     active={tab}

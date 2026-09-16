@@ -10,6 +10,7 @@ import {
   CheckCircle2, Clock, XCircle, Loader2, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import { useNavigate } from 'react-router'
+import toast from 'react-hot-toast'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useAdminBadgeStore } from '@/store/useAdminBadgeStore'
 import { useFinanceStore, type FinancialSummary, type ProjectFinancial } from '@/store/useFinanceStore'
@@ -127,7 +128,10 @@ const AdminDashboard = () => {
     const to = toDateParam(now)
     fetchAllAdminLogs(from, to)
       .then(logs => setCharts(buildMonthlyCharts(logs)))
-      .catch(() => setCharts(buildMonthlyCharts([])))
+      .catch(() => {
+        setCharts(buildMonthlyCharts([]))
+        toast.error('โหลดข้อมูลกิจกรรมสำหรับกราฟไม่สำเร็จ')
+      })
       .finally(() => setIsLoadingCharts(false))
   }, [])
 

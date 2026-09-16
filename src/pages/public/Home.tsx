@@ -17,7 +17,7 @@ import {
 import { usePublicProjectStore, type PublicProject } from '../../store/usePublicProjectStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import useCreateProjectGuard from '../../hooks/useCreateProjectGuard';
-import { getProgress, getDaysLeft } from '../../lib/project';
+import { getProgress, getDaysLeft, getProjectTimingDisplay } from '../../lib/project';
 
 const PLACEHOLDER_IMG = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800';
 
@@ -25,7 +25,7 @@ const PLACEHOLDER_IMG = 'https://images.unsplash.com/photo-1498050108023-c5249f4
 
 const ProjectCard = ({ project }: { project: PublicProject & { isHot?: boolean; isNew?: boolean } }) => {
   const progress = getProgress(project);
-  const daysLeft = getDaysLeft(project);
+  const timing = getProjectTimingDisplay(project);
   const rawCategory = project.category as unknown;
   const categoryName = typeof rawCategory === 'string' ? rawCategory : (rawCategory as { name?: string } | null)?.name ?? null;
 
@@ -68,7 +68,7 @@ const ProjectCard = ({ project }: { project: PublicProject & { isHot?: boolean; 
 
         <div className="flex justify-between items-center pt-1">
           <span className="text-sm font-bold">{(project.current_funding ?? 0).toLocaleString()} ฿</span>
-          <span className="text-xs text-gray-500">{daysLeft} วัน</span>
+          <span className="text-xs text-gray-500">{timing.label}</span>
         </div>
       </div>
     </Link>
@@ -125,8 +125,10 @@ const Home = () => {
   const newProjectsList = newProjects.map(p => ({ ...p, isNew: true }));
 
   return (
-    <div className="min-h-screen bg-gray-50/50 font-sans text-gray-900 pb-20">
-      <section data-testid="home-hero" className="relative pt-24 pb-32 lg:pt-32 lg:pb-40 overflow-hidden">
+    <div
+      className="h-[100dvh] overflow-y-auto scroll-smooth snap-y snap-proximity md:snap-mandatory bg-gray-50/50 font-sans text-gray-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      <section data-testid="home-hero" data-home-snap-section data-snap-key="hero" className="relative min-h-[100dvh] snap-start flex items-center pt-24 pb-20 lg:pt-28 lg:pb-24 overflow-hidden">
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat z-0"
           style={{
@@ -203,7 +205,7 @@ const Home = () => {
       </section>
 
       {/* ── Recommended Section ── */}
-      <section className="py-16 bg-white">
+      <section data-home-snap-section data-snap-key="recommended" className="min-h-[100dvh] snap-start flex items-center py-16 bg-white">
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           <div className="flex justify-between items-end mb-8">
             <div>
@@ -278,7 +280,7 @@ const Home = () => {
 
       {/* ── Hot Projects ── */}
       {hotProjects.length > 0 && (
-        <section className="py-16">
+        <section data-home-snap-section data-snap-key="hot" className="min-h-[100dvh] snap-start flex items-center py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
             <div className="flex justify-between items-end mb-8">
               <div>
@@ -297,7 +299,7 @@ const Home = () => {
       )}
 
       {/* ── New Projects ── */}
-      <section className="py-16 bg-white">
+      <section data-home-snap-section data-snap-key="new" className="min-h-[100dvh] snap-start flex items-center py-16 bg-white">
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
           <div className="flex justify-between items-end mb-8">
             <h2 className="text-2xl font-bold mb-1">โปรเจกต์มาใหม่</h2>
@@ -317,7 +319,7 @@ const Home = () => {
 
       {/* ── Executing / Completed Projects ── */}
       {executingProjects.length > 0 && (
-        <section className="py-16">
+        <section data-home-snap-section data-snap-key="executing" className="min-h-[100dvh] snap-start flex items-center py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
             <div className="flex justify-between items-end mb-8">
               <div>
@@ -336,7 +338,7 @@ const Home = () => {
       )}
 
       {/* ── Stats ── */}
-      <section className="py-20 bg-card">
+      <section data-home-snap-section data-snap-key="stats" className="min-h-[100dvh] snap-start flex items-center py-20 bg-card">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -361,7 +363,7 @@ const Home = () => {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="py-24 bg-card">
+      <section data-home-snap-section data-snap-key="how-it-works" className="min-h-[100dvh] snap-start flex items-center py-24 bg-card">
         <div className="container mx-auto px-4 md:px-8 max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div className="text-center md:text-left">

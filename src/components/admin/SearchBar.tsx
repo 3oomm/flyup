@@ -8,8 +8,8 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ value, onChange, placeholder = 'ค้นหา...', resultCount }: SearchBarProps) => (
-    <div className="flex items-center gap-[10px]">
-        <div className="relative flex-1 max-w-[320px]">
+    <div className="flex min-w-0 flex-1 items-center gap-[10px]">
+        <div className="relative min-w-0 flex-1 sm:max-w-[320px]">
             <Search size={14} className="absolute left-[12px] top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
                 type="text"
@@ -20,7 +20,7 @@ const SearchBar = ({ value, onChange, placeholder = 'ค้นหา...', result
             />
         </div>
         {value && resultCount !== undefined && (
-            <span className="text-[12px] text-muted-foreground">พบ {resultCount} รายการ</span>
+            <span className="hidden text-[12px] text-muted-foreground sm:inline">พบ {resultCount} รายการ</span>
         )}
     </div>
 )
