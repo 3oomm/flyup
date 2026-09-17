@@ -71,6 +71,7 @@ export interface ProjectSummary {
     description: string | null;
     current_funding: number;
     funding_goal: number;
+    cover_image?: string | null;
     thumbnail_url?: string;
 }
 
@@ -357,30 +358,17 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         }
     },
 
-    // ดึงรายการโปรเจกต์ทั้งหมดของ pioneer คนนี้ (ใช้ในหน้า MyProjects) พร้อมแนบรูป thumbnail แรกของแต่ละโปรเจกต์
+    // ดึงรายการโปรเจกต์ทั้งหมดของ pioneer คนนี้ (ใช้ในหน้า MyProjects) โดยใช้รูปปกเป็น thumbnail
     fetchMyProjects: async () => {
         set({ isLoading: true });
         try {
             const res = await api.get('/pioneer/projects');
-            const projects: ProjectSummary[] = res.data?.data ?? [];
+            const projects: ProjectSummary[] = (res.data?.data ?? []).map((p: ProjectSummary) => ({
+                ...p,
+                thumbnail_url: p.cover_image ?? undefined,
+            }));
 
-            // Fetch first image thumbnail for each project in parallel
-            const withThumbnails = await Promise.all(
-                projects.map(async (p) => {
-                    try {
-                        const mediaRes = await api.get(`/pioneer/projects/${p.id}/media`);
-                        const media: { type: string | string[]; url: string; sort_order: number }[] = mediaRes.data?.data ?? [];
-                        const firstImage = media
-                            .filter(m => (Array.isArray(m.type) ? m.type[0] : m.type) === 'image')
-                            .sort((a, b) => a.sort_order - b.sort_order)[0];
-                        return { ...p, thumbnail_url: firstImage?.url };
-                    } catch {
-                        return p;
-                    }
-                })
-            );
-
-            set({ projects: withThumbnails });
+            set({ projects });
         } catch (error) {
             console.error(error);
             toast.error('ไม่สามารถโหลดโปรเจกต์ได้');
