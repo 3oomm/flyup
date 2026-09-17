@@ -62,8 +62,9 @@ const ProjectOverview = () => {
 
   // ปุ่ม "ส่งคำขอสร้างโปรเจกต์" กดได้ก็ต่อเมื่อทั้ง 4 step กรอกข้อมูลครบทุกอัน
   const canSubmit = step.every(s => s.isComplete(currentProject, projectId))
-  const hasPendingEditReview = projects.some(project =>
-    project.id !== Number(projectId) && project.state === 'pending_edit_review'
+  const blockingStates = new Set(['funding', 'pending_review', 'executing', 'pending_cancel', 'pending_edit_review'])
+  const hasBlockingProject = projects.some(project =>
+    project.id !== Number(projectId) && blockingStates.has(project.state)
   )
 
   // ยิง submit โปรเจกต์ไป backend เพื่อรอ Admin อนุมัติ แล้วพากลับไปหน้ารายการโปรเจกต์ถ้าสำเร็จ
@@ -117,9 +118,9 @@ const ProjectOverview = () => {
         {currentProject.state === 'draft' && (
           <div className='flex justify-end p-[10px] mt-[10px]'>
             <button
-              disabled={!canSubmit || hasPendingEditReview}
+              disabled={!canSubmit || hasBlockingProject}
               onClick={() => setShowModal(true)}
-              title={hasPendingEditReview ? 'มีโปรเจกต์ที่กำลังรอ Admin ตรวจสอบการแก้ไข' : undefined}
+              title={hasBlockingProject ? 'มีโปรเจกต์อื่นที่กำลังดำเนินการหรือรอการตรวจสอบ' : undefined}
               className='flex h-[38px] bg-primary text-white-foreground rounded-[12px] w-[190px] justify-center items-center gap-[10px] hover:bg-primary-hover transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary cursor-pointer'>
               <Send size={16} strokeWidth={1} />
               <span className='text-[14px]'>ส่งคำขอสร้างโปรเจกต์</span>
@@ -146,7 +147,7 @@ const ProjectOverview = () => {
               <button
                 data-testid="project-overview-submit-btn"
                 onClick={handleSubmit}
-                disabled={isSubmitting || hasPendingEditReview}
+                disabled={isSubmitting || hasBlockingProject}
                 className="h-[48px] rounded-[12px] bg-primary text-white font-medium hover:bg-primary-hover flex items-center justify-center gap-[8px] transition-colors disabled:opacity-50"
               >
                 <Send size={16} />

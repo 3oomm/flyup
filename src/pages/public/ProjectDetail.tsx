@@ -180,7 +180,7 @@ function ProjectDetail() {
         title: 'ยังไม่ครบเงื่อนไขการลงทุน',
         html: `<p style="margin-bottom:8px">กรุณาดำเนินการให้ครบก่อนลงทุน:</p>${missingHtml}<p style="font-size:12px;color:#6b7280;margin-top:10px">ไปที่ <b>โปรไฟล์ของฉัน → แท็บยืนยันตัวตน</b></p>`,
         confirmButtonText: 'ไปยืนยันตัวตน',
-        confirmButtonColor: '#8B5CF6',
+        confirmButtonColor: '#16A34A',
         showCancelButton: true,
         cancelButtonText: 'ยกเลิก',
         cancelButtonColor: '#6B7280',

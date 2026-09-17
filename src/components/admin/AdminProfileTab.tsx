@@ -107,8 +107,8 @@ const AdminProfileTab = () => {
             onChange={handlePictureChange}
           />
         </div>
-        <div>
-          <p className="font-semibold text-foreground">
+        <div className="min-w-0">
+          <p className="font-semibold text-foreground truncate">
             {authUser?.first_name as string} {authUser?.last_name as string}
           </p>
           <p className="text-[13px] text-muted-foreground">{authUser?.email as string}</p>
@@ -131,6 +131,8 @@ const AdminProfileTab = () => {
               name="first_name"
               value={form.first_name}
               onChange={handleChange}
+              maxLength={30}
+              required
               className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors"
             />
           </div>
@@ -142,6 +144,8 @@ const AdminProfileTab = () => {
               name="last_name"
               value={form.last_name}
               onChange={handleChange}
+              maxLength={30}
+              required
               className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors"
             />
           </div>
@@ -160,7 +164,7 @@ const AdminProfileTab = () => {
 
         <div className="flex flex-col gap-[6px]">
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
-            <Phone size={14} /> เบอร์โทรศัพท์
+            <Phone size={14} /> เบอร์โทรศัพท์ <span className="text-error">*</span>
           </label>
           <input
             name="phone"
@@ -170,6 +174,7 @@ const AdminProfileTab = () => {
             autoComplete="tel"
             maxLength={10}
             pattern="[0-9]{10}"
+            required
             placeholder="เช่น 0812345678"
             className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors"
           />
@@ -185,6 +190,8 @@ const AdminProfileTab = () => {
             value={form.address}
             onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
             rows={3}
+            maxLength={100}
+            required
             autoComplete="street-address"
             placeholder="เช่น 123 ถนนสุขุมวิท กรุงเทพมหานคร"
             className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors resize-y"

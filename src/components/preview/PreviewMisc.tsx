@@ -260,6 +260,8 @@ interface PreviewQuestionProps {
 }
 
 export const PreviewQuestion = ({ questions }: PreviewQuestionProps) => {
+  const [visibleCount, setVisibleCount] = useState(5);
+
   if (questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-[12px] mt-[40px] p-[40px] border border-dashed border-border rounded-[16px] bg-white">
@@ -270,7 +272,7 @@ export const PreviewQuestion = ({ questions }: PreviewQuestionProps) => {
 
   return (
     <div className="flex flex-col gap-[12px] mt-[16px]">
-      {questions.map((item) => (
+      {questions.slice(0, visibleCount).map((item) => (
         <div key={item.id} className="bg-white border border-border rounded-[16px] p-[20px] shadow-sm">
           <div className="flex items-start gap-[12px]">
             <div className="text-primary mt-[2px] flex-shrink-0">
@@ -283,6 +285,17 @@ export const PreviewQuestion = ({ questions }: PreviewQuestionProps) => {
           </div>
         </div>
       ))}
+      {visibleCount < questions.length && (
+        <div className="flex justify-center pt-[4px]">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((count) => count + 5)}
+            className="px-[20px] py-[8px] rounded-[8px] border border-primary text-primary text-[13px] font-medium hover:bg-primary/5 transition-colors cursor-pointer"
+          >
+            ดูเพิ่มเติม
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -414,6 +427,8 @@ function CommentCard({ c, canInteract, isOwner }: { c: ProjectThread; canInterac
 }
 
 export const PreviewComment = ({ comments, canInteract = false, isOwner = false }: PreviewCommentProps) => {
+  const [visibleCount, setVisibleCount] = useState(5);
+
   if (comments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-[12px] mt-[40px] p-[40px] border border-dashed border-border rounded-[16px] bg-white">
@@ -424,9 +439,20 @@ export const PreviewComment = ({ comments, canInteract = false, isOwner = false 
 
   return (
     <div className="flex flex-col gap-[12px] mt-[16px]">
-      {comments.map((c) => (
+      {comments.slice(0, visibleCount).map((c) => (
         <CommentCard key={c.id} c={c} canInteract={canInteract} isOwner={isOwner} />
       ))}
+      {visibleCount < comments.length && (
+        <div className="flex justify-center pt-[4px]">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((count) => count + 5)}
+            className="px-[20px] py-[8px] rounded-[8px] border border-primary text-primary text-[13px] font-medium hover:bg-primary/5 transition-colors cursor-pointer"
+          >
+            ดูเพิ่มเติม
+          </button>
+        </div>
+      )}
     </div>
   );
 };

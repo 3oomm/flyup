@@ -270,7 +270,17 @@ const Step1Basics = () => {
     for (let i = 0; i < filesToUpload.length; i++) {
       const result = await uploadMediaToServer(filesToUpload[i]);
       if (result) {
-        set_replaceFileUrl(previews[i].url, result.url, filesToUpload[i].name, result.mediaId);
+        const isStillSelected = useProjectStore
+          .getState()
+          .currentProject.files
+          .some(file => file.url === previews[i].url);
+
+        if (isStillSelected) {
+          set_replaceFileUrl(previews[i].url, result.url, filesToUpload[i].name, result.mediaId);
+        } else if (result.mediaId) {
+          // ผู้ใช้ลบรูปขณะกำลังอัปโหลด จึงลบ media ที่ API เพิ่งสร้างเสร็จด้วย
+          await deleteProjectMedia(result.mediaId).catch(console.error);
+        }
       }
     }
     toast.success('อัปโหลดรูปภาพสำเร็จ', { id: 'upload-images', duration: 2000 })
@@ -373,10 +383,12 @@ const Step1Basics = () => {
               data-testid="basics-title-input"
               value={localData.title}
               onBlur={() => !isLocked && handleAutoSave('title', localData.title)}
-              onChange={(e) => !isLocked && setLocalData({ ...localData, title: e.target.value })}
+              onChange={(e) => !isLocked && setLocalData({ ...localData, title: e.target.value.slice(0, 40) })}
               type="text"
+              maxLength={40}
               disabled={isLocked}
               className={isLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+            <p className="text-right text-[11px] text-muted-foreground">{localData.title.length}/40</p>
             {isLocked && <p className="text-[11px] text-amber-600">🔒 แก้ไขไม่ได้ในสถานะปัจจุบันของโปรเจกต์</p>}
           </div>
           <p className="text-[12px] text-muted-foreground">*การตั้งชื่อโปรเจกต์ควรเน้นความสั้นและจดจำง่ายในทันที่ เพื่อให้ชื่อโปรเจกต์ของคุณดูโดดเด่นและค้นหาได้รวดเร็ว*</p>
@@ -687,10 +699,11 @@ const Step1Basics = () => {
                       )}
                     </div>
                     <span className={`max-w-[150px] truncate ${uploading ? 'text-muted-foreground' : ''}`}>{f.name}</span>
-                    {!uploading && !isLocked && (
+                    {!isLocked && (
                       <button
                         data-testid={`basics-additional-image-remove-btn-${i}`}
                         onClick={(e) => { e.stopPropagation(); removeImage(i); }}
+                        aria-label={uploading ? 'ยกเลิกและลบรูปที่กำลังอัปโหลด' : 'ลบรูปภาพ'}
                         className="ml-2 hover:text-error cursor-pointer">
                         <X size={14} />
                       </button>

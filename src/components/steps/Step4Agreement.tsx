@@ -13,8 +13,9 @@ const Step4Agreement = () => {
     fetchMyProjects();
   }, [fetchMyProjects]);
 
-  const hasPendingEditReview = projects.some(project =>
-    project.id !== Number(projectId) && project.state === 'pending_edit_review'
+  const blockingStates = new Set(['funding', 'pending_review', 'executing', 'pending_cancel', 'pending_edit_review']);
+  const hasBlockingProject = projects.some(project =>
+    project.id !== Number(projectId) && blockingStates.has(project.state)
   );
 
   // ต้องมีครบ 4 milestone และแต่ละอันกรอก title/description/duration ครบ ถึงจะกดส่งคำขอได้
@@ -152,12 +153,12 @@ const Step4Agreement = () => {
             ========================================= */}
         <StepNavigation
           onSubmit={() => setShowModal(true)}
-          disableSubmit={!isAgreed || !allMilestonesComplete || hasPendingEditReview}
+          disableSubmit={!isAgreed || !allMilestonesComplete || hasBlockingProject}
         />
 
-        {hasPendingEditReview && (
+        {hasBlockingProject && (
           <p className="text-right text-[13px] text-amber-600">
-            ไม่สามารถส่งคำขอได้ เนื่องจากมีโปรเจกต์ที่กำลังรอ Admin ตรวจสอบการแก้ไข
+            ไม่สามารถส่งคำขอได้ เนื่องจากมีโปรเจกต์อื่นที่กำลังดำเนินการหรือรอการตรวจสอบ
           </p>
         )}
       </div>
@@ -191,7 +192,7 @@ const Step4Agreement = () => {
               <button
                 data-testid="step4-submit-btn"
                 onClick={handleSubmitProject}
-                disabled={isSubmitting || hasPendingEditReview}
+                disabled={isSubmitting || hasBlockingProject}
                 className="col-span-1 h-[48px] rounded-[12px] bg-primary text-white font-medium hover:bg-primary-hover flex items-center justify-center gap-[8px] transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <Send size={16} />

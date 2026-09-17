@@ -139,7 +139,7 @@ const MyProjects = () => {
         await updateProjectStatus(id);
         await fetchMyProjects();
       } catch {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถยกเลิกได้ กรุณาลองใหม่', confirmButtonColor: '#8B5CF6' });
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถยกเลิกได้ กรุณาลองใหม่', confirmButtonColor: '#16A34A' });
       }
     }
   };

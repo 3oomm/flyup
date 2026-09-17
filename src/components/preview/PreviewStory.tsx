@@ -61,7 +61,7 @@ const PreviewStory = ({ story, risks }: PreviewStoryProps) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col gap-[20px] min-w-0">
         <div
-          className="prose prose-slate max-w-[800px] text-foreground text-[15px] leading-relaxed [&_h1]:text-[24px] [&_h1]:font-bold [&_h2]:text-[20px] [&_h2]:font-bold [&_h3]:text-[18px] [&_h3]:font-bold [&_h1]:mb-[12px] [&_h2]:mb-[12px] [&_h3]:mb-[12px] [&_p]:mb-[12px] [&_ul]:mb-[12px] [&_li]:mb-[4px] [&_img]:rounded-[12px] [&_img]:my-[20px]"
+          className="prose prose-slate w-full max-w-[800px] min-w-0 break-words [overflow-wrap:anywhere] text-foreground text-[15px] leading-relaxed [&_h1]:text-[24px] [&_h1]:font-bold [&_h2]:text-[20px] [&_h2]:font-bold [&_h3]:text-[18px] [&_h3]:font-bold [&_h1]:mb-[12px] [&_h2]:mb-[12px] [&_h3]:mb-[12px] [&_p]:mb-[12px] [&_ul]:mb-[12px] [&_li]:mb-[4px] [&_img]:rounded-[12px] [&_img]:my-[20px]"
           dangerouslySetInnerHTML={{ __html: sanitizeStoryHtml(html) }}
           onClick={(e) => {
             const target = e.target as HTMLElement;
@@ -73,13 +73,13 @@ const PreviewStory = ({ story, risks }: PreviewStoryProps) => {
         />
 
         {risks && (
-          <div className="mt-[20px] border border-[#FCD34D] bg-[#FEF3C7]/40 rounded-[12px] p-[20px] flex gap-[16px] max-w-[800px]">
+          <div className="mt-[20px] border border-[#FCD34D] bg-[#FEF3C7]/40 rounded-[12px] p-[20px] flex gap-[16px] w-full max-w-[800px] min-w-0 overflow-hidden">
               <div className="text-[#D97706] mt-1 shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
               </div>
-              <div className="flex flex-col gap-[4px]">
+              <div className="flex flex-col gap-[4px] min-w-0 flex-1">
                   <h3 className="text-[14px] font-bold text-foreground">ความเสี่ยงและความท้าทาย</h3>
-                  <div className="text-[13px] text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(risks) }} />
+                  <div className="text-[13px] text-muted-foreground leading-relaxed break-words [overflow-wrap:anywhere] whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(risks) }} />
               </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Loader2, Flag, X, Paperclip, Link2, XCircle } from 'lucide-react'
+import { Loader2, Flag, X, Paperclip, XCircle } from 'lucide-react'
 import { useComplaintStore } from '../store/useComplaintStore'
 import { useProjectStore } from '../store/useProjectStore'
 
@@ -10,31 +10,16 @@ interface ComplaintModalProps {
     onSuccess?: () => void
 }
 
-const isValidUrl = (value: string) => {
-    try {
-        const u = new URL(value)
-        return u.protocol === 'http:' || u.protocol === 'https:'
-    } catch {
-        return false
-    }
-}
-
 const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: ComplaintModalProps) => {
     const { fileComplaint, isSubmitting } = useComplaintStore()
     const { uploadFile } = useProjectStore()
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
-    const [evidence, setEvidence] = useState('') // ลิงก์หลักฐาน — ได้จากการอัปโหลดไฟล์ หรือวางลิงก์เอง
+    const [evidence, setEvidence] = useState('')
     const [evidenceFileName, setEvidenceFileName] = useState('')
     const [isUploadingEvidence, setIsUploadingEvidence] = useState(false)
     const [evidenceError, setEvidenceError] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    const handleEvidenceChange = (value: string) => {
-        setEvidence(value)
-        setEvidenceFileName('')
-        setEvidenceError(false)
-    }
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -61,10 +46,6 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
     const handleSubmit = async () => {
         if (!subject.trim() || body.trim().length < 10) return
         const trimmedEvidence = evidence.trim()
-        if (trimmedEvidence && !isValidUrl(trimmedEvidence)) {
-            setEvidenceError(true)
-            return
-        }
         const ok = await fileComplaint(projectId, subject.trim(), body.trim(), trimmedEvidence || undefined)
         if (ok) {
             onSuccess?.()
@@ -103,10 +84,10 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
                             placeholder="เช่น ข้อมูลโปรเจกต์ไม่ตรงกับความเป็นจริง"
-                            maxLength={200}
+                            maxLength={30}
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
                         />
-                        <span className="text-[11px] text-muted-foreground">{subject.length}/200</span>
+                        <span className="text-[11px] text-muted-foreground">{subject.length}/30</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">รายละเอียด <span className="text-error">*</span></label>
@@ -115,31 +96,15 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             onChange={(e) => setBody(e.target.value)}
                             rows={6}
                             placeholder="อธิบายสิ่งที่ต้องการรายงานให้ละเอียด (อย่างน้อย 10 ตัวอักษร)"
-                            maxLength={5000}
+                            maxLength={200}
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
                         />
-                        <span className="text-[11px] text-muted-foreground">{body.length}/5000</span>
+                        <span className="text-[11px] text-muted-foreground">{body.length}/200</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">หลักฐานประกอบ (ถ้ามี)</label>
-                        <p className="text-[11px] text-muted-foreground mb-1">แนบไฟล์ (ภาพหน้าจอ/เอกสาร) หรือวางลิงก์หลักฐานได้โดยตรง</p>
+                        <p className="text-[11px] text-muted-foreground mb-1">แนบไฟล์ภาพหน้าจอหรือเอกสาร</p>
                         <div className="flex items-center gap-2">
-                            <div className={`flex-1 flex items-center gap-[6px] px-3 py-2 rounded-lg border ${evidenceError ? 'border-error' : 'border-border focus-within:border-primary'}`}>
-                                <Link2 size={14} className="text-muted-foreground shrink-0" />
-                                <input
-                                    type="url"
-                                    value={evidence}
-                                    onChange={(e) => handleEvidenceChange(e.target.value)}
-                                    placeholder="https://..."
-                                    disabled={isUploadingEvidence}
-                                    className="flex-1 text-[14px] outline-none bg-transparent min-w-0"
-                                />
-                                {evidence && !isUploadingEvidence && (
-                                    <button type="button" onClick={clearEvidence} className="text-muted-foreground hover:text-error shrink-0">
-                                        <XCircle size={14} />
-                                    </button>
-                                )}
-                            </div>
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
@@ -158,11 +123,16 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             />
                         </div>
                         {evidenceFileName && !isUploadingEvidence && (
-                            <span className="text-[11px] text-muted-foreground">แนบไฟล์แล้ว: {evidenceFileName}</span>
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                <span className="truncate">แนบไฟล์แล้ว: {evidenceFileName}</span>
+                                <button type="button" onClick={clearEvidence} className="shrink-0 hover:text-error" aria-label="ลบไฟล์แนบ">
+                                    <XCircle size={14} />
+                                </button>
+                            </div>
                         )}
                         {evidenceError && (
                             <span className="text-[11px] text-error">
-                                ลิงก์หลักฐานไม่ถูกต้อง หรืออัปโหลดไฟล์ไม่สำเร็จ กรุณาลองใหม่
+                                อัปโหลดไฟล์ไม่สำเร็จ กรุณาลองใหม่
                             </span>
                         )}
                     </div>

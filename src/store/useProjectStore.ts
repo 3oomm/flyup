@@ -542,7 +542,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
                     title: 'ยังไม่ได้ยืนยันตัวตน',
                     text: 'กรุณายืนยันตัวตนก่อนสร้างโปรเจกต์',
                     confirmButtonText: 'ไปยืนยันตัวตน',
-                    confirmButtonColor: '#8B5CF6',
+                    confirmButtonColor: '#16A34A',
                     showCancelButton: true,
                     cancelButtonText: 'ยกเลิก',
                     cancelButtonColor: '#6B7280',

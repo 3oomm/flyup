@@ -35,11 +35,12 @@ const BankFormFields = ({ form, setForm }: { form: BankFormState; setForm: React
     </div>
     <div className="flex flex-col gap-[6px]">
       <label className="text-[13px] font-medium text-foreground">ชื่อบัญชี <span className="text-error">*</span></label>
-      <input value={form.account_name} onChange={(e) => setForm(p => ({ ...p, account_name: e.target.value }))} className={INPUT_STYLE} />
+      <input value={form.account_name} onChange={(e) => setForm(p => ({ ...p, account_name: e.target.value.slice(0, 30) }))} maxLength={30} required className={INPUT_STYLE} />
     </div>
     <div className="flex flex-col gap-[6px]">
       <label className="text-[13px] font-medium text-foreground">เลขบัญชี <span className="text-error">*</span></label>
-      <input value={form.account_number} onChange={(e) => setForm(p => ({ ...p, account_number: e.target.value.replace(/\D/g, '') }))} inputMode="numeric" className={INPUT_STYLE} />
+      <input value={form.account_number} onChange={(e) => setForm(p => ({ ...p, account_number: e.target.value.replace(/\D/g, '').slice(0, 15) }))} inputMode="numeric" minLength={8} maxLength={15} pattern="[0-9]{8,15}" required className={INPUT_STYLE} />
+      <span className="text-[11px] text-muted-foreground">กรอกตัวเลข 8–15 หลัก</span>
     </div>
   </div>
 );
@@ -196,8 +197,14 @@ const VerifyTab = () => {
   };
 
   const handleAddBank = async () => {
-    if (!addForm.bank_name || !addForm.account_name || !addForm.account_number) {
+    if (!addForm.bank_name || !addForm.account_name.trim() || !addForm.account_number) {
       toast.error("กรุณากรอกข้อมูลให้ครบ"); return;
+    }
+    if (addForm.account_name.trim().length > 30) {
+      toast.error("ชื่อบัญชีต้องไม่เกิน 30 ตัวอักษร"); return;
+    }
+    if (addForm.account_number.length < 8 || addForm.account_number.length > 15) {
+      toast.error("เลขบัญชีต้องมี 8–15 หลัก"); return;
     }
     setIsSavingAdd(true);
     try {
@@ -210,8 +217,14 @@ const VerifyTab = () => {
   };
 
   const handleEditBank = async (id: number) => {
-    if (!editForm.bank_name || !editForm.account_name || !editForm.account_number) {
+    if (!editForm.bank_name || !editForm.account_name.trim() || !editForm.account_number) {
       toast.error("กรุณากรอกข้อมูลให้ครบ"); return;
+    }
+    if (editForm.account_name.trim().length > 30) {
+      toast.error("ชื่อบัญชีต้องไม่เกิน 30 ตัวอักษร"); return;
+    }
+    if (editForm.account_number.length < 8 || editForm.account_number.length > 15) {
+      toast.error("เลขบัญชีต้องมี 8–15 หลัก"); return;
     }
     setIsSavingEdit(true);
     try {
@@ -502,7 +515,7 @@ const VerifyTab = () => {
               </>
             ) : (
               <div className="flex items-start justify-between gap-[12px]">
-                <div className="flex flex-col gap-[4px]">
+                <div className="flex flex-col gap-[4px] flex-1 min-w-0">
                   <div className="flex items-center gap-[6px]">
                     <span className="text-[14px] font-semibold text-foreground">{acc.bank_name}</span>
                     {acc.is_default && (
@@ -511,7 +524,7 @@ const VerifyTab = () => {
                       </span>
                     )}
                   </div>
-                  <span className="text-[13px] text-muted-foreground">{acc.account_name}</span>
+                  <span className="text-[13px] text-muted-foreground truncate max-w-full" title={acc.account_name}>{acc.account_name}</span>
                   <span className="text-[13px] text-muted-foreground">{acc.account_number}</span>
                 </div>
                 <div className="flex items-center gap-[6px] flex-shrink-0">

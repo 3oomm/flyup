@@ -62,7 +62,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน ส่งหลักฐาน',
       cancelButtonText: 'ยกเลิก',
-      confirmButtonColor: '#7C3AED',
+      confirmButtonColor: '#16A34A',
       cancelButtonColor: '#6B7280',
       reverseButtons: true,
     })

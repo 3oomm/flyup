@@ -106,7 +106,7 @@ const VoteDetail = () => {
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
       cancelButtonText: 'ยกเลิก',
-      confirmButtonColor: '#7C3AED',
+      confirmButtonColor: '#16A34A',
       cancelButtonColor: '#6B7280',
       reverseButtons: true,
     })
@@ -308,16 +308,16 @@ const VoteDetail = () => {
 
               {/* Radio Buttons */}
               <div className="space-y-3 mb-5">
-                <label className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-all ${voteValue === 'approve' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted'}`}>
+                <label className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-all ${voteValue === 'approve' ? 'border-green-600 bg-green-50' : 'border-border hover:bg-muted'}`}>
                   <input
                     type="radio"
                     name="vote"
-                    className="w-4 h-4 text-primary focus:ring-primary accent-primary"
+                    className="w-4 h-4 text-green-600 focus:ring-green-600 accent-green-600"
                     checked={voteValue === 'approve'}
                     onChange={() => setVoteValue('approve')}
                   />
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 size={16} className={voteValue === 'approve' ? 'text-primary' : 'text-muted-foreground'} />
+                    <CheckCircle2 size={16} className={voteValue === 'approve' ? 'text-green-600' : 'text-muted-foreground'} />
                     <span className={`text-sm font-semibold ${voteValue === 'approve' ? 'text-foreground' : 'text-muted-foreground'}`}>ยอมรับ (Approve)</span>
                   </div>
                 </label>
@@ -343,9 +343,13 @@ const VoteDetail = () => {
                 <textarea
                   placeholder="ระบุความคิดเห็นหรือข้อเสนอแนะ"
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e) => setComment(e.target.value.slice(0, 200))}
+                  maxLength={200}
                   className="w-full text-sm p-3 border border-border rounded-xl placeholder:text-muted-foreground outline-none focus:border-primary transition-colors resize-none h-24"
                 />
+                <div className="mt-1 text-right text-xs text-muted-foreground">
+                  {comment.length}/200
+                </div>
               </div>
 
               <button

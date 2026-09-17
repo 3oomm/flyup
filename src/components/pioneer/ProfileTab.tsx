@@ -53,6 +53,11 @@ const ProfileTab = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const phone = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm((prev) => ({ ...prev, phone }));
+  };
+
   const handlePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -108,8 +113,8 @@ const ProfileTab = () => {
             onChange={handlePictureChange}
           />
         </div>
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">{authUser?.first_name as string} {authUser?.last_name as string}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-foreground truncate">{authUser?.first_name as string} {authUser?.last_name as string}</p>
           <p className="text-[13px] text-muted-foreground">{authUser?.email as string}</p>
         </div>
         {!isEditing && (
@@ -131,11 +136,11 @@ const ProfileTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
           <div className="flex flex-col gap-[6px]">
             <label className="text-[13px] font-medium text-foreground">ชื่อ <span className="text-error">*</span></label>
-            <input name="first_name" value={form.first_name} onChange={handleChange} disabled={!isEditing} className={inputCls} />
+            <input name="first_name" value={form.first_name} onChange={handleChange} disabled={!isEditing} maxLength={30} required className={inputCls} />
           </div>
           <div className="flex flex-col gap-[6px]">
             <label className="text-[13px] font-medium text-foreground">นามสกุล <span className="text-error">*</span></label>
-            <input name="last_name" value={form.last_name} onChange={handleChange} disabled={!isEditing} className={inputCls} />
+            <input name="last_name" value={form.last_name} onChange={handleChange} disabled={!isEditing} maxLength={30} required className={inputCls} />
           </div>
         </div>
 
@@ -148,16 +153,27 @@ const ProfileTab = () => {
 
         <div className="flex flex-col gap-[6px]">
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
-            <span><Phone size={14} /></span> เบอร์โทรศัพท์
+            <span><Phone size={14} /></span> เบอร์โทรศัพท์ <span className="text-error">*</span>
           </label>
-          <input name="phone" value={form.phone} onChange={handleChange} disabled={!isEditing} className={inputCls} />
+          <input
+            name="phone"
+            value={form.phone}
+            onChange={handlePhoneChange}
+            disabled={!isEditing}
+            inputMode="numeric"
+            autoComplete="tel"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            required
+            className={inputCls}
+          />
         </div>
 
         <div className="flex flex-col gap-[6px]">
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
-            <span><MapPin size={14} /></span> ที่อยู่
+            <span><MapPin size={14} /></span> ที่อยู่ <span className="text-error">*</span>
           </label>
-          <input name="address" value={form.address} onChange={handleChange} disabled={!isEditing} placeholder="เช่น 123 ถนนสุขุมวิท กรุงเทพมหานคร" className={inputCls} />
+          <input name="address" value={form.address} onChange={handleChange} disabled={!isEditing} maxLength={100} required placeholder="เช่น 123 ถนนสุขุมวิท กรุงเทพมหานคร" className={inputCls} />
         </div>
       </div>
 
@@ -177,6 +193,7 @@ const ProfileTab = () => {
             value={form.bio}
             onChange={handleChange}
             disabled={!isEditing}
+            maxLength={100}
             rows={4}
             className={`${inputCls} resize-none`}
           />
@@ -186,14 +203,14 @@ const ProfileTab = () => {
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
             <span><Link size={14} /></span> ลิงก์พอร์ตโฟลิโอ
           </label>
-          <input name="portfolio" value={form.portfolio} onChange={handleChange} disabled={!isEditing} className={inputCls} />
+          <input name="portfolio" value={form.portfolio} onChange={handleChange} disabled={!isEditing} maxLength={100} className={inputCls} />
         </div>
 
         <div className="flex flex-col gap-[6px]">
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
             <span><FileBraces size={14} /></span> ทักษะ/ความชำนาญ
           </label>
-          <input name="skills" value={form.skills} onChange={handleChange} disabled={!isEditing} className={inputCls} />
+          <input name="skills" value={form.skills} onChange={handleChange} disabled={!isEditing} maxLength={100} className={inputCls} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
@@ -201,13 +218,13 @@ const ProfileTab = () => {
             <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
               <span><GraduationCap size={14} /></span> คณะ
             </label>
-            <input name="faculty" value={form.faculty} onChange={handleChange} disabled={!isEditing} placeholder="เช่น คณะวิทยาศาสตร์และเทคโนโลยี" className={inputCls} />
+            <input name="faculty" value={form.faculty} onChange={handleChange} disabled={!isEditing} maxLength={100} placeholder="เช่น คณะวิทยาศาสตร์และเทคโนโลยี" className={inputCls} />
           </div>
           <div className="flex flex-col gap-[6px]">
             <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
               <span><GraduationCap size={14} /></span> สาขา
             </label>
-            <input name="major" value={form.major} onChange={handleChange} disabled={!isEditing} placeholder="เช่น วิทยาการคอมพิวเตอร์" className={inputCls} />
+            <input name="major" value={form.major} onChange={handleChange} disabled={!isEditing} maxLength={100} placeholder="เช่น วิทยาการคอมพิวเตอร์" className={inputCls} />
           </div>
         </div>
       </div>

@@ -519,9 +519,19 @@ const Investment = () => {
                           type="text"
                           value={amount}
                           onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9]/g, "");
-                            setAmount(val ? Number(val).toLocaleString() : "");
+                            const digits = e.target.value.replace(/\D/g, "");
+                            if (!digits) {
+                              setAmount("");
+                              return;
+                            }
+
+                            const value = Number(digits);
+                            const clampedValue = !Number.isSafeInteger(value) || value > maxAmount
+                              ? maxAmount
+                              : value;
+                            setAmount(clampedValue.toLocaleString());
                            }}
+                          inputMode="numeric"
                           placeholder={isSoftcapReached ? `สูงสุด ${maxAmount.toLocaleString()}` : `ขั้นต่ำ ${minAmount.toLocaleString()}`}
                           className="w-full pl-10 pr-4 py-5 rounded-[20px] border-2 border-[#E9ECEF] focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all placeholder:text-[#ADB5BD] font-bold text-2xl text-foreground"
                         />
