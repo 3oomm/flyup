@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import {
   ChevronRight,
@@ -18,6 +18,7 @@ import { usePublicProjectStore, type PublicProject } from '../../store/usePublic
 import { useAuthStore } from '../../store/useAuthStore';
 import useCreateProjectGuard from '../../hooks/useCreateProjectGuard';
 import { getProgress, getDaysLeft, getProjectTimingDisplay } from '../../lib/project';
+import Footer from '../../components/Footer';
 
 const PLACEHOLDER_IMG = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800';
 
@@ -80,6 +81,7 @@ const ProjectCard = ({ project }: { project: PublicProject & { isHot?: boolean; 
 const HERO_WORDS = ['โปรเจกต์ที่ใช่', 'นวัตกรรมใหม่', 'ไอเดียที่ดี', 'ความฝันของคุณ'];
 
 const Home = () => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { authUser } = useAuthStore();
   const { createWithGuard, isCreating } = useCreateProjectGuard();
 
@@ -126,7 +128,8 @@ const Home = () => {
 
   return (
     <div
-      className="h-[100dvh] overflow-y-auto scroll-smooth snap-y snap-proximity md:snap-mandatory bg-gray-50/50 font-sans text-gray-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      ref={scrollContainerRef}
+      className="relative h-full overflow-y-auto overscroll-contain scroll-smooth snap-y snap-proximity md:snap-mandatory bg-gray-50/50 font-sans text-gray-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <section data-testid="home-hero" data-home-snap-section data-snap-key="hero" className="relative min-h-[100dvh] snap-start flex items-center pt-24 pb-20 lg:pt-28 lg:pb-24 overflow-hidden">
         <div
@@ -454,6 +457,10 @@ const Home = () => {
       </section>
 
       {/* ── How It Works Modal ── */}
+      <div className="snap-end">
+        <Footer />
+      </div>
+
       {howItWorksModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setHowItWorksModal(null)}>
           <div
