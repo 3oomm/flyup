@@ -47,7 +47,7 @@ const step: StageItems[] = [
 const ProjectOverview = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
-  const { currentProject, loadCurrentProject, submitProject } = useProjectStore()
+  const { currentProject, projects, loadCurrentProject, fetchMyProjects, submitProject } = useProjectStore()
   const [showModal, setShowModal] = useState(false) // เปิด/ปิด modal ยืนยันส่งโปรเจกต์
   const [isSubmitting, setIsSubmitting] = useState(false) // กันกดส่งซ้ำระหว่างรอ API ตอบกลับ
 
@@ -56,8 +56,15 @@ const ProjectOverview = () => {
     if (projectId) loadCurrentProject(Number(projectId));
   }, [projectId, loadCurrentProject]);
 
+  useEffect(() => {
+    fetchMyProjects();
+  }, [fetchMyProjects]);
+
   // ปุ่ม "ส่งคำขอสร้างโปรเจกต์" กดได้ก็ต่อเมื่อทั้ง 4 step กรอกข้อมูลครบทุกอัน
   const canSubmit = step.every(s => s.isComplete(currentProject, projectId))
+  const hasPendingEditReview = projects.some(project =>
+    project.id !== Number(projectId) && project.state === 'pending_edit_review'
+  )
 
   // ยิง submit โปรเจกต์ไป backend เพื่อรอ Admin อนุมัติ แล้วพากลับไปหน้ารายการโปรเจกต์ถ้าสำเร็จ
   const handleSubmit = async () => {
@@ -110,8 +117,9 @@ const ProjectOverview = () => {
         {currentProject.state === 'draft' && (
           <div className='flex justify-end p-[10px] mt-[10px]'>
             <button
-              disabled={!canSubmit}
+              disabled={!canSubmit || hasPendingEditReview}
               onClick={() => setShowModal(true)}
+              title={hasPendingEditReview ? 'มีโปรเจกต์ที่กำลังรอ Admin ตรวจสอบการแก้ไข' : undefined}
               className='flex h-[38px] bg-primary text-white-foreground rounded-[12px] w-[190px] justify-center items-center gap-[10px] hover:bg-primary-hover transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary cursor-pointer'>
               <Send size={16} strokeWidth={1} />
               <span className='text-[14px]'>ส่งคำขอสร้างโปรเจกต์</span>
@@ -138,7 +146,7 @@ const ProjectOverview = () => {
               <button
                 data-testid="project-overview-submit-btn"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || hasPendingEditReview}
                 className="h-[48px] rounded-[12px] bg-primary text-white font-medium hover:bg-primary-hover flex items-center justify-center gap-[8px] transition-colors disabled:opacity-50"
               >
                 <Send size={16} />
