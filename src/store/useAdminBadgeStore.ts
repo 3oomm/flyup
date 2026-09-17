@@ -10,6 +10,7 @@ export interface AdminBadgeCounts {
     pending_verifications: number
     pending_disbursements: number
     pending_profit_pools: number
+    pending_edit_requests: number
 }
 
 interface AdminBadgeStore {
@@ -26,16 +27,33 @@ const empty: AdminBadgeCounts = {
     pending_verifications: 0,
     pending_disbursements: 0,
     pending_profit_pools: 0,
+    pending_edit_requests: 0,
 }
 
-export const useAdminBadgeStore = create<AdminBadgeStore>((set) => ({
+export const useAdminBadgeStore = create<AdminBadgeStore>((set, get) => ({
     counts: empty,
     fetchBadges: async () => {
-        try {
-            const res = await api.get('/admin/badges')
-            set({ counts: res.data?.data ?? empty })
-        } catch {
-            // ignore
-        }
+        const [badgeResult, editRequestResult] = await Promise.allSettled([
+                api.get('/admin/badges'),
+                api.get('/admin/projects/pending-edit-review'),
+        ])
+
+        const previous = get().counts
+        const badgeCounts = badgeResult.status === 'fulfilled'
+            ? badgeResult.value.data?.data ?? {}
+            : {}
+        const editRequests = editRequestResult.status === 'fulfilled'
+            ? editRequestResult.value.data?.data ?? []
+            : null
+
+        set({
+            counts: {
+                ...previous,
+                ...badgeCounts,
+                pending_edit_requests: Array.isArray(editRequests)
+                    ? editRequests.length
+                    : previous.pending_edit_requests,
+            },
+        })
     },
 }))

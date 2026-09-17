@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
-import { useAdminBadgeStore } from '@/store/useAdminBadgeStore'
+import { useAdminBadgeStore, type AdminBadgeCounts } from '@/store/useAdminBadgeStore'
 import {
     House, Search, LayoutDashboard, UserRoundCheck, MailSearch, Milestone,
     Wallet, TrendingUp, MessageSquareWarning, ShieldBan, RotateCcw, FileText,
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router'
 
-type BadgeKey = 'pending_verifications' | 'pending_projects' | 'submitted_milestones' | 'open_complaints' | 'pending_cancel_requests' | 'pending_refunds' | 'pending_disbursements' | 'pending_profit_pools'
+type BadgeKey = keyof AdminBadgeCounts
 
 interface MenuItem {
     icon: React.ReactNode
@@ -52,7 +52,7 @@ const sections: MenuSection[] = [
         items: [
             { icon: <MessageSquareWarning size={18} />, title: 'คำร้องเรียน', path: '/admin/complaints', badge: 'open_complaints' },
             { icon: <FolderX size={18} />, title: 'ยกเลิกโปรเจกต์', path: '/admin/cancel-requests', badge: 'pending_cancel_requests' },
-            { icon: <FileEdit size={18} />, title: 'คำขอแก้ไขโปรเจกต์', path: '/admin/project-edit-requests' },
+            { icon: <FileEdit size={18} />, title: 'คำขอแก้ไขโปรเจกต์', path: '/admin/project-edit-requests', badge: 'pending_edit_requests' },
             { icon: <ShieldBan size={18} />, title: 'ระงับโปรเจกต์', path: '/admin/projects-suspension' },
         ],
     },
@@ -79,9 +79,24 @@ const SidebarAdmin = () => {
     const { counts, fetchBadges } = useAdminBadgeStore()
 
     useEffect(() => {
-        fetchBadges()
-        const interval = setInterval(fetchBadges, 30_000)
-        return () => clearInterval(interval)
+        const refresh = () => fetchBadges()
+        const refreshWhenVisible = () => {
+            if (document.visibilityState === 'visible') refresh()
+        }
+
+        refresh()
+        window.addEventListener('badges:refresh', refresh)
+        window.addEventListener('focus', refresh)
+        document.addEventListener('visibilitychange', refreshWhenVisible)
+
+        // Fallback in case an SSE event is missed or the connection is reconnecting.
+        const interval = setInterval(refresh, 15_000)
+        return () => {
+            clearInterval(interval)
+            window.removeEventListener('badges:refresh', refresh)
+            window.removeEventListener('focus', refresh)
+            document.removeEventListener('visibilitychange', refreshWhenVisible)
+        }
     }, [fetchBadges])
 
     const handleLogout = () => { logout(); navigate('/') }

@@ -33,7 +33,13 @@ let isRefreshing = false;
 let refreshQueue: Array<(ok: boolean) => void> = [];
 
 instance.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    const method = res.config.method?.toLowerCase();
+    if (method && ["post", "put", "patch", "delete"].includes(method)) {
+      window.dispatchEvent(new CustomEvent("badges:refresh"));
+    }
+    return res;
+  },
   async (error) => {
     const original = error.config;
     const status = error.response?.status;
