@@ -24,6 +24,9 @@ const INPUT_STYLE = "border border-border rounded-[8px] px-[12px] py-[10px] text
 
 type BankFormState = { bank_name: string; account_name: string; account_number: string };
 
+const sanitizeAccountName = (value: string) =>
+  value.replace(/[^\p{L}\p{M}\s]/gu, "").slice(0, 30);
+
 const BankFormFields = ({ form, setForm }: { form: BankFormState; setForm: React.Dispatch<React.SetStateAction<BankFormState>> }) => (
   <div className="flex flex-col gap-[12px]">
     <div className="flex flex-col gap-[6px]">
@@ -35,7 +38,7 @@ const BankFormFields = ({ form, setForm }: { form: BankFormState; setForm: React
     </div>
     <div className="flex flex-col gap-[6px]">
       <label className="text-[13px] font-medium text-foreground">ชื่อบัญชี <span className="text-error">*</span></label>
-      <input value={form.account_name} onChange={(e) => setForm(p => ({ ...p, account_name: e.target.value.slice(0, 30) }))} maxLength={30} required className={INPUT_STYLE} />
+      <input value={form.account_name} onChange={(e) => setForm(p => ({ ...p, account_name: sanitizeAccountName(e.target.value) }))} maxLength={30} required className={INPUT_STYLE} />
     </div>
     <div className="flex flex-col gap-[6px]">
       <label className="text-[13px] font-medium text-foreground">เลขบัญชี <span className="text-error">*</span></label>
