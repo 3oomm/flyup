@@ -6,7 +6,7 @@ import { useProjectStore } from '../store/useProjectStore'
 const useCreateProjectGuard = () => {
     const navigate = useNavigate()
     const { authUser } = useAuthStore()
-    const { createProject, isCreating } = useProjectStore()
+    const { createProject, fetchMyProjects, isCreating } = useProjectStore()
 
     // เช็คเงื่อนไขก่อนอนุญาตให้สร้างโปรเจกต์: ต้องยืนยันตัวตนนักศึกษา (บัตรนักศึกษา + บัตรประชาชน) และผูกบัญชีธนาคารแล้ว
     const createWithGuard = async () => {
@@ -38,6 +38,32 @@ const useCreateProjectGuard = () => {
                 reverseButtons: true,
             })
             if (result.isConfirmed) navigate('/pioneer/profile?tab=verify')
+            return null
+        }
+
+        // Refresh before validating so every entry point (home/dashboard/my projects)
+        // uses the latest project state from the server.
+        await fetchMyProjects()
+        const blockingStates = new Set([
+            'funding',
+            'pending_review',
+            'executing',
+            'pending_cancel',
+            'pending_edit_review',
+        ])
+        const hasActiveProject = useProjectStore
+            .getState()
+            .projects
+            .some(project => blockingStates.has(project.state))
+
+        if (hasActiveProject) {
+            await Swal.fire({
+                icon: 'warning',
+                title: 'ไม่สามารถสร้างโปรเจกต์ใหม่ได้',
+                text: 'คุณมีโปรเจกต์ที่กำลังดำเนินการหรืออยู่ระหว่างรอ Admin ตรวจสอบการแก้ไขแล้ว',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#8B5CF6',
+            })
             return null
         }
 
