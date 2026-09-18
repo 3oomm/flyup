@@ -81,6 +81,7 @@ export interface AdminMilestoneDetail {
     acceptance_criteria: string
     status: string
     progress_pct: number
+    submission_summary?: string | null
     admin_note?: string
     submitted_at?: string
     project_id: number

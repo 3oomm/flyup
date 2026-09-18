@@ -192,6 +192,16 @@ const AdminMilestoneDetail = () => {
                 />
             </div>
 
+            {/* Pioneer submission summary */}
+            {milestone.submission_summary && (
+                <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[10px]">
+                    <h2 className="font-semibold text-foreground">สรุปผลงาน</h2>
+                    <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-wrap break-words">
+                        {milestone.submission_summary}
+                    </p>
+                </div>
+            )}
+
             {/* Acceptance criteria */}
             {criteria.length > 0 && (
                 <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[14px]">
