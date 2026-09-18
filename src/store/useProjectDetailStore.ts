@@ -213,8 +213,29 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
         api.get(`/projects/${id}/faqs`),
         api.get(`/investments/projects/${id}/investors`),
       ]);
+      const updates: ProjectUpdate[] = updatesRes.status === 'fulfilled'
+        ? updatesRes.value.data?.data ?? []
+        : [];
+      const commentsByUpdate = await Promise.all(
+        updates.map(async (update) => {
+          try {
+            const commentsRes = await api.get(`/projects/${id}/updates/${update.id}/threads`);
+            const comments: ProjectThread[] = commentsRes.data?.data ?? [];
+            return [update.id, comments] as const;
+          } catch (error) {
+            console.warn(`fetchUpdateThreads (${update.id}):`, error);
+            return [update.id, [] as ProjectThread[]] as const;
+          }
+        })
+      );
+      const updateThreads = Object.fromEntries(commentsByUpdate) as Record<number, ProjectThread[]>;
+
       set({
-        updates: updatesRes.status === 'fulfilled' ? updatesRes.value.data?.data ?? [] : [],
+        updates: updates.map((update) => ({
+          ...update,
+          comment_count: updateThreads[update.id]?.length ?? 0,
+        })),
+        updateThreads,
         threads: threadsRes.status === 'fulfilled' ? threadsRes.value.data?.data ?? [] : [],
         faqs: faqsRes.status === 'fulfilled' ? faqsRes.value.data?.data ?? [] : [],
         investorCount: invCountRes.status === 'fulfilled' ? invCountRes.value.data?.data?.total ?? 0 : 0,

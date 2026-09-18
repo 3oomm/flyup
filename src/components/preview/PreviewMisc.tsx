@@ -291,15 +291,31 @@ export const PreviewQuestion = ({ questions }: PreviewQuestionProps) => {
           </div>
         </div>
       ))}
-      {visibleCount < questions.length && (
-        <div className="flex justify-center pt-[4px]">
-          <button
-            type="button"
-            onClick={() => setVisibleCount((count) => count + 5)}
-            className="px-[20px] py-[8px] rounded-[8px] border border-primary text-primary text-[13px] font-medium hover:bg-primary/5 transition-colors cursor-pointer"
-          >
-            ดูเพิ่มเติม
-          </button>
+      {questions.length > 5 && (
+        <div className="flex flex-col items-center gap-[12px] pt-[8px]">
+          <span className="text-[13px] text-muted-foreground">
+            แสดง {Math.min(visibleCount, questions.length)} จาก {questions.length} คำถาม
+          </span>
+          <div className="flex gap-[8px]">
+            {visibleCount < questions.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount((count) => count + 5)}
+                className="bg-foreground text-background text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                โหลดเพิ่มเติม
+              </button>
+            )}
+            {visibleCount > 5 && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(5)}
+                className="bg-white border border-border text-foreground text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:border-primary/50 transition-colors cursor-pointer"
+              >
+                แสดงน้อยลง
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -448,15 +464,31 @@ export const PreviewComment = ({ comments, canInteract = false, isOwner = false 
       {comments.slice(0, visibleCount).map((c) => (
         <CommentCard key={c.id} c={c} canInteract={canInteract} isOwner={isOwner} />
       ))}
-      {visibleCount < comments.length && (
-        <div className="flex justify-center pt-[4px]">
-          <button
-            type="button"
-            onClick={() => setVisibleCount((count) => count + 5)}
-            className="px-[20px] py-[8px] rounded-[8px] border border-primary text-primary text-[13px] font-medium hover:bg-primary/5 transition-colors cursor-pointer"
-          >
-            ดูเพิ่มเติม
-          </button>
+      {comments.length > 5 && (
+        <div className="flex flex-col items-center gap-[12px] pt-[8px]">
+          <span className="text-[13px] text-muted-foreground">
+            แสดง {Math.min(visibleCount, comments.length)} จาก {comments.length} ความคิดเห็น
+          </span>
+          <div className="flex gap-[8px]">
+            {visibleCount < comments.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount((count) => count + 5)}
+                className="bg-foreground text-background text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                โหลดเพิ่มเติม
+              </button>
+            )}
+            {visibleCount > 5 && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(5)}
+                className="bg-white border border-border text-foreground text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:border-primary/50 transition-colors cursor-pointer"
+              >
+                แสดงน้อยลง
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
