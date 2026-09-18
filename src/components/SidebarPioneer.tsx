@@ -61,8 +61,17 @@ const SidebarPioneer = () => {
 
     useEffect(() => {
         fetchBadges()
-        const interval = setInterval(fetchBadges, 30_000)
-        return () => clearInterval(interval)
+        const interval = setInterval(fetchBadges, 10_000)
+        const refreshOnVisible = () => {
+            if (document.visibilityState === 'visible') fetchBadges()
+        }
+        window.addEventListener('focus', fetchBadges)
+        document.addEventListener('visibilitychange', refreshOnVisible)
+        return () => {
+            clearInterval(interval)
+            window.removeEventListener('focus', fetchBadges)
+            document.removeEventListener('visibilitychange', refreshOnVisible)
+        }
     }, [fetchBadges])
 
     const handleLogout = () => { logout(); navigate('/') }

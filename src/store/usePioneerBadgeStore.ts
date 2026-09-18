@@ -31,31 +31,54 @@ export const usePioneerBadgeStore = create<PioneerBadgeStore>((set) => ({
             const eligibleProjects = projects.filter((project) =>
                 MEETING_ELIGIBLE_PROJECT_STATES.includes(project.state)
             )
-            const schedulableCounts = await Promise.all(
+            const actionableCounts = await Promise.all(
                 eligibleProjects.map(async (project) => {
                     const [milestonesRes, meetingsRes] = await Promise.all([
                         api.get(`/projects/${project.id}/milestones`),
                         api.get(`/me/projects/${project.id}/meetings`, { params: { filter: 'all' } }),
                     ])
-                    const milestones: { id: number; status?: string }[] = milestonesRes.data?.data ?? []
-                    const meetings: { milestone_id: number; status?: string }[] = meetingsRes.data?.data ?? []
+                    const milestones: { id: number; status?: string; voting_open?: boolean }[] = milestonesRes.data?.data ?? []
+                    const meetings: { milestone_id: number; status?: string; date: string; time: string }[] = meetingsRes.data?.data ?? []
                     const scheduledMilestoneIds = new Set(
                         meetings
-                            .filter((meeting) => meeting.status !== 'cancelled')
+                            .filter((meeting) => meeting.status === 'open')
+                            .map((meeting) => meeting.milestone_id)
+                    )
+                    const now = new Date()
+                    const passedMeetingMilestoneIds = new Set(
+                        meetings
+                            .filter((meeting) => {
+                                if (meeting.status === 'cancelled') return false
+                                const date = new Date(meeting.date)
+                                const time = new Date(meeting.time)
+                                if (Number.isNaN(date.getTime()) || Number.isNaN(time.getTime())) return false
+                                return new Date(
+                                    date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                                    time.getUTCHours(), time.getUTCMinutes(),
+                                ) <= now
+                            })
                             .map((meeting) => meeting.milestone_id)
                     )
 
-                    return milestones.filter((milestone) =>
-                        milestone.status === MEETING_ELIGIBLE_MILESTONE_STATUS &&
-                        !scheduledMilestoneIds.has(milestone.id)
-                    ).length
+                    return {
+                        schedulable: milestones.filter((milestone) =>
+                            milestone.status === MEETING_ELIGIBLE_MILESTONE_STATUS &&
+                            !scheduledMilestoneIds.has(milestone.id)
+                        ).length,
+                        voteReady: milestones.filter((milestone) =>
+                            milestone.status === MEETING_ELIGIBLE_MILESTONE_STATUS &&
+                            milestone.voting_open !== true &&
+                            passedMeetingMilestoneIds.has(milestone.id)
+                        ).length,
+                    }
                 })
             )
             const counts = badgeRes.data?.data ?? empty
             set({
                 counts: {
                     ...counts,
-                    upcoming_meetings: schedulableCounts.reduce((total, count) => total + count, 0),
+                    active_milestones: actionableCounts.reduce((total, count) => total + count.voteReady, 0),
+                    upcoming_meetings: actionableCounts.reduce((total, count) => total + count.schedulable, 0),
                 },
             })
         } catch {
