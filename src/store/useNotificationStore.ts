@@ -38,7 +38,26 @@ function safeNotificationPrefs(raw: unknown): Record<string, boolean> | null {
     return null
 }
 
-export const useNotificationStore = create<NotificationStore>((set) => ({
+const bellSeenStorageKey = (userId: number) => `flyup:notification-bell-seen:${userId}`
+
+function getLastSeenNotificationId(userId?: number): number {
+    if (!userId) return 0
+    try {
+        return Number(localStorage.getItem(bellSeenStorageKey(userId))) || 0
+    } catch {
+        return 0
+    }
+}
+
+function saveLastSeenNotificationId(userId: number, notificationId: number) {
+    try {
+        localStorage.setItem(bellSeenStorageKey(userId), String(notificationId))
+    } catch {
+        // The in-memory count still clears when storage is unavailable.
+    }
+}
+
+export const useNotificationStore = create<NotificationStore>((set, get) => ({
     notifications: [],
     unread: 0,
     bellUnread: 0,
@@ -50,10 +69,15 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
         try {
             const res = await api.get('/notifications', { params: { limit: 20, page: 1 } })
             const data = res.data?.data
+            const notifications: Notification[] = data?.notifications ?? []
+            const userId = notifications[0]?.user_id
+            const lastSeenId = getLastSeenNotificationId(userId)
             set({
-                notifications: data?.notifications ?? [],
+                notifications,
                 unread: data?.unread ?? 0,
-                bellUnread: data?.unread ?? 0,
+                bellUnread: lastSeenId > 0
+                    ? notifications.filter((n) => !n.is_read && n.id > lastSeenId).length
+                    : data?.unread ?? 0,
                 total: data?.total ?? 0,
             })
         } catch {
@@ -92,6 +116,11 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
     },
 
     clearUnreadCount: () => {
+        const latest = get().notifications.reduce<Notification | null>(
+            (current, notif) => !current || notif.id > current.id ? notif : current,
+            null,
+        )
+        if (latest) saveLastSeenNotificationId(latest.user_id, latest.id)
         set({ bellUnread: 0 })
     },
 
