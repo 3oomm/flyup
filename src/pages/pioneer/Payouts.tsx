@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Banknote, Clock, CheckCircle2, Lock, Loader2, Building2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Banknote, Clock, CheckCircle2, Loader2, Building2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { usePioneerPayoutStore, type PioneerPayoutItem } from '../../store/usePioneerPayoutStore'
 import { useProjectStore } from '../../store/useProjectStore'
 
@@ -178,12 +178,6 @@ function ProjectDetail({
         {items.map(item => <PayoutRow key={item.id} item={item} />)}
       </div>
 
-      {!allComplete && (
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700">
-          <Lock size={16} className="shrink-0 mt-0.5" />
-          <span>เมื่อโปรเจกต์ผ่านครบ 4 Phase Admin จะดำเนินการโอนยอดที่เหลือทั้งหมดให้</span>
-        </div>
-      )}
     </div>
   )
 }
