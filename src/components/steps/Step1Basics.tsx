@@ -476,18 +476,33 @@ const Step1Basics = () => {
                 const newGoal = parseNum(e.target.value);
                 const autoSoftCap = Math.ceil(newGoal * 0.7);
                 const autoMinInvest = Math.ceil(newGoal * 0.01);
-                setLocalData({ ...localData, fundingGoal: newGoal, softCap: autoSoftCap, minInvestAmount: autoMinInvest });
+                setLocalData({
+                  ...localData,
+                  fundingGoal: newGoal,
+                  softCap: autoSoftCap,
+                  minInvestAmount: autoMinInvest,
+                  maxInvestAmount: newGoal,
+                });
               }}
               onBlur={async () => {
                 setActiveField(null);
                 if (isFundingLocked) return;
                 const goalChanged = localData.fundingGoal !== currentProject.fundingGoal;
                 const capChanged = localData.softCap !== currentProject.softCap;
-                if (!goalChanged && !capChanged) return;
-                updateProjectInfo({ fundingGoal: localData.fundingGoal, softCap: localData.softCap });
+                const maxInvestChanged = localData.maxInvestAmount !== currentProject.maxInvestAmount;
+                if (!goalChanged && !capChanged && !maxInvestChanged) return;
+                updateProjectInfo({
+                  fundingGoal: localData.fundingGoal,
+                  softCap: localData.softCap,
+                  maxInvestAmount: localData.maxInvestAmount,
+                });
                 setSaveStatus('saving');
                 if (projectId) {
-                  await updateProject(Number(projectId), { fundingGoal: localData.fundingGoal, softCap: localData.softCap });
+                  await updateProject(Number(projectId), {
+                    fundingGoal: localData.fundingGoal,
+                    softCap: localData.softCap,
+                    maxInvestAmount: localData.maxInvestAmount,
+                  });
                 }
                 triggerSaved();
               }}
