@@ -3,7 +3,6 @@ import { toast } from 'react-hot-toast'
 import api from '../services/api'
 import { addDays } from '../components/pioneer/milestone/types'
 import type { MilestoneData, MilestoneStatus, EvidenceLink } from '../components/pioneer/milestone/types'
-import { usePioneerBadgeStore } from './usePioneerBadgeStore'
 
 const PHASE_PERCENTS = [0.15, 0.20, 0.30, 0.35]
 
@@ -260,7 +259,6 @@ export const useMilestoneStore = create<MilestoneStore>((set) => ({
       toast.success('เปิดการโหวตเรียบร้อยแล้ว')
       // refetch จาก server เพื่อให้ voting_opened_at อัปเดต ซึ่ง trigger re-fetch voters ใน PhaseCard
       await useMilestoneStore.getState().fetchMilestones(projectId)
-      await usePioneerBadgeStore.getState().fetchBadges()
       return true
     } catch {
       toast.error('ไม่สามารถเปิดการโหวตได้')
