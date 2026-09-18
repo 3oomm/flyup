@@ -79,7 +79,9 @@ function groupInvestments(invs: BoosterInvestment[]): GroupedInvestment[] {
       project_id,
       primary,
       all: list,
-      totalAmount: list.reduce((s, i) => s + (i.amount ?? 0), 0),
+      totalAmount: list
+        .filter(i => i.status === 'verified')
+        .reduce((s, i) => s + (i.amount ?? 0), 0),
     }
   })
 }
@@ -163,7 +165,7 @@ function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment
 
         {/* Summary Footer */}
         <div className="px-5 py-3.5 border-t border-border bg-muted/30 flex justify-between items-center">
-          <span className="text-xs text-muted-foreground">ยอดรวมทั้งหมด</span>
+          <span className="text-xs text-muted-foreground">ยอดลงทุนที่ชำระสำเร็จ</span>
           <span className="font-bold text-foreground">฿{group.totalAmount.toLocaleString()}</span>
         </div>
       </div>
@@ -230,7 +232,7 @@ function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowA
           )}
         </div>
         <p className="text-sm text-muted-foreground mb-2">
-          ลงทุน ฿{group.totalAmount.toLocaleString()} · {dateStr}
+          ลงทุนสำเร็จ ฿{group.totalAmount.toLocaleString()} · {dateStr}
         </p>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span className="bg-muted px-2.5 py-1 rounded-full">
@@ -343,10 +345,10 @@ const MyInvestments = () => {
   useEffect(() => { fetchProfitPayouts(); }, [fetchProfitPayouts]);
 
   const stats = useMemo(() => {
-    const valid = investments.filter(i => i.status !== 'cancelled');
+    const verified = investments.filter(i => i.status === 'verified');
     return {
-      totalAmount: valid.reduce((s, i) => s + (i.amount || 0), 0),
-      projectCount: new Set(valid.map(i => i.project_id)).size,
+      totalAmount: verified.reduce((s, i) => s + (i.amount || 0), 0),
+      projectCount: new Set(verified.map(i => i.project_id)).size,
       totalProfit: profitPayouts
         .filter(p => p.status === 'confirmed')
         .reduce((s, p) => s + p.amount, 0),
