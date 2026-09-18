@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api from '../services/api';
 import type { PublicProject } from './usePublicProjectStore';
+import { useBoosterBadgeStore } from './useBoosterBadgeStore';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -210,10 +211,14 @@ export const useBoosterStore = create<BoosterStoreState>((set) => ({
   voteOnMilestone: async (milestoneId: number, payload: { choice: 'approve' | 'reject', comment?: string }) => {
     try {
       await api.post(`/investments/milestones/${milestoneId}/vote`, payload);
+      await useBoosterBadgeStore.getState().fetchBadges();
       return true;
     } catch (error: unknown) {
       const msg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '';
-      if (msg === 'you have already voted') return 'already_voted' as const;
+      if (msg === 'you have already voted') {
+        await useBoosterBadgeStore.getState().fetchBadges();
+        return 'already_voted' as const;
+      }
       console.error('voteOnMilestone:', error);
       return false;
     }

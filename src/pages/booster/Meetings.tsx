@@ -158,7 +158,7 @@ function MeetingCard({ meeting, now }: { meeting: BoosterMeeting; now: Date }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const Meetings = () => {
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('upcoming');
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('all');
   const [now, setNow] = useState(() => new Date());
   const { boosterMeetings, fetchBoosterMeetings } = useBoosterStore();
 

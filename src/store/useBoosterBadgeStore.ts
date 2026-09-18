@@ -24,8 +24,25 @@ export const useBoosterBadgeStore = create<BoosterBadgeStore>((set) => ({
     counts: empty,
     fetchBadges: async () => {
         try {
-            const res = await api.get('/booster/badges')
-            set({ counts: res.data?.data ?? empty })
+            const [badgeRes, meetingsRes] = await Promise.all([
+                api.get('/booster/badges'),
+                api.get('/me/investor-meetings'),
+            ])
+            const meetings: { date: string; time: string; status: string }[] = meetingsRes.data?.data ?? []
+            const now = new Date()
+            const upcomingMeetings = meetings.filter((meeting) => {
+                if (meeting.status !== 'open') return false
+                const date = new Date(meeting.date)
+                const time = new Date(meeting.time)
+                if (Number.isNaN(date.getTime()) || Number.isNaN(time.getTime())) return false
+                const startsAt = new Date(
+                    date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                    time.getUTCHours(), time.getUTCMinutes(),
+                )
+                return startsAt > now
+            }).length
+            const counts = badgeRes.data?.data ?? empty
+            set({ counts: { ...counts, upcoming_meetings: upcomingMeetings } })
         } catch {
             // ignore
         }

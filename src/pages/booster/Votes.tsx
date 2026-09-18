@@ -34,6 +34,8 @@ const PAGE_SIZE = 5;
 function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
   const fmtDate = (d?: string | null) =>
     d ? new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+  const isPassed = vote.status === 'approved' || vote.status === 'paid';
+  const isFailed = vote.status === 'rejected' || vote.status === 'failed';
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -45,8 +47,12 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
               เปิดโหวต
             </span>
           ) : (
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-              ปิดแล้ว
+            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+              isPassed ? 'bg-green-50 text-green-700 border-green-200' :
+              isFailed ? 'bg-red-50 text-red-600 border-red-200' :
+              'bg-muted text-muted-foreground border-border'
+            }`}>
+              {isPassed ? 'โหวตผ่าน' : isFailed ? 'โหวตไม่ผ่าน' : 'ปิดแล้ว'}
             </span>
           )}
         </div>
@@ -60,12 +66,12 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
           )}
           {!isOpen && (
             <span className={`font-semibold ${
-              vote.status === 'approved' || vote.status === 'paid' ? 'text-green-600' :
-              vote.status === 'rejected' ? 'text-red-500' : 'text-muted-foreground'
+              isPassed ? 'text-green-600' :
+              isFailed ? 'text-red-500' : 'text-muted-foreground'
             }`}>
               ผลโหวต: {
-                vote.status === 'approved' || vote.status === 'paid' ? 'อนุมัติ' :
-                vote.status === 'rejected' ? 'ไม่อนุมัติ' : vote.status
+                isPassed ? 'ผ่าน' :
+                isFailed ? 'ไม่ผ่าน' : 'รอสรุปผล'
               }
             </span>
           )}
