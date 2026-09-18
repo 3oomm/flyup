@@ -122,10 +122,16 @@ const Projects = () => {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        p.title.toLowerCase().includes(query) ||
-        (p.description || '').toLowerCase().includes(query)
-      );
+      result = result.filter(p => {
+        const rawCat = p.category as unknown;
+        const categoryName = typeof rawCat === 'string'
+          ? rawCat
+          : (rawCat as { name?: string } | null)?.name ?? '';
+
+        return p.title.toLowerCase().includes(query) ||
+          (p.description || '').toLowerCase().includes(query) ||
+          categoryName.toLowerCase().includes(query);
+      });
     }
 
     if (activeCategory !== 'ทั้งหมด') {

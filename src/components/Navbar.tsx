@@ -94,11 +94,19 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const suggestions = publicProjects.filter((p) =>
-        searchQuery.trim() &&
-        (p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (p.description ?? '').toLowerCase().includes(searchQuery.toLowerCase()))
-    ).slice(0, 5);
+    const suggestions = publicProjects.filter((p) => {
+        const query = searchQuery.trim().toLowerCase();
+        if (!query) return false;
+
+        const rawCategory = p.category as unknown;
+        const categoryName = typeof rawCategory === 'string'
+            ? rawCategory
+            : (rawCategory as { name?: string } | null)?.name ?? '';
+
+        return p.title.toLowerCase().includes(query) ||
+            (p.description ?? '').toLowerCase().includes(query) ||
+            categoryName.toLowerCase().includes(query);
+    }).slice(0, 5);
     const suggestionRef = useRef<HTMLDivElement>(null);
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
