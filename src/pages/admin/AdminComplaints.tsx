@@ -17,6 +17,8 @@ const STATUS_CONFIG: Record<ComplaintStatus, { label: string; className: string;
 const fmtDate = (d?: string | null) =>
     d ? new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'
 
+const REJECT_NOTE_MAX_LENGTH = 50
+
 const ResolveModal = ({
     complaint,
     mode,
@@ -47,10 +49,16 @@ const ResolveModal = ({
                     <textarea
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
+                        maxLength={isResolve ? undefined : REJECT_NOTE_MAX_LENGTH}
                         rows={4}
                         placeholder={isResolve ? 'อธิบายผลการตรวจสอบและการดำเนินการ' : 'เหตุผลที่ปฏิเสธคำร้องเรียนนี้'}
                         className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
                     />
+                    {!isResolve && (
+                        <span className="self-end text-[11px] text-muted-foreground" aria-live="polite">
+                            {note.length}/{REJECT_NOTE_MAX_LENGTH} ตัวอักษร
+                        </span>
+                    )}
                 </div>
                 <div className="flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
@@ -243,16 +251,18 @@ const AdminComplaints = () => {
         }
     }
 
-    const filtered = complaints.filter((c) => {
-        const q = search.toLowerCase()
-        const fullname = c.complainant ? `${c.complainant.first_name} ${c.complainant.last_name}` : ''
-        return (
-            c.subject.toLowerCase().includes(q) ||
-            c.body.toLowerCase().includes(q) ||
-            fullname.toLowerCase().includes(q) ||
-            (c.project?.title ?? '').toLowerCase().includes(q)
-        )
-    })
+    const filtered = complaints
+        .filter((c) => tab === 'all' || c.status === tab)
+        .filter((c) => {
+            const q = search.toLowerCase()
+            const fullname = c.complainant ? `${c.complainant.first_name} ${c.complainant.last_name}` : ''
+            return (
+                c.subject.toLowerCase().includes(q) ||
+                c.body.toLowerCase().includes(q) ||
+                fullname.toLowerCase().includes(q) ||
+                (c.project?.title ?? '').toLowerCase().includes(q)
+            )
+        })
 
     const tabs: { key: ComplaintStatus | 'all'; label: string }[] = [
         { key: 'open', label: 'รอดำเนินการ' },
