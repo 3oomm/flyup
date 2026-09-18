@@ -59,11 +59,19 @@ const ConfirmModal = ({
                         <div className="flex flex-col gap-1">
                             <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-error">*</span></label>
                             <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                maxLength={35}
                                 value={transferRef}
-                                onChange={(e) => setTransferRef(e.target.value)}
-                                placeholder="เช่น TXN-20260426-001"
+                                onChange={(e) => setTransferRef(e.target.value.replace(/\D/g, '').slice(0, 35))}
+                                placeholder="กรอกเลขอ้างอิง สูงสุด 35 หลัก"
                                 className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
                             />
+                            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                                <span>กรอกได้เฉพาะตัวเลข</span>
+                                <span>{transferRef.length}/35</span>
+                            </div>
                         </div>
                         <div className="flex flex-col gap-1">
                             <label className="text-[13px] font-medium">หมายเหตุ</label>
