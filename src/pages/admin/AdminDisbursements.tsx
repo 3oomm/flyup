@@ -120,7 +120,7 @@ const ConfirmModal = ({
 
 const AdminDisbursements = () => {
     const { disbursements, isLoading, fetchAll, fetchPending, confirm } = useDisbursementStore()
-    const [tab, setTab] = useState<'pending' | 'all'>('pending')
+    const [tab, setTab] = useState<'pending' | 'all'>('all')
     const [search, setSearch] = useState('')
     const [selected, setSelected] = useState<Disbursement | null>(null)
     const [isConfirming, setIsConfirming] = useState(false)
@@ -139,6 +139,7 @@ const AdminDisbursements = () => {
     }
 
     const filtered = disbursements.filter((d) => {
+        if (tab === 'pending' && d.status !== 'pending') return false
         const q = search.toLowerCase()
         return (
             d.project_title.toLowerCase().includes(q) ||
