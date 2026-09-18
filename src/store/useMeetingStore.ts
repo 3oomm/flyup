@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
+import { usePioneerBadgeStore } from './usePioneerBadgeStore';
 import {
   MEETING_ELIGIBLE_MILESTONE_STATUS,
   type CreateMeetingPayload,
@@ -106,6 +107,7 @@ export const useMeetingStore = create<MeetingStoreState>((set) => ({
     set({ isSubmitting: true });
     try {
       await api.post(`/pioneer/projects/meeting`, payload);
+      void usePioneerBadgeStore.getState().fetchBadges();
       toast.success('ส่งนัดหมายเรียบร้อยแล้ว');
       return true;
     } catch (err: unknown) {
@@ -140,6 +142,7 @@ export const useMeetingStore = create<MeetingStoreState>((set) => ({
     set({ isSubmitting: true });
     try {
       await api.patch(`/pioneer/projects/cancel/meeting/${id}`);
+      void usePioneerBadgeStore.getState().fetchBadges();
       toast.success('ยกเลิกนัดหมายเรียบร้อยแล้ว');
       return true;
     } catch (err: unknown) {

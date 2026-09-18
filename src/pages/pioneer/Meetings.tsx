@@ -31,6 +31,14 @@ const PioneerMeetings = () => {
     () => projects.filter(p => MEETING_ELIGIBLE_PROJECT_STATES.includes(p.state)),
     [projects],
   );
+  const schedulableMilestones = useMemo(() => {
+    const scheduledMilestoneIds = new Set(
+      meetings
+        .filter(meeting => meeting.status !== 'cancelled')
+        .map(meeting => meeting.milestone_id),
+    );
+    return milestones.filter(milestone => !scheduledMilestoneIds.has(milestone.id));
+  }, [meetings, milestones]);
 
   useEffect(() => {
     if (!projectsReady) return;
@@ -74,7 +82,7 @@ const PioneerMeetings = () => {
       </div>
 
       <CreateMeetingForm
-        milestones={milestones}
+        milestones={schedulableMilestones}
         milestonesLoading={milestonesLoading}
         onCreated={handleCreated}
       />
