@@ -210,7 +210,7 @@ const AdminDisbursements = () => {
                                         <span className="md:hidden">ดูรายละเอียด</span>
                                         <span className="hidden md:flex items-center gap-1">
                                             {isPending && <CheckCircle size={13} />}
-                                            {isPending ? 'ยืนยัน' : 'ดูรายละเอียด'}
+                                            {isPending ? 'จัดการ' : 'ดูรายละเอียด'}
                                         </span>
                                     </button>
                                 </div>
