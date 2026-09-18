@@ -17,6 +17,7 @@ import { usePublicProjectStore } from "../../store/usePublicProjectStore";
 import { useInvestmentStore } from "../../store/useInvestmentStore";
 
 type Step = 1 | 2 | 3 | 4;
+const PAYMENT_QR_LIFETIME_SECONDS = 5 * 60;
 
 const ContractModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;
@@ -62,7 +63,7 @@ const Investment = () => {
   const [isPrintingPDF, setIsPrintingPDF] = useState(false);
   const [isSavingQr, setIsSavingQr] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15 * 60);
+  const [timeLeft, setTimeLeft] = useState(PAYMENT_QR_LIFETIME_SECONDS);
 
   const pollingRef = useRef<number | null>(null);
 
@@ -93,7 +94,7 @@ const Investment = () => {
 
       const remainingSeconds = restored.expires_at
         ? Math.max(0, Math.floor((new Date(restored.expires_at).getTime() - Date.now()) / 1000))
-        : 15 * 60;
+        : PAYMENT_QR_LIFETIME_SECONDS;
       if (remainingSeconds <= 0) {
         toast.error('QR Code หมดอายุแล้ว กรุณาสร้างรายการลงทุนใหม่');
         clearInvestmentData();
@@ -154,7 +155,7 @@ const Investment = () => {
             if (pollingRef.current) clearInterval(pollingRef.current);
             toast.error('การชำระเงินไม่สำเร็จ หรือ QR Code หมดอายุ กรุณาทำรายการใหม่');
             clearInvestmentData();
-            setTimeLeft(15 * 60);
+            setTimeLeft(PAYMENT_QR_LIFETIME_SECONDS);
             setStep(2);
           }
         } catch (error) {
