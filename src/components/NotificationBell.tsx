@@ -43,7 +43,10 @@ function getNotifPath(notif: Notification, role: string): string {
                 if (related_type === 'project' && related_id)
                     return `/pioneer/dashboard/projects/${related_id}/milestones`
                 return '/pioneer/dashboard/milestones'
-            case 'profit':   return '/pioneer/dashboard/profit'
+            case 'profit':
+                return related_type === 'disbursement'
+                    ? '/pioneer/dashboard/payouts'
+                    : '/pioneer/dashboard/profit'
             case 'meeting':  return '/pioneer/dashboard/meetings'
             case 'project_status': return '/pioneer/dashboard/projects'
             default:         return '/pioneer/dashboard'
