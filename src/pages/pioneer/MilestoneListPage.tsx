@@ -184,7 +184,9 @@ const MilestoneListPage = () => {
           {/* Tabs */}
           <div className="flex items-center gap-2 flex-wrap">
             {visibleTabs.map(t => {
-              const count = t.key === 'all' ? projects.length : projects.filter(p => p.state === t.key).length
+              const count = t.key === 'all'
+                ? manageableProjects.length
+                : manageableProjects.filter(p => p.state === t.key).length
               return (
                 <button
                   key={t.key}
