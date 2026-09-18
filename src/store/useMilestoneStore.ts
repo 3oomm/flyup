@@ -260,8 +260,15 @@ export const useMilestoneStore = create<MilestoneStore>((set) => ({
       // refetch จาก server เพื่อให้ voting_opened_at อัปเดต ซึ่ง trigger re-fetch voters ใน PhaseCard
       await useMilestoneStore.getState().fetchMilestones(projectId)
       return true
-    } catch {
-      toast.error('ไม่สามารถเปิดการโหวตได้')
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message
+      const thaiMessage = message === 'please schedule a new meeting first'
+        ? 'กรุณานัดประชุมรอบใหม่ก่อนเปิดโหวต'
+        : message === 'meeting has not started yet'
+          ? 'ยังไม่ถึงเวลาประชุม จึงยังเปิดโหวตไม่ได้'
+          : 'ไม่สามารถเปิดการโหวตได้'
+      toast.error(thaiMessage)
       return false
     } finally {
       set({ isOpeningVoting: false })

@@ -34,7 +34,8 @@ const PioneerMeetings = () => {
   const schedulableMilestones = useMemo(() => {
     const scheduledMilestoneIds = new Set(
       meetings
-        .filter(meeting => meeting.status !== 'cancelled')
+        // เฉพาะนัดที่ยังเปิดอยู่เท่านั้นที่กันการสร้างนัดใหม่
+        .filter(meeting => meeting.status === 'open')
         .map(meeting => meeting.milestone_id),
     );
     return milestones.filter(milestone => !scheduledMilestoneIds.has(milestone.id));

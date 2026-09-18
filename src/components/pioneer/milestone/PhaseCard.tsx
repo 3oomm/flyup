@@ -54,7 +54,8 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
     } catch { return null }
   }
 
-  const activeMeetings = (milestone.meetings ?? []).filter(m => m.status !== 'cancelled')
+  // นัดเก่าที่ปิด/ยกเลิกแล้วห้ามนำมาใช้เปิดโหวตรอบใหม่
+  const activeMeetings = (milestone.meetings ?? []).filter(m => m.status === 'open')
   const hasMeeting = activeMeetings.length > 0
   const meetingPassed = activeMeetings.some(m => {
     const dt = getMeetingDatetime(m)
