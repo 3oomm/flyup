@@ -190,7 +190,14 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
   fetchPublicProjectBySlug: async (slug: string) => {
     set({ isDetailLoading: true, currentPublicProject: null });
     try {
-      const res = await api.get(`/projects/slug/${slug}`);
+      // Project slugs always end with the project ID. Using that ID avoids
+      // encoded Thai path parameters being compared directly with the
+      // decoded slug stored in the database.
+      const projectId = slug.match(/-(\d+)$/)?.[1];
+      const endpoint = projectId
+        ? `/projects/${projectId}`
+        : `/projects/slug/${encodeURIComponent(slug)}`;
+      const res = await api.get(endpoint);
       set({ currentPublicProject: res.data?.data ?? null });
     } catch (error) {
       console.error('fetchPublicProjectBySlug:', error);
