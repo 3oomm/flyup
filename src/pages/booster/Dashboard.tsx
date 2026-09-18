@@ -367,6 +367,7 @@ const toggleProject = (name: string) =>
                       refund_pending: {label:'รอคืนเงิน', cls:'bg-orange-100 text-orange-700'},
                       pending:   {label:'รอชำระ',          cls:'bg-yellow-100 text-yellow-700'},
                       pending_payment: {label:'รอชำระเงิน', cls:'bg-yellow-100 text-yellow-700'},
+                      expired: {label:'หมดเวลาชำระเงิน', cls:'bg-gray-100 text-gray-600'},
                     }
                     const st = statusCfg[statusKey] ?? {label: statusKey, cls: 'bg-gray-100 text-gray-600'}
                     const coverImage = inv.project?.cover_image ?? null

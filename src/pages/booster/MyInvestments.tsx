@@ -10,6 +10,7 @@ const PAGE_SIZE = 5;
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending:        { label: 'รอชำระเงิน',      color: 'bg-yellow-100 text-yellow-700' },
   pending_payment:{ label: 'รอชำระเงิน',      color: 'bg-yellow-100 text-yellow-700' },
+  expired:        { label: 'หมดเวลาชำระเงิน', color: 'bg-gray-100 text-gray-600' },
   refund_pending: { label: 'รอคืนเงิน',       color: 'bg-orange-100 text-orange-700' },
   refunded:       { label: 'คืนเงินแล้ว',     color: 'bg-orange-100 text-orange-700' },
   cancelled:      { label: 'ยกเลิก',          color: 'bg-red-100 text-red-700' },
@@ -47,7 +48,7 @@ const TABS: { key: string; label: string }[] = [
   { key: 'closed',        label: 'เสร็จสิ้น' },
   { key: 'refund_pending',label: 'รอคืนเงิน' },
   { key: 'refunded',      label: 'คืนเงินแล้ว' },
-  { key: 'cancelled',     label: 'ยกเลิก' },
+  { key: 'cancelled',     label: 'ยกเลิก/หมดอายุ' },
 ];
 
 // ─── Grouping ─────────────────────────────────────────────────────────────────
@@ -61,7 +62,7 @@ interface GroupedInvestment {
 
 // priority order: refund_pending > verified > pending > refunded > cancelled
 const STATUS_PRIORITY: Record<string, number> = {
-  refund_pending: 5, verified: 4, pending_payment: 3, pending: 3, refunded: 2, cancelled: 1, rejected: 1,
+  refund_pending: 5, verified: 4, pending_payment: 3, pending: 3, refunded: 2, expired: 1, cancelled: 1, rejected: 1,
 }
 
 function groupInvestments(invs: BoosterInvestment[]): GroupedInvestment[] {
@@ -92,7 +93,7 @@ function matchesTab(inv: BoosterInvestment, tab: string): boolean {
   if (tab === 'pending_payment') return inv.status === 'pending_payment' || inv.status === 'pending';
   if (tab === 'refund_pending') return inv.status === 'refund_pending';
   if (tab === 'refunded') return inv.status === 'refunded';
-  if (tab === 'cancelled') return inv.status === 'cancelled' || inv.status === 'rejected';
+  if (tab === 'cancelled') return inv.status === 'cancelled' || inv.status === 'rejected' || inv.status === 'expired';
   // tabs ที่ map จาก project.state
   if (inv.status === 'verified') return (inv.project?.state ?? 'funding') === tab;
   return false;
