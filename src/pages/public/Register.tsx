@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router"
 import { Loader2, Users, CheckCircle, Circle, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useAuthStore } from "../../store/useAuthStore"
+import { isValidPasswordLength, unicodeLength, utf8ByteLength } from "../../lib/validation"
 
 type UserRole = 'booster' | 'pioneer' | ''
 
@@ -82,7 +83,7 @@ const Register = () => {
             /[a-z]/.test(formData.password) &&
             /[0-9]/.test(formData.password) &&
             /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(formData.password) &&
-            formData.password.length >= 8;
+            isValidPasswordLength(formData.password);
 
         if (formData.password && !isPasswordValid) {
             newErrors.password = true;
@@ -189,7 +190,8 @@ const Register = () => {
                                         { id: 2, text: "พิมพ์เล็ก 1 ตัว", valid: /[a-z]/.test(formData.password) },
                                         { id: 3, text: "ตัวเลข 1 ตัว", valid: /[0-9]/.test(formData.password) },
                                         { id: 4, text: "อักษรพิเศษ 1 ตัว", valid: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(formData.password) },
-                                        { id: 5, text: "ไม่ต่ำกว่า 8 ตัว", valid: formData.password.length >= 8 }
+                                        { id: 5, text: "8 ตัวอักษรขึ้นไป", valid: unicodeLength(formData.password) >= 8 },
+                                        { id: 6, text: "ไม่เกิน 72 ไบต์ UTF-8", valid: utf8ByteLength(formData.password) <= 72 }
                                     ].map(item => (
                                         <div key={item.id} className="flex items-center gap-[6px]">
                                             {item.valid ? (

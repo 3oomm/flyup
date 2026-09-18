@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
-import { CheckSquare, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router';
+import { CheckSquare, Loader2, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router';
 import { useBoosterStore } from '../../store/useBoosterStore';
 import { useMilestoneStore, type ProjectMilestoneRaw } from '../../store/useMilestoneStore';
 
@@ -17,6 +17,12 @@ interface VoteMilestone {
   voting_closed_at: string | null;
   status: string;
   percent_release: number;
+}
+
+interface VoteProject {
+  id: number;
+  title: string;
+  milestones: VoteMilestone[];
 }
 
 type TabKey = 'all' | 'open' | 'closed';
@@ -98,6 +104,40 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
   );
 }
 
+function ProjectRow({ project }: { project: VoteProject }) {
+  const openCount = project.milestones.filter(m => m.voting_open).length;
+  const closedCount = project.milestones.filter(m => !m.voting_open && m.voting_closed_at).length;
+
+  return (
+    <Link
+      to={`/booster/votes?project=${project.id}`}
+      className="bg-card border border-border rounded-xl p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:shadow-sm transition-all"
+    >
+      <div className="min-w-0">
+        <h3 className="font-bold text-foreground text-base leading-tight mb-2">{project.title}</h3>
+        <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+            {project.milestones.length} Phase
+          </span>
+          {openCount > 0 && (
+            <span className="px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20">
+              เปิดโหวต {openCount}
+            </span>
+          )}
+          {closedCount > 0 && (
+            <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+              ปิดแล้ว {closedCount}
+            </span>
+          )}
+        </div>
+      </div>
+      <span className="shrink-0 px-6 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground">
+        ดูแต่ละ Phase
+      </span>
+    </Link>
+  );
+}
+
 function Pagination({
   page, totalPages, onChange,
 }: { page: number; totalPages: number; onChange: (p: number) => void }) {
@@ -144,6 +184,8 @@ const Votes = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [page, setPage] = useState(1);
+  const [searchParams] = useSearchParams();
+  const selectedProjectId = Number(searchParams.get('project')) || null;
 
   useEffect(() => { fetchMyInvestments(); }, [fetchMyInvestments]);
 
@@ -178,17 +220,42 @@ const Votes = () => {
     fetchAll();
   }, [investments, investLoading, fetchProjectMilestones]);
 
-  const openVotes   = useMemo(() => milestones.filter(m => m.voting_open === true), [milestones]);
-  const closedVotes = useMemo(() => milestones.filter(m => m.voting_open === false && m.voting_closed_at), [milestones]);
+  const projects = useMemo(() => {
+    const grouped = new Map<number, VoteProject>();
+    milestones.forEach(milestone => {
+      const project = grouped.get(milestone.project_id);
+      if (project) project.milestones.push(milestone);
+      else grouped.set(milestone.project_id, {
+        id: milestone.project_id,
+        title: milestone.projectTitle,
+        milestones: [milestone],
+      });
+    });
+    return Array.from(grouped.values());
+  }, [milestones]);
 
-  const filtered = useMemo(() => {
-    if (activeTab === 'open')   return openVotes;
-    if (activeTab === 'closed') return closedVotes;
-    return milestones;
-  }, [activeTab, milestones, openVotes, closedVotes]);
+  const openProjects = useMemo(
+    () => projects.filter(project => project.milestones.some(m => m.voting_open)),
+    [projects]
+  );
+  const closedProjects = useMemo(
+    () => projects.filter(project => project.milestones.some(m => !m.voting_open && m.voting_closed_at)),
+    [projects]
+  );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const filteredProjects = useMemo(() => {
+    if (activeTab === 'open') return openProjects;
+    if (activeTab === 'closed') return closedProjects;
+    return projects;
+  }, [activeTab, projects, openProjects, closedProjects]);
+
+  const selectedProject = useMemo(
+    () => projects.find(project => project.id === selectedProjectId),
+    [projects, selectedProjectId]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredProjects.length / PAGE_SIZE));
+  const paginated = filteredProjects.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleTabChange = (key: TabKey) => { setActiveTab(key); setPage(1); };
 
@@ -197,8 +264,15 @@ const Votes = () => {
   return (
     <div className="w-full">
       <div className="mb-6">
+        {selectedProjectId && (
+          <Link to="/booster/votes" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-4">
+            <ArrowLeft size={16} /> กลับไปโปรเจกต์ทั้งหมด
+          </Link>
+        )}
         <h1 className="text-2xl font-bold text-foreground">การโหวต</h1>
-        <p className="text-sm text-muted-foreground mt-1">โหวตอนุมัติหรือปฏิเสธ Milestone ของโปรเจกต์ที่คุณลงทุน</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          {selectedProject ? selectedProject.title : 'โหวตอนุมัติหรือปฏิเสธ Milestone ของโปรเจกต์ที่คุณลงทุน'}
+        </p>
       </div>
 
       {isPageLoading ? (
@@ -207,10 +281,9 @@ const Votes = () => {
         </div>
       ) : (
         <>
-          {/* Tabs */}
-          <div className="flex items-center gap-2 flex-wrap mb-5">
+          {!selectedProjectId && <div className="flex items-center gap-2 flex-wrap mb-5">
             {TABS.map(t => {
-              const count = t.key === 'all' ? milestones.length : t.key === 'open' ? openVotes.length : closedVotes.length;
+              const count = t.key === 'all' ? projects.length : t.key === 'open' ? openProjects.length : closedProjects.length;
               return (
                 <button
                   key={t.key}
@@ -230,14 +303,26 @@ const Votes = () => {
                 </button>
               );
             })}
-          </div>
+          </div>}
 
           {/* List */}
-          {paginated.length > 0 ? (
+          {selectedProject ? (
             <div className="space-y-4">
-              {paginated.map(vote => (
+              {selectedProject.milestones
+                .slice()
+                .sort((a, b) => a.phase_no - b.phase_no)
+                .map(vote => (
                 <VoteRow key={vote.id} vote={vote} isOpen={vote.voting_open === true} />
               ))}
+            </div>
+          ) : selectedProjectId ? (
+            <div className="flex flex-col items-center justify-center py-16 bg-card border border-border rounded-xl">
+              <CheckSquare size={32} className="mb-3 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">ไม่พบโปรเจกต์นี้</p>
+            </div>
+          ) : paginated.length > 0 ? (
+            <div className="space-y-4">
+              {paginated.map(project => <ProjectRow key={project.id} project={project} />)}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 bg-card border border-border rounded-xl">
@@ -249,7 +334,7 @@ const Votes = () => {
             </div>
           )}
 
-          <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+          {!selectedProjectId && <Pagination page={page} totalPages={totalPages} onChange={setPage} />}
         </>
       )}
     </div>

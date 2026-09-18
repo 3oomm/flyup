@@ -445,11 +445,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         }
     },
 
-    // บันทึก milestone phase เดียวขึ้น backend (ต้องมี id อยู่แล้วจาก pre-create ตอน createProject)
-    saveMilestonePhase: async (_projectId, phaseIndex) => {
+    // บันทึก milestone phase เดียว: สร้างพร้อมข้อมูลจริงครั้งแรก แล้วจึง PATCH เมื่อแก้ไข
+    saveMilestonePhase: async (projectId, phaseIndex) => {
         const { currentProject } = get();
         const m = currentProject.milestones[phaseIndex];
-        const phasePercents = [15, 20, 30, 35];
 
         const acceptanceCriteria = m.criteria.filter(c => c.trim()).join('\n') || undefined;
 
@@ -457,8 +456,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         const videoUrls = (m.videos ?? []).filter(v => v.url && !v.url.startsWith('blob:')).map(v => v.url);
         const fileUrls = (m.files ?? []).filter(f => f.url && !f.url.startsWith('blob:')).map(f => f.url);
 
-        // ไม่ save ถ้ายังไม่มี id (milestone ยังไม่ถูก pre-create) หรือไม่มีข้อมูลอะไรเลย
-        if (!m.id) return;
         const hasMedia = videoUrls.length > 0 || fileUrls.length > 0;
         const hasAnyData = !!(m?.title || m?.description || m?.duration || acceptanceCriteria || hasMedia);
         if (!hasAnyData) return;
@@ -472,16 +469,31 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         if (videoUrls.length > 0) mTypes.push('video');
 
         try {
-            await api.patch(`/pioneer/projects/milestones/${m.id}`, {
+            const payload = {
                 title: m.title,
                 description: m.description || undefined,
-                phase_no: phaseIndex + 1,
-                percent_release: phasePercents[phaseIndex],
                 acceptance_criteria: acceptanceCriteria,
                 duration: m.duration || undefined,
                 urls: allUrls,
                 type: mTypes.length > 0 ? mTypes : undefined,
-            });
+            };
+
+            if (m.id) {
+                await api.patch(`/pioneer/projects/milestones/${m.id}`, payload);
+            } else {
+                const res = await api.post(`/pioneer/projects/${projectId}/milestones`, payload);
+                const newId = res.data?.data?.id;
+                if (newId) {
+                    set(state => ({
+                        currentProject: {
+                            ...state.currentProject,
+                            milestones: state.currentProject.milestones.map((item, index) =>
+                                index === phaseIndex ? { ...item, id: newId } : item
+                            ),
+                        },
+                    }));
+                }
+            }
         } catch (error) {
             console.error('saveMilestonePhase:', error);
             toast.error('บันทึก Milestone ไม่สำเร็จ');
@@ -496,25 +508,17 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             const res = await api.post('/pioneer/projects');
             const projectId = res.data?.data?.id ?? res.data?.id;
 
-            // Pre-create milestone ทั้ง 4 phase ทันที เพื่อให้มี id ครบ
-            // ต้องสร้างทีละตัว (sequential) เพื่อให้ backend assign phase_no ถูกลำดับ
-            const phasePercents = [15, 20, 30, 35];
-            const milestoneIds: (number | undefined)[] = [undefined, undefined, undefined, undefined];
-            for (let i = 0; i < phasePercents.length; i++) {
-                try {
-                    const mRes = await api.post(`/pioneer/projects/${projectId}/milestones`, {
-                        phase_no: i + 1,
-                        percent_release: phasePercents[i],
-                    });
-                    milestoneIds[i] = mRes.data?.data?.id;
-                } catch { /* ignore */ }
-            }
-
-            const milestones = initialProject.milestones.map((m, i) => ({
-                ...m,
-                id: milestoneIds[i],
-            }));
-            set({ currentProject: { ...initialProject, milestones } });
+            set({
+                currentProject: {
+                    ...initialProject,
+                    milestones: initialProject.milestones.map(m => ({
+                        ...m,
+                        criteria: [...m.criteria],
+                        files: [],
+                        videos: [],
+                    })),
+                },
+            });
             return projectId;
         } catch (error: unknown) {
             const err = error as { response?: { data?: { message?: string } }; message?: string };

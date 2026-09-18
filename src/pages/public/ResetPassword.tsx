@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router"
 import { Loader2, CheckCircle, Circle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useAuthStore } from "../../store/useAuthStore"
+import { isValidPasswordLength, unicodeLength, utf8ByteLength } from "../../lib/validation"
 
 const ResetPassword = () => {
     const { resetPassword, isResetting } = useAuthStore()
@@ -28,7 +29,7 @@ const ResetPassword = () => {
                                 /[a-z]/.test(password) && 
                                 /[0-9]/.test(password) && 
                                 /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(password) && 
-                                password.length >= 8;
+                                isValidPasswordLength(password);
 
         if (!password || !isPasswordValid) {
             setHasError(true)
@@ -82,7 +83,8 @@ const ResetPassword = () => {
                                         { id: 2, text: "พิมพ์เล็ก 1 ตัว", valid: /[a-z]/.test(password) },
                                         { id: 3, text: "ตัวเลข 1 ตัว", valid: /[0-9]/.test(password) },
                                         { id: 4, text: "อักษรพิเศษ 1 ตัว", valid: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(password) },
-                                        { id: 5, text: "ไม่ต่ำกว่า 8 ตัว", valid: password.length >= 8 }
+                                        { id: 5, text: "8 ตัวอักษรขึ้นไป", valid: unicodeLength(password) >= 8 },
+                                        { id: 6, text: "ไม่เกิน 72 ไบต์ UTF-8", valid: utf8ByteLength(password) <= 72 }
                                     ].map(item => (
                                         <div key={item.id} className="flex items-center gap-[6px]">
                                             {item.valid ? (

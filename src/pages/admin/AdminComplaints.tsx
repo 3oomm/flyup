@@ -17,7 +17,7 @@ const STATUS_CONFIG: Record<ComplaintStatus, { label: string; className: string;
 const fmtDate = (d?: string | null) =>
     d ? new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'
 
-const REJECT_NOTE_MAX_LENGTH = 50
+const ADMIN_NOTE_MAX_LENGTH = 2000
 
 const ResolveModal = ({
     complaint,
@@ -34,6 +34,8 @@ const ResolveModal = ({
 }) => {
     const [note, setNote] = useState('')
     const isResolve = mode === 'resolve'
+    const noteLength = Array.from(note.trim()).length
+    const noteValid = noteLength >= 3 && noteLength <= ADMIN_NOTE_MAX_LENGTH
     return (
         <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white rounded-2xl w-full max-w-[460px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
@@ -49,22 +51,19 @@ const ResolveModal = ({
                     <textarea
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
-                        maxLength={isResolve ? undefined : REJECT_NOTE_MAX_LENGTH}
                         rows={4}
                         placeholder={isResolve ? 'อธิบายผลการตรวจสอบและการดำเนินการ' : 'เหตุผลที่ปฏิเสธคำร้องเรียนนี้'}
                         className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
                     />
-                    {!isResolve && (
-                        <span className="self-end text-[11px] text-muted-foreground" aria-live="polite">
-                            {note.length}/{REJECT_NOTE_MAX_LENGTH} ตัวอักษร
-                        </span>
-                    )}
+                    <span className="self-end text-[11px] text-muted-foreground" aria-live="polite">
+                        {noteLength}/{ADMIN_NOTE_MAX_LENGTH.toLocaleString()} ตัวอักษร (อย่างน้อย 3)
+                    </span>
                 </div>
                 <div className="flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
                     <button
-                        onClick={() => onConfirm(note)}
-                        disabled={!note.trim() || isSubmitting}
+                        onClick={() => onConfirm(note.trim())}
+                        disabled={!noteValid || isSubmitting}
                         className={`px-4 py-2 text-[13px] rounded-lg text-white disabled:opacity-50 flex items-center gap-2 ${
                             isResolve ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
                         }`}

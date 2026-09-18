@@ -3,6 +3,7 @@ import { Upload, X, Plus, CheckCircle2, Circle, ExternalLink, Loader2, Send } fr
 import Swal from 'sweetalert2'
 import type { EvidenceLink, MilestoneData } from './types'
 import { useMilestoneStore } from '../../../store/useMilestoneStore'
+import { isValidHttpUrl } from '../../../lib/validation'
 
 interface EvidenceFormProps {
   criteria: MilestoneData['criteria']
@@ -52,7 +53,10 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
     if (!summary.trim()) { setSummaryError(true); hasError = true }
     if (!allCriteriaChecked) { setCriteriaError(true); hasError = true }
     if (files.length === 0) { setFilesError(true); hasError = true }
-    if (validLinks.length === 0) { setLinksError(true); hasError = true }
+    if (validLinks.length === 0 || validLinks.some(link => !isValidHttpUrl(link.url))) {
+      setLinksError(true)
+      hasError = true
+    }
     if (hasError) return
 
     const result = await Swal.fire({
@@ -203,7 +207,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
             </div>
           ))}
           {linksError && (
-            <p className="text-[12px] text-[#EF4444]">กรุณาใส่ลิงก์อย่างน้อย 1 ลิงก์</p>
+            <p className="text-[12px] text-[#EF4444]">กรุณาใส่ลิงก์ HTTP/HTTPS ที่ถูกต้อง ไม่เกิน 2,048 ตัวอักษร และไม่มี username/password</p>
           )}
           <button
             onClick={addLink}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Lock, Eye, EyeOff, CheckCircle, Circle } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
+import { unicodeLength, utf8ByteLength } from "../../lib/validation";
 
 const PasswordTab = () => {
   const { authUser, addPassword, changePassword, isSavingPassword } = useAuthStore();
@@ -24,7 +25,8 @@ const PasswordTab = () => {
     { label: "พิมพ์เล็ก 1 ตัว", ok: /[a-z]/.test(newPass) },
     { label: "ตัวเลข 1 ตัว", ok: /[0-9]/.test(newPass) },
     { label: "อักษรพิเศษ 1 ตัว", ok: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/.test(newPass) },
-    { label: "ไม่ต่ำกว่า 8 ตัว", ok: newPass.length >= 8 },
+    { label: "8 ตัวอักษรขึ้นไป", ok: unicodeLength(newPass) >= 8 },
+    { label: "ไม่เกิน 72 ไบต์ UTF-8", ok: utf8ByteLength(newPass) <= 72 },
   ];
   const allChecksPass = checks.every((c) => c.ok);
 

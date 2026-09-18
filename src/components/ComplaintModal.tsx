@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Loader2, Flag, X, Paperclip, XCircle } from 'lucide-react'
 import { useComplaintStore } from '../store/useComplaintStore'
 import { useProjectStore } from '../store/useProjectStore'
+import { isValidHttpUrl } from '../lib/validation'
 
 interface ComplaintModalProps {
     projectId: number
@@ -44,7 +45,10 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
     }
 
     const handleSubmit = async () => {
-        if (!subject.trim() || body.trim().length < 10) return
+        if (!subjectValid || !bodyValid || !evidenceValid) {
+            if (!evidenceValid) setEvidenceError(true)
+            return
+        }
         const trimmedEvidence = evidence.trim()
         const ok = await fileComplaint(projectId, subject.trim(), body.trim(), trimmedEvidence || undefined)
         if (ok) {
@@ -53,9 +57,12 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
         }
     }
 
-    const subjectValid = subject.trim().length >= 3
-    const bodyValid = body.trim().length >= 10
-    const canSubmit = subjectValid && bodyValid && !isSubmitting && !isUploadingEvidence
+    const subjectLength = Array.from(subject.trim()).length
+    const bodyLength = Array.from(body.trim()).length
+    const subjectValid = subjectLength >= 3 && subjectLength <= 200
+    const bodyValid = bodyLength >= 10 && bodyLength <= 5000
+    const evidenceValid = !evidence.trim() || isValidHttpUrl(evidence)
+    const canSubmit = subjectValid && bodyValid && evidenceValid && !isSubmitting && !isUploadingEvidence
 
     return (
         <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
@@ -84,10 +91,9 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             value={subject}
                             onChange={(e) => setSubject(e.target.value)}
                             placeholder="เช่น ข้อมูลโปรเจกต์ไม่ตรงกับความเป็นจริง"
-                            maxLength={30}
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
                         />
-                        <span className="text-[11px] text-muted-foreground">{subject.length}/30</span>
+                        <span className="text-[11px] text-muted-foreground">{subjectLength}/200</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">รายละเอียด <span className="text-error">*</span></label>
@@ -96,10 +102,9 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                             onChange={(e) => setBody(e.target.value)}
                             rows={6}
                             placeholder="อธิบายสิ่งที่ต้องการรายงานให้ละเอียด (อย่างน้อย 10 ตัวอักษร)"
-                            maxLength={200}
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary resize-none"
                         />
-                        <span className="text-[11px] text-muted-foreground">{body.length}/200</span>
+                        <span className="text-[11px] text-muted-foreground">{bodyLength}/5,000</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">หลักฐานประกอบ (ถ้ามี)</label>
@@ -132,7 +137,7 @@ const ComplaintModal = ({ projectId, projectTitle, onClose, onSuccess }: Complai
                         )}
                         {evidenceError && (
                             <span className="text-[11px] text-error">
-                                อัปโหลดไฟล์ไม่สำเร็จ กรุณาลองใหม่
+                                อัปโหลดไม่สำเร็จ หรือ URL หลักฐานไม่ถูกต้อง (ต้องเป็น HTTP/HTTPS และไม่เกิน 2,048 ตัวอักษร)
                             </span>
                         )}
                     </div>
