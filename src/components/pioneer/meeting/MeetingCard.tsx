@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Video, MapPin, ChevronDown, ExternalLink, CheckCircle, Pencil, Trash2, Ban,
 } from 'lucide-react';
@@ -31,25 +31,31 @@ export default function MeetingCard({
   meeting, projectTitle, phaseLabel, onEdit, onCancel,
 }: MeetingCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [now, setNow] = useState(() => new Date());
   const typeLabel = MEETING_TYPE_LABEL[meeting.meeting_type] ?? meeting.meeting_type;
-  const hasDetail = !!meeting.about || !!meeting.description || !!meeting.link || !!meeting.place;
+  const agenda = meeting.about || meeting.description;
+  const hasDetail = !!agenda || !!meeting.link || !!meeting.place;
   const isCanceled = meeting.status === 'cancelled';
   const isClosed = meeting.status === 'closed';
   const isOpen = meeting.status === 'open';
 
-  // เช็ค datetime จริงว่าผ่านไปแล้วหรือยัง
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  // วันที่และเวลาจาก API เป็นคนละฟิลด์ และเวลาเป็นเวลาท้องถิ่นของผู้ใช้
   const meetingDatetime = (() => {
     try {
       const dateD = new Date(meeting.date)
       const timeD = new Date(meeting.time)
       const combined = new Date(
-        Date.UTC(dateD.getUTCFullYear(), dateD.getUTCMonth(), dateD.getUTCDate(),
-                 timeD.getUTCHours(), timeD.getUTCMinutes())
+        dateD.getUTCFullYear(), dateD.getUTCMonth(), dateD.getUTCDate(),
+        timeD.getUTCHours(), timeD.getUTCMinutes()
       )
       return combined
     } catch { return null }
   })()
-  const now = new Date()
   const isOngoing  = isOpen && !!meetingDatetime && meetingDatetime <= now && now < new Date(meetingDatetime.getTime() + MEETING_WINDOW_MS)
   const isUpcoming = isOpen && (!meetingDatetime || meetingDatetime > now)
   const canModify = isUpcoming;
@@ -155,10 +161,10 @@ export default function MeetingCard({
       {expanded && hasDetail && (
         <div className="border-t border-border px-5 py-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex flex-col sm:flex-row gap-6">
-            {meeting.about && (
+            {agenda && (
               <div className="flex-1">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">วาระการประชุม</h4>
-                <p className="text-sm text-foreground whitespace-pre-line">{meeting.about}</p>
+                <p className="text-sm text-foreground whitespace-pre-line">{agenda}</p>
               </div>
             )}
 

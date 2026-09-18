@@ -46,6 +46,14 @@ const PioneerMeetings = () => {
     fetchMyMeetings(eligibleProjects);
   }, [projectsReady, eligibleProjects, filter, fetchEligibleMilestones, fetchMyMeetings]);
 
+  useEffect(() => {
+    if (!projectsReady) return;
+    const interval = window.setInterval(() => {
+      fetchMyMeetings(eligibleProjects);
+    }, 30_000);
+    return () => window.clearInterval(interval);
+  }, [projectsReady, eligibleProjects, fetchMyMeetings]);
+
   const handleCreated = () => {
     fetchMyMeetings(eligibleProjects);
   };
