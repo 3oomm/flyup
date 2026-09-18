@@ -35,6 +35,7 @@ export interface CreateMeetingPayload {
   link?: string;
   place?: string;
   description: string;
+  about: string;
 }
 
 export const MEETING_TYPE_LABEL: Record<MeetingType, string> = {

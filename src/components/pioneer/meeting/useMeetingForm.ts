@@ -38,7 +38,7 @@ function fromMeeting(m: Meeting): MeetingFormValues {
     meetingType: m.meeting_type,
     meetingUrl: m.link ?? '',
     location: m.place ?? '',
-    agenda: m.description ?? m.about ?? '',
+    agenda: m.about || m.description || '',
   };
 }
 
@@ -75,6 +75,7 @@ export function useMeetingForm(initial?: Meeting) {
       link: values.meetingType === 'online' || values.meetingType === 'hybrid' ? values.meetingUrl.trim() : undefined,
       place: values.meetingType === 'onsite' || values.meetingType === 'hybrid' ? values.location.trim() : undefined,
       description: values.agenda.trim(),
+      about: values.agenda.trim(),
     };
   };
 
