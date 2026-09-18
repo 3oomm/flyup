@@ -9,6 +9,7 @@ const PAGE_SIZE = 5;
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending:        { label: 'รอชำระเงิน',      color: 'bg-yellow-100 text-yellow-700' },
+  pending_payment:{ label: 'รอชำระเงิน',      color: 'bg-yellow-100 text-yellow-700' },
   refund_pending: { label: 'รอคืนเงิน',       color: 'bg-orange-100 text-orange-700' },
   refunded:       { label: 'คืนเงินแล้ว',     color: 'bg-orange-100 text-orange-700' },
   cancelled:      { label: 'ยกเลิก',          color: 'bg-red-100 text-red-700' },
@@ -31,9 +32,16 @@ function getEffectiveStatus(inv: BoosterInvestment): { label: string; color: str
   return statusConfig[inv.status] ?? { label: inv.status, color: 'bg-gray-100 text-gray-600' };
 }
 
+function investmentDestination(inv: BoosterInvestment): string {
+  if (inv.status === 'pending_payment' || inv.status === 'pending') {
+    return `/projects/${inv.project?.slug || inv.project_id}/invest?investmentId=${inv.id}`;
+  }
+  return `/booster/investments/${inv.id}`;
+}
+
 const TABS: { key: string; label: string }[] = [
   { key: 'all',           label: 'ทั้งหมด' },
-  { key: 'pending',       label: 'รอชำระเงิน' },
+  { key: 'pending_payment', label: 'รอชำระเงิน' },
   { key: 'funding',       label: 'กำลังระดมทุน' },
   { key: 'executing',     label: 'กำลังดำเนินการ' },
   { key: 'closed',        label: 'เสร็จสิ้น' },
@@ -53,7 +61,7 @@ interface GroupedInvestment {
 
 // priority order: refund_pending > verified > pending > refunded > cancelled
 const STATUS_PRIORITY: Record<string, number> = {
-  refund_pending: 5, verified: 4, pending: 3, refunded: 2, cancelled: 1, rejected: 1,
+  refund_pending: 5, verified: 4, pending_payment: 3, pending: 3, refunded: 2, cancelled: 1, rejected: 1,
 }
 
 function groupInvestments(invs: BoosterInvestment[]): GroupedInvestment[] {
@@ -81,7 +89,7 @@ function matchesTabGroup(g: GroupedInvestment, tab: string): boolean {
 
 function matchesTab(inv: BoosterInvestment, tab: string): boolean {
   if (tab === 'all') return true;
-  if (tab === 'pending') return inv.status === 'pending';
+  if (tab === 'pending_payment') return inv.status === 'pending_payment' || inv.status === 'pending';
   if (tab === 'refund_pending') return inv.status === 'refund_pending';
   if (tab === 'refunded') return inv.status === 'refunded';
   if (tab === 'cancelled') return inv.status === 'cancelled' || inv.status === 'rejected';
@@ -140,10 +148,10 @@ function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment
                   <td className="px-4 py-4 text-right font-bold text-primary">฿{(inv.amount ?? 0).toLocaleString()}</td>
                   <td className="px-5 py-4">
                     <Link
-                      to={`/booster/investments/${inv.id}`}
+                      to={investmentDestination(inv)}
                       className="text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                     >
-                      ดูรายละเอียด →
+                      {inv.status === 'pending_payment' || inv.status === 'pending' ? 'ชำระเงิน →' : 'ดูรายละเอียด →'}
                     </Link>
                   </td>
                 </tr>
@@ -270,14 +278,14 @@ function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowA
           </button>
         ) : (
           <Link
-            to={`/booster/investments/${inv.id}`}
+            to={investmentDestination(inv)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity ${
               canRefund
                 ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
                 : 'bg-primary text-white-foreground'
             }`}
           >
-            {canRefund ? 'ขอเงินคืน' : 'รายละเอียด'}
+            {inv.status === 'pending_payment' || inv.status === 'pending' ? 'ชำระเงิน' : canRefund ? 'ขอเงินคืน' : 'รายละเอียด'}
           </Link>
         )}
       </div>

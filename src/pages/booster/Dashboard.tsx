@@ -366,11 +366,18 @@ const toggleProject = (name: string) =>
                       cancelled: {label:'ยกเลิก',          cls:'bg-red-100 text-red-700'},
                       refund_pending: {label:'รอคืนเงิน', cls:'bg-orange-100 text-orange-700'},
                       pending:   {label:'รอชำระ',          cls:'bg-yellow-100 text-yellow-700'},
+                      pending_payment: {label:'รอชำระเงิน', cls:'bg-yellow-100 text-yellow-700'},
                     }
                     const st = statusCfg[statusKey] ?? {label: statusKey, cls: 'bg-gray-100 text-gray-600'}
                     const coverImage = inv.project?.cover_image ?? null
                     return (
-                      <div key={inv.id} className="grid grid-cols-[2fr_1fr_1fr_100px] px-6 py-3 hover:bg-muted/20 transition-colors items-center">
+                      <Link
+                        key={inv.id}
+                        to={statusKey === 'pending_payment'
+                          ? `/projects/${inv.project?.slug || inv.project_id}/invest?investmentId=${inv.id}`
+                          : `/booster/investments/${inv.id}`}
+                        className="grid grid-cols-[2fr_1fr_1fr_100px] px-6 py-3 hover:bg-muted/20 transition-colors items-center"
+                      >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 bg-muted border border-border">
                             {coverImage
@@ -391,7 +398,7 @@ const toggleProject = (name: string) =>
                         <div className="flex justify-end">
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
                         </div>
-                      </div>
+                      </Link>
                     )
                   })}
                 </div>

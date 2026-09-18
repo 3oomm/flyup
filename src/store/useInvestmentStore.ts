@@ -21,7 +21,20 @@ export interface InvestmentData {
 
 export interface InvestmentStatusResponse {
   data?: {
-    investment?: { status: string };
+    investment?: {
+      id: number;
+      status: string;
+      amount?: number;
+      total_amount?: number;
+      reference_number?: string;
+      project?: { title?: string };
+    };
+    transaction?: {
+      qr_code_image_url?: string;
+      qr_code_base64?: string;
+      qr_code_base_64?: string;
+      expires_at?: string;
+    };
     status?: string;
   };
 }
@@ -34,6 +47,7 @@ interface InvestmentStoreState {
 
   createInvestment: (data: CreateInvestmentData) => Promise<boolean>;
   getInvestmentById: (id: number) => Promise<InvestmentStatusResponse>;
+  resumeInvestment: (id: number) => Promise<InvestmentData | null>;
   clearInvestmentData: () => void;
 }
 
@@ -66,6 +80,30 @@ export const useInvestmentStore = create<InvestmentStoreState>((set) => ({
     } catch (error) {
       console.error(`Error fetching investment ${id}:`, error);
       throw error;
+    }
+  },
+
+  resumeInvestment: async (id: number) => {
+    try {
+      const response = await api.get(`/investments/${id}`);
+      const investment = response.data?.data?.investment;
+      const transaction = response.data?.data?.transaction;
+      if (!investment || !transaction || investment.status !== 'pending_payment') return null;
+
+      const restored: InvestmentData = {
+        investment_id: investment.id,
+        reference_number: investment.reference_number ?? `INV-${investment.id}`,
+        qr_code_image_url: transaction.qr_code_image_url ?? '',
+        qr_code_base64: transaction.qr_code_base64 ?? transaction.qr_code_base_64,
+        expires_at: transaction.expires_at ?? '',
+        total_amount: investment.total_amount ?? investment.amount ?? 0,
+        title: investment.project?.title ?? '',
+      };
+      set({ investmentData: restored });
+      return restored;
+    } catch (error) {
+      console.error(`Error resuming investment ${id}:`, error);
+      return null;
     }
   },
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import toast, { Toaster } from "react-hot-toast";
 import {
   ArrowLeft,
@@ -52,6 +52,7 @@ const ContractModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 const Investment = () => {
   const navigate = useNavigate();
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<Step>(1);
   const [agreed, setAgreed] = useState(false);
@@ -67,7 +68,7 @@ const Investment = () => {
 
   const { authUser } = useAuthStore();
   const { currentPublicProject, fetchPublicProjectBySlug, fetchPublicProjectById } = usePublicProjectStore();
-  const { createInvestment, getInvestmentById, isSubmitting, investmentData, clearInvestmentData } = useInvestmentStore();
+  const { createInvestment, getInvestmentById, resumeInvestment, isSubmitting, investmentData, clearInvestmentData } = useInvestmentStore();
 
   const project = currentPublicProject;
 
@@ -77,6 +78,35 @@ const Investment = () => {
       else fetchPublicProjectBySlug(slug);
     }
   }, [slug, fetchPublicProjectBySlug, fetchPublicProjectById]);
+
+  useEffect(() => {
+    const investmentId = Number(searchParams.get('investmentId'));
+    if (!investmentId) return;
+
+    let cancelled = false;
+    resumeInvestment(investmentId).then((restored) => {
+      if (cancelled) return;
+      if (!restored) {
+        toast.error('ไม่พบรายการรอชำระเงิน หรือรายการนี้ไม่สามารถชำระต่อได้');
+        return;
+      }
+
+      const remainingSeconds = restored.expires_at
+        ? Math.max(0, Math.floor((new Date(restored.expires_at).getTime() - Date.now()) / 1000))
+        : 15 * 60;
+      if (remainingSeconds <= 0) {
+        toast.error('QR Code หมดอายุแล้ว กรุณาสร้างรายการลงทุนใหม่');
+        clearInvestmentData();
+        return;
+      }
+
+      setAmount(String(restored.total_amount));
+      setTimeLeft(remainingSeconds);
+      setStep(3);
+    });
+
+    return () => { cancelled = true; };
+  }, [searchParams, resumeInvestment, clearInvestmentData]);
 
   // Guard: ต้องยืนยันตัวตน / ไม่ใช่เจ้าของ / ไม่ใช่ admin
   useEffect(() => {
