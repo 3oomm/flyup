@@ -375,8 +375,8 @@ const AdminProjectDetail = () => {
                                 </div>
                             </div>
                             {project.owner?.student_profile?.bio && (
-                                <div>
-                                    <p className="text-[12px] text-muted-foreground">{project.owner.student_profile.bio}</p>
+                                <div className="min-w-0">
+                                    <p className="max-w-full text-[12px] text-muted-foreground whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{project.owner.student_profile.bio}</p>
                                 </div>
                             )}
                             <div className="flex gap-[20px]">

@@ -642,7 +642,7 @@ function ProjectDetail() {
                 </div>
               </div>
               {project?.owner_profile?.bio && (
-                <p className="text-[12px] text-muted-foreground leading-relaxed wrap-break-word whitespace-pre-wrap">{project.owner_profile.bio}</p>
+                <p className="max-w-full text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{project.owner_profile.bio}</p>
               )}
               <div className="flex gap-[20px]">
                 <span className="inline-flex items-center gap-[5px] border border-primary text-primary px-[10px] py-[4px] rounded-full text-[11px] font-medium">

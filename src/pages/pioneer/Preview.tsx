@@ -270,8 +270,8 @@ const Preview = () => {
                                     <span className="text-[12px] text-muted-foreground">{(authUser?.student_profile?.university?.name_th as string) || ""}</span>
                                 </div>
                             </div>
-                            <div>
-                                <p className="text-[12px] text-muted-foreground">{authUser?.student_profile?.bio as string}</p>
+                            <div className="min-w-0">
+                                <p className="max-w-full text-[12px] text-muted-foreground whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{authUser?.student_profile?.bio as string}</p>
                             </div>
                             <div className="flex gap-[20px]">
                                 <span className="inline-flex items-center gap-[5px] border border-primary text-primary px-[10px] py-[4px] rounded-full text-[11px] font-medium">
