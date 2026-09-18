@@ -23,10 +23,10 @@ function getMeetingDatetime(date: string, time: string): Date | null {
     const dateD = new Date(date);
     const timeD = new Date(time);
     if (isNaN(dateD.getTime()) || isNaN(timeD.getTime())) return null;
-    return new Date(Date.UTC(
+    return new Date(
       dateD.getUTCFullYear(), dateD.getUTCMonth(), dateD.getUTCDate(),
       timeD.getUTCHours(), timeD.getUTCMinutes()
-    ));
+    );
   } catch { return null; }
 }
 
@@ -36,7 +36,7 @@ const TYPE_LABEL: Record<string, string> = { online: 'ออนไลน์', on
 
 const MEETING_WINDOW_MS = 2 * 60 * 60 * 1000; // 2 hours after start time
 
-function MeetingCard({ meeting }: { meeting: BoosterMeeting }) {
+function MeetingCard({ meeting, now }: { meeting: BoosterMeeting; now: Date }) {
   const [expanded, setExpanded] = useState(false);
 
   const isCancelled = meeting.status === 'cancelled' || meeting.status === 'canceled';
@@ -44,7 +44,6 @@ function MeetingCard({ meeting }: { meeting: BoosterMeeting }) {
   const isOpen      = meeting.status === 'open';
 
   const meetingDatetime = getMeetingDatetime(meeting.date, meeting.time);
-  const now = new Date();
   const isOngoing  = isOpen && !!meetingDatetime && meetingDatetime <= now && now < new Date(meetingDatetime.getTime() + MEETING_WINDOW_MS);
   const isUpcoming = isOpen && (!meetingDatetime || meetingDatetime > now);
 
@@ -53,7 +52,8 @@ function MeetingCard({ meeting }: { meeting: BoosterMeeting }) {
     ? `Phase ${meeting.milestone.phase_no || ''}: ${meeting.milestone.title || ''}`
     : '';
   const typeStr = TYPE_LABEL[meeting.meeting_type ?? ''] ?? meeting.meeting_type ?? '';
-  const hasDetail = !!meeting.about || !!meeting.link || !!meeting.place;
+  const agenda = meeting.about || meeting.description;
+  const hasDetail = !!agenda || !!meeting.link || !!meeting.place;
 
   return (
     <div className={`bg-card border rounded-2xl overflow-hidden transition-all ${expanded ? 'border-primary/30' : 'border-border'} ${isCancelled ? 'opacity-60' : ''}`}>
@@ -120,11 +120,11 @@ function MeetingCard({ meeting }: { meeting: BoosterMeeting }) {
       {/* Expanded Detail */}
       {expanded && (
         <div className="border-t border-border px-5 py-4 bg-muted/30 flex flex-col sm:flex-row gap-6">
-          {meeting.about && (
+          {agenda && (
             <div className="flex-1">
               <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">วาระการประชุม</h4>
               <ul className="space-y-2 list-disc pl-4">
-                {meeting.about.split('\n').filter(l => l.trim()).map((a, i) => (
+                {agenda.split('\n').filter(l => l.trim()).map((a, i) => (
                   <li key={i} className="text-sm text-foreground">{a}</li>
                 ))}
               </ul>
@@ -159,9 +159,17 @@ function MeetingCard({ meeting }: { meeting: BoosterMeeting }) {
 
 const Meetings = () => {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('upcoming');
+  const [now, setNow] = useState(() => new Date());
   const { boosterMeetings, fetchBoosterMeetings } = useBoosterStore();
 
-  useEffect(() => { fetchBoosterMeetings(); }, [fetchBoosterMeetings]);
+  useEffect(() => {
+    fetchBoosterMeetings();
+    const interval = window.setInterval(() => {
+      setNow(new Date());
+      fetchBoosterMeetings();
+    }, 30_000);
+    return () => window.clearInterval(interval);
+  }, [fetchBoosterMeetings]);
 
   const filtered = useMemo(() =>
     boosterMeetings.filter((m: BoosterMeeting) => {
@@ -170,7 +178,6 @@ const Meetings = () => {
       const isClosed    = m.status === 'closed';
       const isOpen      = m.status === 'open';
       const dt = getMeetingDatetime(m.date, m.time);
-      const now = new Date();
       const ongoing  = isOpen && !!dt && dt <= now && now < new Date(dt.getTime() + MEETING_WINDOW_MS);
       const upcoming = isOpen && (!dt || dt > now);
       if (filter === 'ongoing')  return ongoing;
@@ -178,7 +185,7 @@ const Meetings = () => {
       if (filter === 'past')     return isClosed || isCancelled || (!upcoming && !ongoing && isOpen);
       return true;
     }),
-    [boosterMeetings, filter]
+    [boosterMeetings, filter, now]
   );
 
   return (
@@ -205,7 +212,7 @@ const Meetings = () => {
 
         {filtered.length > 0 ? (
           <div className="space-y-3">
-            {filtered.map((m: BoosterMeeting) => <MeetingCard key={m.id} meeting={m} />)}
+            {filtered.map((m: BoosterMeeting) => <MeetingCard key={m.id} meeting={m} now={now} />)}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">

@@ -8,6 +8,7 @@ export interface BoosterMeeting {
   id: number;
   milestone_id: number;
   about?: string;
+  description?: string | null;
   meeting_type?: string;
   place?: string;
   date: string;
