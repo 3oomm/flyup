@@ -9,6 +9,7 @@ export interface ProjectUpdate {
   body: string;
   posted_by: number;
   created_at: string;
+  comment_count?: number;
 }
 
 export interface ProjectThread {
@@ -85,7 +86,28 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
   fetchUpdates: async (id: number) => {
     try {
       const res = await api.get(`/projects/${id}/updates`);
-      set({ updates: res.data?.data ?? [] });
+      const updates: ProjectUpdate[] = res.data?.data ?? [];
+      const commentsByUpdate = await Promise.all(
+        updates.map(async (update) => {
+          try {
+            const commentsRes = await api.get(`/projects/${id}/updates/${update.id}/threads`);
+            const comments: ProjectThread[] = commentsRes.data?.data ?? [];
+            return [update.id, comments] as const;
+          } catch (error) {
+            console.warn(`fetchUpdateThreads (${update.id}):`, error);
+            return [update.id, [] as ProjectThread[]] as const;
+          }
+        })
+      );
+      const updateThreads = Object.fromEntries(commentsByUpdate) as Record<number, ProjectThread[]>;
+
+      set({
+        updates: updates.map((update) => ({
+          ...update,
+          comment_count: updateThreads[update.id]?.length ?? 0,
+        })),
+        updateThreads,
+      });
     } catch (error) {
       console.warn('fetchUpdates:', error);
     }
@@ -133,6 +155,11 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
       const res = await api.get(`/projects/${projectId}/updates/${updateId}/threads`);
       set((state) => ({
         updateThreads: { ...state.updateThreads, [updateId]: res.data?.data ?? [] },
+        updates: state.updates.map((update) =>
+          update.id === updateId
+            ? { ...update, comment_count: (res.data?.data ?? []).length }
+            : update
+        ),
       }));
     } catch (error) {
       console.warn('fetchUpdateThreads:', error);
@@ -147,6 +174,11 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
     const res = await api.get(`/projects/${projectId}/updates/${updateId}/threads`);
     set((state) => ({
       updateThreads: { ...state.updateThreads, [updateId]: res.data?.data ?? [] },
+      updates: state.updates.map((update) =>
+        update.id === updateId
+          ? { ...update, comment_count: (res.data?.data ?? []).length }
+          : update
+      ),
     }));
   },
 

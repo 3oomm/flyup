@@ -16,7 +16,7 @@ interface PreviewUpdateProps {
 
 export const PreviewUpdate = ({ updates, creatorName = 'ผู้พัฒนาโปรเจกต์', creatorAvatar, projectId, hasInvested, isOwner }: PreviewUpdateProps) => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [visibleCount, setVisibleCount] = useState(10);
+  const [visibleCount, setVisibleCount] = useState(5);
   const [updateComment, setUpdateComment] = useState('');
   const [isPostingComment, setIsPostingComment] = useState(false);
   const { updateThreads, fetchUpdateThreads, createUpdateThread } = useProjectDetailStore();
@@ -95,6 +95,9 @@ export const PreviewUpdate = ({ updates, creatorName = 'ผู้พัฒนา
           <h3 className="text-[15px] font-semibold text-foreground flex items-center gap-[6px]">
             <MessageCircle size={16} className="text-primary" />
             ความคิดเห็น
+            <span className="min-w-[20px] h-[20px] px-[6px] rounded-full bg-primary text-white text-[11px] font-bold inline-flex items-center justify-center">
+              {currentUpdateComments.length || selectedUpdate.comment_count || 0}
+            </span>
           </h3>
 
           {/* Existing comments for this update */}
@@ -218,13 +221,16 @@ export const PreviewUpdate = ({ updates, creatorName = 'ผู้พัฒนา
               <span className="flex items-center gap-[5px] text-[13px] text-muted-foreground">
                 <MessageCircle size={14} />
                 ความคิดเห็น
+                <span className="min-w-[20px] h-[20px] px-[6px] rounded-full bg-primary/10 text-primary text-[11px] font-bold inline-flex items-center justify-center">
+                  {u.comment_count || 0}
+                </span>
               </span>
             </div>
           </div>
         );
       })}
 
-      {updates.length > 10 && (
+      {updates.length > 5 && (
         <div className="flex flex-col items-center gap-[12px] pt-[8px]">
           <span className="text-[13px] text-muted-foreground">
             แสดง {Math.min(visibleCount, updates.length)} จาก {updates.length} อัปเดต
@@ -232,15 +238,15 @@ export const PreviewUpdate = ({ updates, creatorName = 'ผู้พัฒนา
           <div className="flex gap-[8px]">
             {visibleCount < updates.length && (
               <button
-                onClick={() => setVisibleCount(v => v + 10)}
+                onClick={() => setVisibleCount(v => v + 5)}
                 className="bg-foreground text-background text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:opacity-80 transition-opacity cursor-pointer"
               >
                 โหลดเพิ่มเติม
               </button>
             )}
-            {visibleCount > 10 && (
+            {visibleCount > 5 && (
               <button
-                onClick={() => setVisibleCount(10)}
+                onClick={() => setVisibleCount(5)}
                 className="bg-white border border-border text-foreground text-[14px] font-medium px-[32px] py-[10px] rounded-[8px] hover:border-primary/50 transition-colors cursor-pointer"
               >
                 แสดงน้อยลง
