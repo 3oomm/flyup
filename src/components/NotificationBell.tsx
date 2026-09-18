@@ -150,7 +150,7 @@ interface NotificationBellProps {
 }
 
 const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProps = {}) => {
-    const { notifications, unread, isLoading, fetchNotifications, markAsRead, markAllAsRead, clearUnreadCount } =
+    const { notifications, unread, bellUnread, isLoading, fetchNotifications, markAsRead, markAllAsRead, clearUnreadCount } =
         useNotificationStore()
     const { authUser } = useAuthStore()
     const navigate = useNavigate()
@@ -184,7 +184,7 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
     const handleBellClick = () => {
         const next = !open
         setOpen(next)
-        if (next && unread > 0) clearUnreadCount()
+        if (next && bellUnread > 0) clearUnreadCount()
     }
 
     const role = authUser?.role ?? ''
@@ -203,9 +203,9 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
                 aria-label="การแจ้งเตือน"
             >
                 <BellIcon size={20} />
-                {unread > 0 && (
+                {bellUnread > 0 && (
                     <span className="absolute top-1 right-1 min-w-[16px] h-[16px] bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
-                        {unread > 99 ? '99+' : unread}
+                        {bellUnread > 99 ? '99+' : bellUnread}
                     </span>
                 )}
             </button>

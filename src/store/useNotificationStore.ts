@@ -19,6 +19,7 @@ export interface Notification {
 interface NotificationStore {
     notifications: Notification[]
     unread: number
+    bellUnread: number
     total: number
     isLoading: boolean
     fetchNotifications: () => Promise<void>
@@ -40,6 +41,7 @@ function safeNotificationPrefs(raw: unknown): Record<string, boolean> | null {
 export const useNotificationStore = create<NotificationStore>((set) => ({
     notifications: [],
     unread: 0,
+    bellUnread: 0,
     total: 0,
     isLoading: false,
 
@@ -51,6 +53,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
             set({
                 notifications: data?.notifications ?? [],
                 unread: data?.unread ?? 0,
+                bellUnread: data?.unread ?? 0,
                 total: data?.total ?? 0,
             })
         } catch {
@@ -68,6 +71,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
                     n.id === id ? { ...n, is_read: true } : n
                 ),
                 unread: Math.max(0, state.unread - 1),
+                bellUnread: Math.max(0, state.bellUnread - 1),
             }))
         } catch {
             // ignore
@@ -80,6 +84,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
             set((state) => ({
                 notifications: state.notifications.map((n) => ({ ...n, is_read: true })),
                 unread: 0,
+                bellUnread: 0,
             }))
         } catch {
             // ignore
@@ -87,7 +92,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
     },
 
     clearUnreadCount: () => {
-        set({ unread: 0 })
+        set({ bellUnread: 0 })
     },
 
     addNotification: (notif: Notification) => {
@@ -97,6 +102,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
             return {
                 notifications: [notif, ...state.notifications],
                 unread: state.unread + 1,
+                bellUnread: state.bellUnread + 1,
                 total: state.total + 1,
             }
         })
