@@ -18,6 +18,17 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       const response = await api.post("/kyc/");
       const data = response.data?.data as KycSession;
       if (!data?.token || !data?.mobile_url) throw new Error("invalid session");
+
+      // ถ้าเปิดหน้าโปรไฟล์อยู่บนมือถืออยู่แล้ว ให้เข้ากล้องโดยตรง
+      // ไม่ต้องแสดง QR ที่ไม่สามารถสแกนจากอุปกรณ์เครื่องเดียวกันได้
+      const isMobileDevice = window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 1024;
+      if (isMobileDevice) {
+        const cameraUrl = new URL("/mobile-kyc", window.location.origin);
+        cameraUrl.searchParams.set("token", data.token);
+        window.location.assign(cameraUrl.toString());
+        return;
+      }
+
       setSession(data);
       setQrDataUrl(await QRCode.toDataURL(data.mobile_url, { width: 280, margin: 1, errorCorrectionLevel: "M" }));
       setStep("qr");
