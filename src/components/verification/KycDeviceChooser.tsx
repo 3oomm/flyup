@@ -25,6 +25,7 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       if (isMobileDevice) {
         const cameraUrl = new URL("/mobile-kyc", window.location.origin);
         cameraUrl.searchParams.set("token", data.token);
+        cameraUrl.searchParams.set("return_to", `${window.location.pathname}${window.location.search}`);
         window.location.assign(cameraUrl.toString());
         return;
       }

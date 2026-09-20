@@ -1,19 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
 import { useSearchParams } from "react-router";
 import toast from "react-hot-toast";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import LiveCamera from "../../components/verification/LiveCamera";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export default function MobileKyc() {
   const [params] = useSearchParams();
   const token = params.get("token") ?? "";
+  const requestedReturnTo = params.get("return_to") ?? "";
+  const authUser = useAuthStore(state => state.authUser);
   const { uploadVerificationDocument, submitIdVerify } = useSelfVerificationStore();
   const [idCard, setIdCard] = useState<File | null>(null);
   const [selfie, setSelfie] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [step, setStep] = useState<"id" | "selfie" | "review">("id");
+
+  const safeReturnTo = requestedReturnTo.startsWith("/") && !requestedReturnTo.startsWith("//")
+    ? requestedReturnTo
+    : authUser?.role === "booster"
+      ? "/booster/profile"
+      : authUser?.role === "pioneer"
+        ? "/pioneer/profile"
+        : "";
+
+  useEffect(() => {
+    if (!done || !safeReturnTo) return;
+    const timer = window.setTimeout(() => window.location.replace(safeReturnTo), 1800);
+    return () => window.clearTimeout(timer);
+  }, [done, safeReturnTo]);
 
   const submit = async () => {
     if (!token) return toast.error("ลิงก์ยืนยันตัวตนไม่ถูกต้อง");
@@ -30,7 +47,7 @@ export default function MobileKyc() {
     } finally { setSaving(false); }
   };
 
-  if (done) return <main className="flex min-h-screen items-center justify-center bg-slate-50 p-5"><div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm"><CheckCircle className="mx-auto size-14 text-green-500" /><h1 className="mt-4 text-xl font-bold">ส่งข้อมูลสำเร็จ</h1><p className="mt-2 text-sm text-muted-foreground">กลับไปที่คอมพิวเตอร์เพื่อดำเนินการต่อได้เลย</p></div></main>;
+  if (done) return <main className="flex min-h-screen items-center justify-center bg-slate-50 p-5"><div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm"><CheckCircle className="mx-auto size-14 text-green-500" /><h1 className="mt-4 text-xl font-bold">ส่งข้อมูลสำเร็จ</h1><p className="mt-2 text-sm text-muted-foreground">{safeReturnTo ? "กำลังกลับไปยังหน้าโปรไฟล์..." : "กลับไปที่คอมพิวเตอร์เพื่อดำเนินการต่อได้เลย"}</p>{safeReturnTo && <button onClick={() => window.location.replace(safeReturnTo)} className="mt-5 w-full rounded-xl bg-primary py-3 font-medium text-white">กลับหน้าโปรไฟล์</button>}</div></main>;
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 py-8">
