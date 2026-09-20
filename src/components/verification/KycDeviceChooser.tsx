@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Laptop, Loader2, QrCode, Smartphone, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Laptop, Loader2, QrCode, Smartphone, X } from "lucide-react";
 import QRCode from "qrcode";
 import api from "../../services/api";
 import toast from "react-hot-toast";
@@ -11,6 +11,15 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
   const [session, setSession] = useState<KycSession | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showOtherOptions, setShowOtherOptions] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyMobileLink = async () => {
+    if (!session) return;
+    await navigator.clipboard.writeText(session.mobile_url);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
 
   const startMobile = async () => {
     setLoading(true);
@@ -103,7 +112,18 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       <p className="mt-1 text-sm text-muted-foreground">สแกน QR Code ด้วยกล้องมือถือ แล้วทำตามขั้นตอนบนหน้าจอ</p>
       {qrDataUrl && <img src={qrDataUrl} alt="QR Code สำหรับยืนยันตัวตนบนมือถือ" className="mx-auto my-5 size-56 rounded-lg border bg-white p-2" />}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 size={15} className="animate-spin" /> กำลังรอข้อมูลจากมือถือ</div>
-      <button onClick={startMobile} className="mt-4 text-sm font-medium text-primary hover:underline">สร้าง QR Code ใหม่</button>
+      <button onClick={() => setShowOtherOptions(value => !value)} className="mt-4 text-sm font-medium text-primary underline underline-offset-4">ตัวเลือกอื่น</button>
+      {showOtherOptions && session && (
+        <div className="mx-auto mt-4 max-w-md rounded-xl border border-border bg-slate-50 p-3 text-left">
+          <p className="mb-2 text-xs text-muted-foreground">หากสแกน QR Code ไม่ได้ ให้ส่งลิงก์นี้ไปเปิดบนมือถือ</p>
+          <div className="flex gap-2">
+            <input readOnly value={session.mobile_url} className="min-w-0 flex-1 rounded-lg border border-border bg-white px-3 py-2 text-xs" onFocus={event => event.currentTarget.select()} />
+            <button onClick={copyMobileLink} className="flex shrink-0 items-center gap-1 rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium hover:border-primary">{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? "คัดลอกแล้ว" : "คัดลอก"}</button>
+          </div>
+          <a href={session.mobile_url} target="_blank" rel="noreferrer" className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-border bg-white py-2 text-xs font-medium hover:border-primary"><ExternalLink size={14} /> เปิดลิงก์ยืนยันตัวตน</a>
+        </div>
+      )}
+      <button onClick={startMobile} className="mt-4 block w-full text-sm font-medium text-primary hover:underline">สร้าง QR Code ใหม่</button>
     </div>
   );
 }

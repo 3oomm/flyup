@@ -13,7 +13,7 @@ export default function LiveCamera({ facingMode, label, onCapture }: { facingMod
     setError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { facingMode: { ideal: facingMode }, width: { ideal: 1080 }, height: { ideal: 1920 }, aspectRatio: { ideal: 0.75 } },
         audio: false,
       });
       streamRef.current = stream;
@@ -48,9 +48,13 @@ export default function LiveCamera({ facingMode, label, onCapture }: { facingMod
 
   return (
     <div>
-      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-slate-950">
+      <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-2xl bg-slate-950">
         <video ref={videoRef} playsInline muted className={`h-full w-full object-cover ${facingMode === "user" ? "-scale-x-100" : ""}`} />
-        <div className="pointer-events-none absolute inset-5 rounded-2xl border-2 border-dashed border-white/80" />
+        {facingMode === "environment" ? (
+          <div className="pointer-events-none absolute left-4 right-4 top-1/2 aspect-[1.586/1] -translate-y-1/2 rounded-xl border-2 border-dashed border-white/90" />
+        ) : (
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border-2 border-dashed border-white/90" />
+        )}
         {starting && <div className="absolute inset-0 flex items-center justify-center bg-slate-950/70 text-white"><Loader2 className="size-8 animate-spin" /></div>}
         {error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950 p-6 text-center text-sm text-white"><p>{error}</p><button onClick={startCamera} className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-slate-900"><RefreshCw size={16} /> ลองใหม่</button></div>}
       </div>
