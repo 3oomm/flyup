@@ -23,8 +23,8 @@ interface StudentVerifyPayload {
 
 interface SelfVerificationStore {
     uploadVerificationDocument: (file: File) => Promise<string | null>
-    submitIdVerify: (payload: IdVerifyPayload) => Promise<'approved' | 'pending' | null>
-    submitStudentVerify: (payload: StudentVerifyPayload) => Promise<boolean>
+    submitIdVerify: (payload: IdVerifyPayload, kycToken?: string) => Promise<'approved' | 'pending' | null>
+    submitStudentVerify: (payload: StudentVerifyPayload, kycToken?: string) => Promise<boolean>
     addBankAccount: (form: BankAccountForm) => Promise<boolean>
     updateBankAccount: (id: number, form: BankAccountForm) => Promise<boolean>
     setDefaultBankAccount: (id: number) => Promise<boolean>
@@ -48,10 +48,12 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
         }
     },
 
-    submitIdVerify: async (payload) => {
+    submitIdVerify: async (payload, kycToken) => {
         try {
-            const res = await api.post('/user/id-verify', payload)
-            await useAuthStore.getState().checkAuth()
+            const res = await api.post('/user/id-verify', payload, {
+                params: kycToken ? { token: kycToken } : undefined,
+            })
+            if (!kycToken) await useAuthStore.getState().checkAuth()
             return res.data?.data?.status === 'approved' ? 'approved' : 'pending'
         } catch {
             toast.error('เกิดข้อผิดพลาด')
@@ -59,10 +61,12 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
         }
     },
 
-    submitStudentVerify: async (payload) => {
+    submitStudentVerify: async (payload, kycToken) => {
         try {
-            await api.post('/user/student-verify', payload)
-            await useAuthStore.getState().checkAuth()
+            await api.post('/user/student-verify', payload, {
+                params: kycToken ? { token: kycToken } : undefined,
+            })
+            if (!kycToken) await useAuthStore.getState().checkAuth()
             return true
         } catch {
             toast.error('เกิดข้อผิดพลาด')

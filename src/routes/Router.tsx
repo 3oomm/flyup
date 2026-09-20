@@ -41,6 +41,7 @@ const MilestoneDetail = lazy(() => import('../pages/public/MilestoneDetail'));
 const AboutUs = lazy(() => import('../pages/public/AboutUs'));
 const Terms = lazy(() => import('../pages/public/Terms'));
 const HelpCenter = lazy(() => import('../pages/public/HelpCenter'));
+const MobileKyc = lazy(() => import('../pages/public/MobileKyc'));
 
 // Pioneer Pages
 const ProjectOverview = lazy(() => import('../pages/pioneer/ProjectOverview'));
@@ -169,6 +170,7 @@ const Router = () => {
                 <ScrollToTop />
                 <Suspense fallback={<PageLoader />}>
                 <Routes>
+                    <Route path='/mobile-kyc' element={<MobileKyc />} />
                     <Route element={<MainLayout />}>
                         <Route path='/' element={<Home />} />
                         <Route path='/register' element={!authUser ? <Register /> : <Navigate to='/' />} />

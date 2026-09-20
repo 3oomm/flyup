@@ -3,6 +3,7 @@ import { Lock, Upload, Clock, CheckCircle, XCircle, Pencil, X, Save, Loader2, Pl
 import { useAuthStore } from "../../store/useAuthStore";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
+import KycDeviceChooser from "../verification/KycDeviceChooser";
 
 const THAI_BANKS = [
   "ธนาคารกรุงเทพ (BBL)",
@@ -75,6 +76,7 @@ const BoosterVerifyTab = () => {
   const [acceptTerms, setAcceptTerms] = useState(idCardLocked);
   const [acceptAccuracy, setAcceptAccuracy] = useState(idCardLocked);
   const [isSavingVerify, setIsSavingVerify] = useState(false);
+  const [deviceChosen, setDeviceChosen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -201,8 +203,15 @@ const BoosterVerifyTab = () => {
 
   return (
     <div className="flex flex-col gap-[16px]">
+      {!idCardLocked && !deviceChosen && (
+        <KycDeviceChooser
+          onComputer={() => setDeviceChosen(true)}
+          onCompleted={async () => { await checkAuth(); setDeviceChosen(true); }}
+          liveOnly
+        />
+      )}
       {/* ยืนยันตัวตน */}
-      <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]">
+      <div className={`${!idCardLocked && !deviceChosen ? "hidden" : ""} bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]`}>
         <div className="flex items-center gap-[8px]">
           <Lock size={18} className="text-foreground" />
           <h2 className="font-semibold text-foreground">ยืนยันตัวตน</h2>

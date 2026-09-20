@@ -18,6 +18,7 @@ const THAI_BANKS = [
 import { useAuthStore } from "../../store/useAuthStore";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
+import KycDeviceChooser from "../verification/KycDeviceChooser";
 
 const SELECT_STYLE = "border border-border rounded-[8px] px-[12px] py-[10px] pr-[32px] text-[14px] outline-none focus:border-primary transition-colors bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_10px_center]";
 const INPUT_STYLE = "border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors";
@@ -103,6 +104,7 @@ const VerifyTab = () => {
   const [acceptTerms, setAcceptTerms] = useState(studentCardLocked);
   const [acceptAccuracy, setAcceptAccuracy] = useState(studentCardLocked);
   const [isSavingStudent, setIsSavingStudent] = useState(false);
+  const [deviceChosen, setDeviceChosen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -262,8 +264,14 @@ const VerifyTab = () => {
 
   return (
     <div className="flex flex-col gap-[16px]">
+      {!bothLocked && !deviceChosen && (
+        <KycDeviceChooser
+          onComputer={() => setDeviceChosen(true)}
+          onCompleted={async () => { await checkAuth(); setDeviceChosen(true); }}
+        />
+      )}
       {/* ยืนยันตัวตนนักศึกษา */}
-      <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]">
+      <div className={`${!bothLocked && !deviceChosen ? "hidden" : ""} bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]`}>
         <div className="flex items-center gap-[8px]">
           <Lock size={18} className="text-foreground" />
           <h2 className="font-semibold text-foreground">ยืนยันตัวตนนักศึกษา</h2>
