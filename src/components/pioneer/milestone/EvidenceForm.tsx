@@ -1,9 +1,12 @@
 import { useState, useRef } from 'react'
 import { Upload, X, Plus, CheckCircle2, Circle, ExternalLink, Loader2, Send } from 'lucide-react'
 import Swal from 'sweetalert2'
+import toast from 'react-hot-toast'
 import type { EvidenceLink, MilestoneData } from './types'
 import { useMilestoneStore } from '../../../store/useMilestoneStore'
 import { isValidHttpUrl } from '../../../lib/validation'
+
+const MIN_SUMMARY_LENGTH = 50
 
 interface EvidenceFormProps {
   criteria: MilestoneData['criteria']
@@ -48,16 +51,33 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
 
   const handleSubmit = async () => {
     const validLinks = links.filter(l => l.url.trim())
+    const summaryLength = Array.from(summary.trim()).length
     let hasError = false
 
-    if (!summary.trim()) { setSummaryError(true); hasError = true }
-    if (!allCriteriaChecked) { setCriteriaError(true); hasError = true }
-    if (files.length === 0) { setFilesError(true); hasError = true }
-    if (validLinks.length === 0 || validLinks.some(link => !isValidHttpUrl(link.url))) {
+    const isSummaryInvalid = summaryLength < MIN_SUMMARY_LENGTH
+    const isCriteriaInvalid = !allCriteriaChecked
+    const isFilesInvalid = files.length === 0
+    const isLinksInvalid = validLinks.length === 0 || validLinks.some(link => !isValidHttpUrl(link.url))
+
+    if (isSummaryInvalid) { setSummaryError(true); hasError = true }
+    if (isCriteriaInvalid) { setCriteriaError(true); hasError = true }
+    if (isFilesInvalid) { setFilesError(true); hasError = true }
+    if (isLinksInvalid) {
       setLinksError(true)
       hasError = true
     }
-    if (hasError) return
+    if (hasError) {
+      if (isSummaryInvalid) {
+        toast.error(`กรุณาสรุปผลงานอย่างน้อย ${MIN_SUMMARY_LENGTH} ตัวอักษร (ปัจจุบัน ${summaryLength} ตัวอักษร)`)
+      } else if (isCriteriaInvalid) {
+        toast.error('กรุณาติ๊กเกณฑ์การยอมรับให้ครบทุกข้อ')
+      } else if (isFilesInvalid) {
+        toast.error('กรุณาอัปโหลดไฟล์หลักฐานอย่างน้อย 1 ไฟล์')
+      } else {
+        toast.error('กรุณาใส่ลิงก์ HTTP/HTTPS ที่ถูกต้องอย่างน้อย 1 ลิงก์')
+      }
+      return
+    }
 
     const result = await Swal.fire({
       title: 'ยืนยันการส่งหลักฐาน?',
@@ -93,8 +113,11 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
           placeholder="เช่น พัฒนาระบบคลังข้อมูลเสร็จสมบูรณ์ พร้อมคู่มือแนะนำการใช้งาน..."
           className={`w-full px-[12px] py-[10px] rounded-[10px] border text-[13px] outline-none resize-none transition-colors ${summaryError ? 'border-[#EF4444]' : 'border-border focus:border-primary'}`}
         />
+        <p className={`text-[11px] mt-[4px] text-right ${Array.from(summary.trim()).length < MIN_SUMMARY_LENGTH ? 'text-muted-foreground' : 'text-primary'}`}>
+          {Array.from(summary.trim()).length}/{MIN_SUMMARY_LENGTH} ตัวอักษรขั้นต่ำ
+        </p>
         {summaryError && (
-          <p className="text-[12px] text-[#EF4444] mt-[4px]">กรุณาสรุปผลงานก่อนส่งหลักฐาน</p>
+          <p className="text-[12px] text-[#EF4444] mt-[4px]">กรุณาสรุปผลงานอย่างน้อย {MIN_SUMMARY_LENGTH} ตัวอักษร</p>
         )}
       </div>
 

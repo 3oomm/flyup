@@ -243,8 +243,10 @@ export const useMilestoneStore = create<MilestoneStore>((set) => ({
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
       if (msg === 'previous milestone payment has not been transferred yet') {
         toast.error('ยังไม่สามารถส่งได้ เนื่องจาก Milestone ก่อนหน้ายังไม่ได้รับการโอนเงิน')
+      } else if (msg?.includes('SubmitMilestoneRequest.Summary')) {
+        toast.error('กรุณาสรุปผลงานอย่างน้อย 50 ตัวอักษร')
       } else {
-        toast.error('เกิดข้อผิดพลาดในการส่งหลักฐาน')
+        toast.error(msg || 'เกิดข้อผิดพลาดในการส่งหลักฐาน')
       }
       return false
     } finally {
