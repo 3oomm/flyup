@@ -246,7 +246,13 @@ const AdminComplaints = () => {
         if (ok) {
             setModalMode(null)
             setSelected(null)
-            fetchBadges()
+            // resolved_reports/total_reports are project-level aggregates from
+            // the API. Refetch so the remaining rows update (e.g. 2/3 -> 3/3)
+            // immediately after closing or rejecting a complaint.
+            await Promise.all([
+                fetchAdminList(tab),
+                fetchBadges(),
+            ])
         }
     }
 
