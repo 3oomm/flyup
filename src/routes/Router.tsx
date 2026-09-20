@@ -129,7 +129,8 @@ const Router = () => {
         // backward compat: รองรับ ?token=1 เดิม + ?access_token=<jwt> ใหม่
         const legacyFlag = params.get('token')
         const isVerifyPage = window.location.pathname === '/verify'
-        if ((accessToken || legacyFlag) && !isVerifyPage) {
+        const isKycPage = window.location.pathname === '/mobile-kyc'
+        if ((accessToken || legacyFlag) && !isVerifyPage && !isKycPage) {
             // Google OAuth flow: ใช้ loginWithGoogleToken อย่างเดียว
             // ไม่เรียก checkAuth() พร้อมกัน เพื่อป้องกัน race condition
             params.delete('access_token')
