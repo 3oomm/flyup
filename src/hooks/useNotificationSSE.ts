@@ -10,6 +10,7 @@ import { usePioneerBadgeStore } from '../store/usePioneerBadgeStore'
 import { useBoosterBadgeStore } from '../store/useBoosterBadgeStore'
 import { useAdminStore } from '../store/useAdminStore'
 import { useMilestoneStore } from '../store/useMilestoneStore'
+import { useComplaintStore } from '../store/useComplaintStore'
 
 const useNotificationSSE = () => {
     const { authUser, checkAuth } = useAuthStore()
@@ -20,6 +21,7 @@ const useNotificationSSE = () => {
 
             case 'verification_approved':
             case 'verification_rejected':
+            case 'user_status':
                 checkAuth()
                 break
 
@@ -90,6 +92,11 @@ const useNotificationSSE = () => {
                 useBoosterStore.getState().fetchMyInvestments()
                 break
             }
+
+            case 'complaint': {
+                useComplaintStore.getState().fetchMyComplaints()
+                break
+            }
         }
     }, [checkAuth])
 
@@ -98,44 +105,62 @@ const useNotificationSSE = () => {
 
         let es: EventSource | null = null
         let cancelled = false
+        let retryTimer: ReturnType<typeof setTimeout> | null = null
 
-        // Fetch a short-lived one-time SSE token (60s TTL, deleted on first use)
-        // so the main JWT never appears in browser history or server logs
-        api.post('/notifications/sse-token')
-            .then((res: { data?: { token?: string } }) => {
-                if (cancelled) return
-                const sseToken: string = res.data?.token ?? ''
-                if (!sseToken) return
+        const connect = () => {
+            api.post('/notifications/sse-token')
+                .then((res: { data?: { token?: string } }) => {
+                    if (cancelled) return
+                    const sseToken: string = res.data?.token ?? ''
+                    if (!sseToken) throw new Error('missing SSE token')
 
-                const url = `${import.meta.env.VITE_BASE_URL}/notifications/stream?sse_token=${encodeURIComponent(sseToken)}`
-                es = new EventSource(url)
+                    const url = `${import.meta.env.VITE_BASE_URL}/notifications/stream?sse_token=${encodeURIComponent(sseToken)}`
+                    es = new EventSource(url)
 
-                es.onmessage = (e: MessageEvent) => {
-                    try {
-                        const notif = JSON.parse(e.data) as Notification
-                        if (!notif?.id) return
-                        addNotification(notif)
-                        handleRefresh(notif)
-                        if (authUser?.role === 'admin') {
-                            useAdminBadgeStore.getState().fetchBadges()
-                        } else if (authUser?.role === 'pioneer') {
-                            usePioneerBadgeStore.getState().fetchBadges()
-                        } else if (authUser?.role?.toLowerCase() === 'booster') {
-                            useBoosterBadgeStore.getState().fetchBadges()
+                    es.onmessage = (e: MessageEvent) => {
+                        try {
+                            const notif = JSON.parse(e.data) as Notification
+                            if (!notif?.id) return
+                            addNotification(notif)
+                            handleRefresh(notif)
+                            if (authUser?.role === 'admin') {
+                                useAdminBadgeStore.getState().fetchBadges()
+                            } else if (authUser?.role === 'pioneer') {
+                                usePioneerBadgeStore.getState().fetchBadges()
+                            } else if (authUser?.role?.toLowerCase() === 'booster') {
+                                useBoosterBadgeStore.getState().fetchBadges()
+                            }
+                        } catch {
+                            // ignore ping / non-JSON events
                         }
-                    } catch {
-                        // ignore ping / non-JSON events
                     }
-                }
 
-                es.onerror = () => {
-                    // EventSource auto-reconnects
-                }
-            })
-            .catch(() => { /* ignore auth errors */ })
+                    es.onerror = () => {
+                        es?.close()
+                        es = null
+                        if (!cancelled && !retryTimer) {
+                            retryTimer = setTimeout(() => {
+                                retryTimer = null
+                                connect()
+                            }, 3000)
+                        }
+                    }
+                })
+                .catch(() => {
+                    if (!cancelled && !retryTimer) {
+                        retryTimer = setTimeout(() => {
+                            retryTimer = null
+                            connect()
+                        }, 5000)
+                    }
+                })
+        }
+
+        connect()
 
         return () => {
             cancelled = true
+            if (retryTimer) clearTimeout(retryTimer)
             es?.close()
         }
     }, [authUser, addNotification, handleRefresh])
