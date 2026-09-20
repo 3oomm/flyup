@@ -35,6 +35,18 @@ const bankErrorMessage = (err: unknown) => {
     return msg === 'account number already exists' ? 'เลขบัญชีนี้มีในระบบแล้ว' : 'กรุณากรอกเลขบัญชีให้ครบถ้วน'
 }
 
+const verificationErrorMessage = (err: unknown) => {
+    const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+    const messages: Record<string, string> = {
+        'invalid or expired kyc session': 'ลิงก์ยืนยันตัวตนไม่ถูกต้องหรือหมดอายุ กรุณาสร้าง QR Code ใหม่',
+        'verification service unavailable, please try again later': 'ระบบตรวจสอบใบหน้าไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง',
+        'verification is already pending': 'ข้อมูลยืนยันตัวตนถูกส่งแล้วและกำลังรอตรวจสอบ',
+        'already verified': 'บัญชีนี้ยืนยันตัวตนแล้ว',
+        'invalid ID card URL': 'ระบบไม่สามารถอ่านรูปบัตรประชาชนที่อัปโหลดได้',
+    }
+    return message ? (messages[message] ?? message) : 'ส่งข้อมูลยืนยันตัวตนไม่สำเร็จ กรุณาลองใหม่'
+}
+
 export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
     uploadVerificationDocument: async (file) => {
         try {
@@ -55,8 +67,13 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
             })
             if (!kycToken) await useAuthStore.getState().checkAuth()
             return res.data?.data?.status === 'approved' ? 'approved' : 'pending'
-        } catch {
-            toast.error('เกิดข้อผิดพลาด')
+        } catch (err) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            // คำขอรอบก่อนอาจบันทึกสำเร็จแล้ว แต่ response ขั้นท้ายล้มเหลว
+            // ให้หน้า mobile จบ flow ได้แทนการบังคับส่งรูปซ้ำ
+            if (message === 'verification is already pending') return 'pending'
+            if (message === 'already verified') return 'approved'
+            toast.error(verificationErrorMessage(err))
             return null
         }
     },
@@ -68,8 +85,8 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
             })
             if (!kycToken) await useAuthStore.getState().checkAuth()
             return true
-        } catch {
-            toast.error('เกิดข้อผิดพลาด')
+        } catch (err) {
+            toast.error(verificationErrorMessage(err))
             return false
         }
     },
