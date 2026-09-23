@@ -158,7 +158,7 @@ const AdminProfileTab = () => {
           <input
             value={(authUser?.email as string) ?? ""}
             disabled
-            className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-[#F8F9FA] text-muted-foreground cursor-not-allowed"
+            className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-surface-soft text-muted-foreground cursor-not-allowed"
           />
         </div>
 

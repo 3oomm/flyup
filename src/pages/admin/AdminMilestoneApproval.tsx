@@ -44,7 +44,7 @@ const AdminMilestoneApproval = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
                 {/* Header */}
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_76px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(140px,1fr)_120px_160px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_76px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(140px,1fr)_120px_160px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="hidden md:block text-center">Pioneer</div>

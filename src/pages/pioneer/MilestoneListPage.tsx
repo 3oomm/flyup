@@ -20,12 +20,12 @@ const STATE_LABEL: Record<string, string> = {
 }
 
 const STATE_BADGE: Record<string, string> = {
-  funding:             'bg-[#8B5CF6] text-white',
+  funding:             'bg-brand-violet text-white',
   executing:           'bg-[#3B82F6] text-white',
   closed:              'bg-[#2BA88E] text-white',
   pending_review:      'bg-[#F5A623] text-white',
   draft:               'bg-slate-100 text-slate-500',
-  cancelled:           'bg-[#EF4444] text-white',
+  cancelled:           'bg-danger-bright text-white',
   suspended:           'bg-orange-100 text-orange-700',
   pending_cancel:      'bg-[#F5A623] text-white',
   pending_edit_review: 'bg-[#F5A623] text-white',
@@ -47,7 +47,7 @@ const TABS: { key: string; label: string }[] = [
 const ProjectRow = ({ project }: { project: ProjectSummary }) => {
   const navigate = useNavigate()
   const navigable = MILESTONE_NAVIGABLE.includes(project.state)
-  const badge = STATE_BADGE[project.state] ?? 'bg-[#F1F3F5] text-[#6C757D]'
+  const badge = STATE_BADGE[project.state] ?? 'bg-surface-hover text-[#6C757D]'
   const label = STATE_LABEL[project.state] ?? project.state
   const progress = project.funding_goal > 0
     ? Math.min(100, Math.round((project.current_funding / project.funding_goal) * 100))
@@ -60,7 +60,7 @@ const ProjectRow = ({ project }: { project: ProjectSummary }) => {
       }`}
       onClick={() => navigable && navigate(`/pioneer/dashboard/projects/${project.id}/milestones`)}
     >
-      <div className="shrink-0 w-14 h-14 rounded-[10px] bg-[#F1F3F5] overflow-hidden">
+      <div className="shrink-0 w-14 h-14 rounded-[10px] bg-surface-hover overflow-hidden">
         {project.thumbnail_url
           ? <img src={project.thumbnail_url} alt={project.title} className="w-full h-full object-cover" />
           : <div className="w-full h-full flex items-center justify-center text-muted-foreground"><Flag size={20} /></div>
@@ -80,7 +80,7 @@ const ProjectRow = ({ project }: { project: ProjectSummary }) => {
         )}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 flex-1">
-            <div className="flex-1 h-1.5 rounded-full bg-[#F1F3F5] overflow-hidden">
+            <div className="flex-1 h-1.5 rounded-full bg-surface-hover overflow-hidden">
               <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
             </div>
             <span className="text-[11px] text-muted-foreground shrink-0">{progress}%</span>

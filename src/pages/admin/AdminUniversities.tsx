@@ -150,7 +150,7 @@ const AdminUniversities = () => {
                         <div className="w-full overflow-x-auto">
                             <table className="w-full table-fixed md:table-auto text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-[#f8f9fc] text-[13px] font-medium text-gray-500 border-b border-border">
+                                    <tr className="bg-surface-table text-[13px] font-medium text-gray-500 border-b border-border">
                                         <th className="w-[44px] md:w-[60px] px-2 md:px-4 py-3 font-medium whitespace-nowrap text-center">ลำดับ</th>
                                         <th className="px-2 md:px-4 py-3 font-medium whitespace-nowrap md:min-w-[200px]">ชื่อมหาวิทยาลัย (TH)</th>
                                         <th className="hidden md:table-cell px-4 py-3 font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (EN)</th>

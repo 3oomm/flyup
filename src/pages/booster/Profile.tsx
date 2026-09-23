@@ -36,7 +36,7 @@ const Profile = () => {
             className={`px-[16px] py-[8px] rounded-[8px] text-[14px] font-medium transition-colors cursor-pointer ${
               activeTab === tab.key
                 ? "bg-primary text-white"
-                : "text-muted-foreground hover:text-foreground hover:bg-[#F1F3F5]"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
             }`}
           >
             {tab.label}

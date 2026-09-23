@@ -95,7 +95,7 @@ const DetailModal = ({
 
                 {/* Refund Preview */}
                 <div className="border border-border rounded-xl overflow-hidden mb-4">
-                    <div className="bg-[#f8f9fc] px-4 py-2.5 flex items-center justify-between">
+                    <div className="bg-surface-table px-4 py-2.5 flex items-center justify-between">
                         <p className="text-[13px] font-semibold text-foreground">สรุปการคืนเงิน</p>
                         {isLoadingPreview && <Loader2 size={14} className="animate-spin text-muted-foreground" />}
                     </div>
@@ -151,7 +151,7 @@ const DetailModal = ({
                                 <div>
                                     <p className="text-[12px] font-semibold text-muted-foreground mb-2">รายการคืนเงินนักลงทุน ({preview.investors.length} ราย)</p>
                                     <div className="border border-border rounded-lg overflow-hidden">
-                                        <div className="grid grid-cols-[60px_1fr_100px_100px] bg-[#f8f9fc] px-3 py-2 text-[11px] font-medium text-gray-500 border-b border-border">
+                                        <div className="grid grid-cols-[60px_1fr_100px_100px] bg-surface-table px-3 py-2 text-[11px] font-medium text-gray-500 border-b border-border">
                                             <div className="text-center">ลำดับ</div>
                                             <div>นักลงทุน</div>
                                             <div className="text-right">ลงทุน</div>
@@ -339,7 +339,7 @@ const AdminCancelRequests = () => {
             />
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_90px_96px] md:grid-cols-[60px_2fr_1fr_2fr_120px_120px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_90px_96px] md:grid-cols-[60px_2fr_1fr_2fr_120px_120px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="text-center">เจ้าของโปรเจกต์</div>
@@ -388,7 +388,7 @@ const AdminCancelRequests = () => {
                                     <button
                                         data-testid={`cancel-request-detail-btn-${r.id}`}
                                         onClick={(e) => { e.stopPropagation(); openDetail(r) }}
-                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-[#F1F3F5] hover:bg-[#E9ECEF] text-[11px] md:text-[12px] font-medium text-foreground cursor-pointer whitespace-nowrap"
+                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface-raised text-[11px] md:text-[12px] font-medium text-foreground cursor-pointer whitespace-nowrap"
                                     >
                                         ดูรายละเอียด
                                     </button>

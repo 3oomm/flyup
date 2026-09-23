@@ -357,8 +357,8 @@ const Step3Milestone = () => {
                 onChange={(e) => !isLocked && handleChange('title', e.target.value)}
                 onBlur={() => { if (!isLocked) savePhaseIfChanged(activePhase) }}
                 className={isLocked
-                  ? "w-full h-[40px] px-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
-                  : "w-full h-[40px] px-3 bg-[#F8F9FB] border border-[#E5E7EB] rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-[14px]"
+                  ? "w-full h-[40px] px-3 bg-surface-disabled border border-border-strong rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
+                  : "w-full h-[40px] px-3 bg-surface-field border border-border-strong rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-[14px]"
                 }
               />
             </div>
@@ -379,8 +379,8 @@ const Step3Milestone = () => {
                 }}
                 onBlur={() => { if (!isLocked) savePhaseIfChanged(activePhase) }}
                 className={isLocked
-                  ? "w-full p-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-[8px] outline-none resize-none overflow-hidden text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
-                  : "w-full p-3 bg-[#F8F9FB] border border-[#E5E7EB] rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden text-[14px]"
+                  ? "w-full p-3 bg-surface-disabled border border-border-strong rounded-[8px] outline-none resize-none overflow-hidden text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
+                  : "w-full p-3 bg-surface-field border border-border-strong rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all resize-none overflow-hidden text-[14px]"
                 }
               />
             </div>
@@ -397,7 +397,7 @@ const Step3Milestone = () => {
                 type="text"
                 disabled
                 value={fundingGoal > 0 ? `฿${(fundingGoal * phasePercents[activePhase]).toLocaleString('th-TH')}` : 'กรุณากำหนดเป้าหมายเงินทุนก่อน'}
-                className="w-full h-[40px] px-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed"
+                className="w-full h-[40px] px-3 bg-surface-disabled border border-border-strong rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed"
               />
             </div>
 
@@ -426,8 +426,8 @@ const Step3Milestone = () => {
                   savePhaseIfChanged(activePhase);
                 }}
                 className={isLocked
-                  ? "w-full h-[40px] px-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
-                  : "w-full h-[40px] px-3 bg-[#F8F9FB] border border-[#E5E7EB] rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none text-[14px]"
+                  ? "w-full h-[40px] px-3 bg-surface-disabled border border-border-strong rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
+                  : "w-full h-[40px] px-3 bg-surface-field border border-border-strong rounded-[8px] focus:ring-1 focus:ring-primary focus:border-primary outline-none text-[14px]"
                 }
               />
               {isLocked && <p className="text-[11px] text-amber-600">🔒 วันที่/ระยะเวลาแก้ไม่ได้หลังเข้าสู่การระดมทุน</p>}
@@ -473,7 +473,7 @@ const Step3Milestone = () => {
                       toast.error('คุณสามารถระบุเกณฑ์การยอมรับได้สูงสุด 10 ข้อ')
                     }
                   }}
-                  className="flex items-center space-x-2 bg-[#F3F4F6] text-foreground hover:bg-[#E5E7EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-all cursor-pointer"
+                  className="flex items-center space-x-2 bg-surface-disabled text-foreground hover:bg-border-strong px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-all cursor-pointer"
                 >
                   <Plus size={14} />
                   <span>เพิ่มเกณฑ์</span>
@@ -527,8 +527,8 @@ const Step3Milestone = () => {
                     }}
                     onBlur={() => { if (!isLocked) savePhaseIfChanged(activePhase) }}
                     className={isLocked
-                      ? "flex-grow h-[40px] px-3 bg-[#F3F4F6] border border-[#E5E7EB] rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
-                      : "flex-grow h-[40px] px-3 bg-[#F8F9FB] border border-[#E5E7EB] rounded-[8px] outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-[14px]"
+                      ? "flex-grow h-[40px] px-3 bg-surface-disabled border border-border-strong rounded-[8px] outline-none text-[14px] text-muted-foreground cursor-not-allowed opacity-70"
+                      : "flex-grow h-[40px] px-3 bg-surface-field border border-border-strong rounded-[8px] outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-[14px]"
                     }
                   />
                   {/* ปุ่มลบเกณฑ์ถังขยะ (แสดงเฉพาะเมื่อมีมากกว่า 1 ข้อ ไม่งั้นให้เหลือ 1 ไว้เสมอ) */}
@@ -589,7 +589,7 @@ const Step3Milestone = () => {
                         {isImage && f.url ? (
                           <img src={f.url} className="w-[50px] h-[50px] object-cover rounded" alt="preview" />
                         ) : (
-                          <div className="w-[50px] h-[50px] flex items-center justify-center bg-[#F8F9FB] rounded text-[20px]">{fileIcon}</div>
+                          <div className="w-[50px] h-[50px] flex items-center justify-center bg-surface-field rounded text-[20px]">{fileIcon}</div>
                         )}
                         {uploading && (
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded">

@@ -118,7 +118,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
 
       {/* ── Progress bar ── */}
       <div className="px-[20px]">
-        <div className="h-[6px] rounded-full bg-[#F1F3F5] overflow-hidden">
+        <div className="h-[6px] rounded-full bg-surface-hover overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${milestone.voting_open ? 'bg-amber-400' : cfg.barCls}`}
             style={{ width: `${displayPct}%` }}
@@ -155,8 +155,8 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
                   disabled={hasMeeting}
                   className={`flex items-center gap-[6px] px-[14px] py-[7px] rounded-[10px] border text-[13px] font-medium transition-colors ${
                     hasMeeting
-                      ? 'border-border text-muted-foreground bg-[#F8F9FA] cursor-not-allowed opacity-60'
-                      : 'border-border text-foreground hover:bg-[#F8F9FA] cursor-pointer'
+                      ? 'border-border text-muted-foreground bg-surface-soft cursor-not-allowed opacity-60'
+                      : 'border-border text-foreground hover:bg-surface-soft cursor-pointer'
                   }`}
                 >
                   <Calendar size={14} className="text-muted-foreground" />
@@ -237,7 +237,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
             <div className="relative group">
               <button
                 disabled
-                className="flex items-center gap-[6px] px-[14px] py-[7px] rounded-[10px] border border-border text-muted-foreground bg-[#F8F9FA] text-[13px] font-medium cursor-not-allowed opacity-60"
+                className="flex items-center gap-[6px] px-[14px] py-[7px] rounded-[10px] border border-border text-muted-foreground bg-surface-soft text-[13px] font-medium cursor-not-allowed opacity-60"
               >
                 จัดการ
               </button>

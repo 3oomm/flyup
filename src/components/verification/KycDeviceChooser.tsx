@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Check, Copy, ExternalLink, Laptop, Loader2, QrCode, Smartphone, X } from "lucide-react";
 import QRCode from "qrcode";
-import api from "../../services/api";
+import { useSelfVerificationStore, type KycSession } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
 
-type KycSession = { token: string; mobile_url: string; expires_at: string };
-
 export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = false }: { onComputer: () => void; onCompleted: () => void; liveOnly?: boolean }) {
+  const createKycSession = useSelfVerificationStore((state) => state.createKycSession);
+  const getKycSessionStatus = useSelfVerificationStore((state) => state.getKycSessionStatus);
   const [step, setStep] = useState<"choose" | "qr">("choose");
   const [session, setSession] = useState<KycSession | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState("");
@@ -24,9 +24,7 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
   const startMobile = async () => {
     setLoading(true);
     try {
-      const response = await api.post("/kyc/");
-      const data = response.data?.data as KycSession;
-      if (!data?.token || !data?.mobile_url) throw new Error("invalid session");
+      const data = await createKycSession();
 
       // ถ้าเปิดหน้าโปรไฟล์อยู่บนมือถืออยู่แล้ว ให้เข้ากล้องโดยตรง
       // ไม่ต้องแสดง QR ที่ไม่สามารถสแกนจากอุปกรณ์เครื่องเดียวกันได้
@@ -53,8 +51,8 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
     if (step !== "qr" || !session) return;
     const poll = window.setInterval(async () => {
       try {
-        const response = await api.get("/kyc/session-status", { params: { token: session.token } });
-        if (response.data?.data?.status === "approved") {
+        const status = await getKycSessionStatus(session.token);
+        if (status === "approved") {
           window.clearInterval(poll);
           toast.success("รับข้อมูลยืนยันตัวตนจากมือถือแล้ว");
           onCompleted();
@@ -62,7 +60,7 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       } catch { /* session อาจหมดอายุ ปล่อยให้ผู้ใช้สร้างใหม่ */ }
     }, 2500);
     return () => window.clearInterval(poll);
-  }, [onCompleted, session, step]);
+  }, [getKycSessionStatus, onCompleted, session, step]);
 
   if (step === "choose" && liveOnly) return (
     <div className="rounded-2xl border border-border bg-white p-6">

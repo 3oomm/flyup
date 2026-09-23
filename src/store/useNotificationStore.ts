@@ -22,6 +22,7 @@ interface NotificationStore {
     bellUnread: number
     total: number
     isLoading: boolean
+    issueSseToken: () => Promise<string>
     fetchNotifications: () => Promise<void>
     markAsRead: (id: number) => Promise<void>
     markAllAsRead: () => Promise<void>
@@ -63,6 +64,13 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     bellUnread: 0,
     total: 0,
     isLoading: false,
+
+    issueSseToken: async () => {
+        const res = await api.post('/notifications/sse-token')
+        const token: string = res.data?.token ?? ''
+        if (!token) throw new Error('missing SSE token')
+        return token
+    },
 
     fetchNotifications: async () => {
         set({ isLoading: true })

@@ -42,6 +42,7 @@ interface AdminLogStore {
     filter: AdminLogFilter
     setFilter: (f: Partial<AdminLogFilter>) => void
     fetchLogs: () => Promise<void>
+    fetchChartLogs: (from: string, to: string) => Promise<AdminLogItem[]>
 }
 
 const DEFAULT_FILTER: AdminLogFilter = { page: 1, page_size: 20 }
@@ -54,6 +55,20 @@ export const useAdminLogStore = create<AdminLogStore>((set, get) => ({
 
     setFilter: (f) => {
         set(s => ({ filter: { ...s.filter, ...f, page: f.page ?? 1 } }))
+    },
+
+    fetchChartLogs: async (from, to) => {
+        const pageSize = 100 // The API caps page_size at 100.
+        const all: AdminLogItem[] = []
+        for (let page = 1; page <= 100; page++) {
+            const params = new URLSearchParams({ page: String(page), page_size: String(pageSize), from, to })
+            const res = await api.get(`/admin/logs?${params.toString()}`)
+            const data: AdminLogItem[] = res.data?.data ?? []
+            all.push(...data)
+            const total: number = res.data?.meta?.total ?? all.length
+            if (data.length === 0 || all.length >= total) break
+        }
+        return all
     },
 
     fetchLogs: async () => {

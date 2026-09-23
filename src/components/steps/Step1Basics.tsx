@@ -38,7 +38,7 @@ const Step1Basics = () => {
   // เงื่อนไขการระดมทุน (เป้าหมายเงินทุน, ระยะเวลา, Soft Cap, ส่วนแบ่งกำไร) เป็นข้อตกลงที่ Booster ใช้ตัดสินใจลงทุน
   // ล็อกถาวรทันทีที่พ้น draft ไปแล้ว ไม่ให้แก้ไขอีกเลยแม้จะผ่านระบบขอแก้ไข (ต่างจาก field อื่นในหน้านี้)
   const isFundingLocked = !!currentProject.state && currentProject.state !== 'draft';
-  const lockedInputCls = 'border border-border bg-[#F3F4F6] h-[38px] px-[12px] rounded-[6px] text-muted-foreground cursor-not-allowed opacity-70';
+  const lockedInputCls = 'border border-border bg-surface-disabled h-[38px] px-[12px] rounded-[6px] text-muted-foreground cursor-not-allowed opacity-70';
 
   // รายการหมวดหมู่ทั้งหมดที่ดึงมาจาก API สำหรับ dropdown
   const [allCategories, setAllCategories] = useState<{ id: number; name: string }[]>([]);
@@ -442,7 +442,7 @@ const Step1Basics = () => {
                         }
                         setIsOpen(false);
                       }}
-                      className={`px-[12px] py-[8px] text-[14px] cursor-pointer transition-colors ${localData.category === cat.name ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-[#F8F9FB]'}`}>
+                      className={`px-[12px] py-[8px] text-[14px] cursor-pointer transition-colors ${localData.category === cat.name ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-surface-field'}`}>
                       {cat.name}
                     </li>
                   ))}

@@ -86,6 +86,8 @@ export interface PlatformStats {
   passed_milestones: number;
 }
 
+let latestDetailRequest = 0;
+
 // ─── Store Interface ─────────────────────────────────────────────────────────
 
 interface PublicProjectState {
@@ -176,18 +178,20 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
   },
 
   fetchPublicProjectById: async (id: number) => {
+    const request = ++latestDetailRequest;
     set({ isDetailLoading: true, currentPublicProject: null });
     try {
       const res = await api.get(`/projects/${id}`);
-      set({ currentPublicProject: res.data?.data ?? null });
+      if (request === latestDetailRequest) set({ currentPublicProject: res.data?.data ?? null });
     } catch (error) {
       console.error('fetchPublicProjectById:', error);
     } finally {
-      set({ isDetailLoading: false });
+      if (request === latestDetailRequest) set({ isDetailLoading: false });
     }
   },
 
   fetchPublicProjectBySlug: async (slug: string) => {
+    const request = ++latestDetailRequest;
     set({ isDetailLoading: true, currentPublicProject: null });
     try {
       // Project slugs always end with the project ID. Using that ID avoids
@@ -198,11 +202,11 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
         ? `/projects/${projectId}`
         : `/projects/slug/${encodeURIComponent(slug)}`;
       const res = await api.get(endpoint);
-      set({ currentPublicProject: res.data?.data ?? null });
+      if (request === latestDetailRequest) set({ currentPublicProject: res.data?.data ?? null });
     } catch (error) {
       console.error('fetchPublicProjectBySlug:', error);
     } finally {
-      set({ isDetailLoading: false });
+      if (request === latestDetailRequest) set({ isDetailLoading: false });
     }
   },
 

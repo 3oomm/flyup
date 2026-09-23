@@ -56,14 +56,14 @@ interface ProjectDetailState {
   updateThreads: Record<number, ProjectThread[]>;
   threadMessages: Record<number, ProjectThreadMessage[]>;
   faqs: ProjectFAQ[];
-  investorCount: number;
+  investorCount: number | null;
   investors: ProjectInvestorItem[];
   isLoading: boolean;
   fetchUpdates: (id: number) => Promise<void>;
   fetchThreads: (id: number) => Promise<void>;
   fetchFAQs: (id: number) => Promise<void>;
   fetchInvestorCount: (id: number) => Promise<void>;
-  fetchAll: (id: number) => Promise<void>;
+  fetchAll: (id: number, includeInvestors?: boolean) => Promise<void>;
   createThread: (projectId: number, body: string, isOwner?: boolean) => Promise<void>;
   fetchUpdateThreads: (projectId: number, updateId: number) => Promise<void>;
   createUpdateThread: (projectId: number, updateId: number, body: string, isOwner: boolean) => Promise<void>;
@@ -73,13 +73,15 @@ interface ProjectDetailState {
 
 // ─── Store Implementation ────────────────────────────────────────────────────
 
+let latestProjectDetailsRequest = 0;
+
 export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
   updates: [],
   threads: [],
   updateThreads: {},
   threadMessages: {},
   faqs: [],
-  investorCount: 0,
+  investorCount: null,
   investors: [],
   isLoading: false,
 
@@ -137,7 +139,7 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
       set({ investorCount: res.data?.data?.total ?? 0 });
     } catch (error) {
       console.warn('fetchInvestorCount:', error);
-      set({ investorCount: 0 });
+      set({ investorCount: null });
     }
   },
 
@@ -204,14 +206,15 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
     }));
   },
 
-  fetchAll: async (id: number) => {
-    set({ isLoading: true });
+  fetchAll: async (id: number, includeInvestors = true) => {
+    const request = ++latestProjectDetailsRequest;
+    set({ isLoading: true, updates: [], threads: [], updateThreads: {}, faqs: [], investorCount: null, investors: [] });
     try {
       const [updatesRes, threadsRes, faqsRes, invCountRes] = await Promise.allSettled([
         api.get(`/projects/${id}/updates`),
         api.get(`/projects/${id}/threads`),
         api.get(`/projects/${id}/faqs`),
-        api.get(`/investments/projects/${id}/investors`),
+        includeInvestors ? api.get(`/investments/projects/${id}/investors`) : Promise.resolve(null),
       ]);
       const updates: ProjectUpdate[] = updatesRes.status === 'fulfilled'
         ? updatesRes.value.data?.data ?? []
@@ -230,6 +233,8 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
       );
       const updateThreads = Object.fromEntries(commentsByUpdate) as Record<number, ProjectThread[]>;
 
+      if (request !== latestProjectDetailsRequest) return;
+      const investorResponse = invCountRes.status === 'fulfilled' ? invCountRes.value : null;
       set({
         updates: updates.map((update) => ({
           ...update,
@@ -238,13 +243,13 @@ export const useProjectDetailStore = create<ProjectDetailState>((set) => ({
         updateThreads,
         threads: threadsRes.status === 'fulfilled' ? threadsRes.value.data?.data ?? [] : [],
         faqs: faqsRes.status === 'fulfilled' ? faqsRes.value.data?.data ?? [] : [],
-        investorCount: invCountRes.status === 'fulfilled' ? invCountRes.value.data?.data?.total ?? 0 : 0,
-        investors: invCountRes.status === 'fulfilled' ? invCountRes.value.data?.data?.investors ?? [] : [],
+        investorCount: investorResponse?.data?.data?.total ?? null,
+        investors: investorResponse?.data?.data?.investors ?? [],
       });
     } catch (error) {
       console.warn('fetchAll:', error);
     } finally {
-      set({ isLoading: false });
+      if (request === latestProjectDetailsRequest) set({ isLoading: false });
     }
   },
 }));

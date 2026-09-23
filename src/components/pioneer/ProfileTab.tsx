@@ -82,7 +82,7 @@ const ProfileTab = () => {
 
   const inputCls = isEditing
     ? "border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors w-full"
-    : "border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-[#F8F9FA] text-muted-foreground cursor-not-allowed w-full";
+    : "border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-surface-soft text-muted-foreground cursor-not-allowed w-full";
 
   return (
     <div className="flex flex-col gap-[16px]">
@@ -121,7 +121,7 @@ const ProfileTab = () => {
           <button
             data-testid="profile-edit-btn"
             onClick={handleEdit}
-            className="flex items-center gap-[6px] px-[12px] py-[7px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-[#F1F3F5] transition-colors cursor-pointer"
+            className="flex items-center gap-[6px] px-[12px] py-[7px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-hover transition-colors cursor-pointer"
           >
             <Pencil size={13} />
             แก้ไขโปรไฟล์
@@ -148,7 +148,7 @@ const ProfileTab = () => {
           <label className="text-[13px] font-medium text-foreground flex items-center gap-[6px]">
             <span><Mail size={14} /></span> อีเมล
           </label>
-          <input value={(authUser?.email as string) ?? ""} disabled className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-[#F8F9FA] text-muted-foreground cursor-not-allowed w-full" />
+          <input value={(authUser?.email as string) ?? ""} disabled className="border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] bg-surface-soft text-muted-foreground cursor-not-allowed w-full" />
         </div>
 
         <div className="flex flex-col gap-[6px]">
@@ -235,7 +235,7 @@ const ProfileTab = () => {
             data-testid="profile-cancel-btn"
             onClick={handleCancel}
             disabled={isSavingProfile}
-            className="flex items-center gap-[6px] px-[16px] py-[9px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-[#F1F3F5] transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-[6px] px-[16px] py-[9px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-hover transition-colors disabled:opacity-50 cursor-pointer"
           >
             <X size={14} /> ยกเลิก
           </button>

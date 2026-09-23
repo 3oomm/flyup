@@ -21,7 +21,15 @@ interface StudentVerifyPayload {
     accept_pioneer_terms: boolean
 }
 
+export interface KycSession {
+    token: string
+    mobile_url: string
+    expires_at: string
+}
+
 interface SelfVerificationStore {
+    createKycSession: () => Promise<KycSession>
+    getKycSessionStatus: (token: string) => Promise<string | undefined>
     uploadVerificationDocument: (file: File) => Promise<string | null>
     submitIdVerify: (payload: IdVerifyPayload, kycToken?: string) => Promise<'approved' | 'pending' | null>
     submitStudentVerify: (payload: StudentVerifyPayload, kycToken?: string) => Promise<boolean>
@@ -48,6 +56,18 @@ const verificationErrorMessage = (err: unknown) => {
 }
 
 export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
+    createKycSession: async () => {
+        const res = await api.post('/kyc/')
+        const session = res.data?.data as KycSession
+        if (!session?.token || !session?.mobile_url) throw new Error('invalid session')
+        return session
+    },
+
+    getKycSessionStatus: async (token) => {
+        const res = await api.get('/kyc/session-status', { params: { token } })
+        return res.data?.data?.status
+    },
+
     uploadVerificationDocument: async (file) => {
         try {
             const fd = new FormData()

@@ -654,7 +654,7 @@ const Step2Story = () => {
               triggerSaved();
             }}
             rows={3}
-            className={`w-full border p-[12px] rounded-[8px] resize-none focus:outline-none transition-all duration-200 overflow-hidden ${isRisksLocked ? 'border-border bg-[#F3F4F6] text-muted-foreground cursor-not-allowed opacity-70' : 'border-border bg-background focus:border-primary hover:border-primary/50'}`}/>
+            className={`w-full border p-[12px] rounded-[8px] resize-none focus:outline-none transition-all duration-200 overflow-hidden ${isRisksLocked ? 'border-border bg-surface-disabled text-muted-foreground cursor-not-allowed opacity-70' : 'border-border bg-background focus:border-primary hover:border-primary/50'}`}/>
           <p className='text-[12px] text-muted-foreground'>*ระบุความเสี่ยงที่อาจเกิดขึ้น  เพื่อให้ผู้สนับสนุนได้รับทราบข้อมูลที่ครบถ้วน  *</p>
           {isRisksReviewFlow && risks !== risksSaved && (
             <div className="flex items-center justify-between gap-[12px] px-[16px] py-[12px] rounded-[10px] bg-amber-50 border border-amber-200">

@@ -46,11 +46,11 @@ const statePriority: Record<StateType, number> = {
 };
 
 const stateBadgeClass: Record<StateType, string> = {
-  funding: "bg-[#8B5CF6] text-white",
-  closed: "bg-[#8B5CF6] text-white",
-  pending_review: "bg-[#F1F3F5] text-[#495057]",
+  funding: "bg-brand-violet text-white",
+  closed: "bg-brand-violet text-white",
+  pending_review: "bg-surface-hover text-[#495057]",
   draft: "bg-slate-100 text-slate-500",
-  cancelled: "bg-[#EF4444] text-white",
+  cancelled: "bg-danger-bright text-white",
   executing: "bg-[#3B82F6] text-white",
   pending_cancel: "bg-[#F59E0B] text-white",
   suspended: "bg-orange-100 text-orange-700",
@@ -206,7 +206,7 @@ const MyProjects = () => {
             <div className="absolute top-[48px] right-0 bg-white border border-border rounded-[12px] shadow-lg z-50 min-w-[180px] py-[4px]">
               <button
                 onClick={() => { setActiveFilter("all"); setPage(1); setIsFilterOpen(false); }}
-                className={`w-full text-left px-[16px] py-[10px] text-[13px] hover:bg-[#F1F3F5] transition-colors cursor-pointer ${activeFilter === "all" ? "text-primary font-semibold" : "text-foreground"}`}
+                className={`w-full text-left px-[16px] py-[10px] text-[13px] hover:bg-surface-hover transition-colors cursor-pointer ${activeFilter === "all" ? "text-primary font-semibold" : "text-foreground"}`}
               >
                 ทั้งหมด
               </button>
@@ -214,7 +214,7 @@ const MyProjects = () => {
                 <button
                   key={s.type}
                   onClick={() => { setActiveFilter(s.type as StateType); setPage(1); setIsFilterOpen(false); }}
-                  className={`w-full text-left px-[16px] py-[10px] text-[13px] hover:bg-[#F1F3F5] transition-colors cursor-pointer ${activeFilter === s.type ? "text-primary font-semibold" : "text-foreground"}`}
+                  className={`w-full text-left px-[16px] py-[10px] text-[13px] hover:bg-surface-hover transition-colors cursor-pointer ${activeFilter === s.type ? "text-primary font-semibold" : "text-foreground"}`}
                 >
                   {s.label}
                 </button>
@@ -340,7 +340,7 @@ const MyProjects = () => {
                           <div className="text-[#F59E0B] shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                           </div>
-                          <span className="text-[12px] text-[#EF4444] font-medium">โปรเจกต์ถูกยกเลิก กรุณาติดต่อทีมสนับสนุน</span>
+                          <span className="text-[12px] text-danger-bright font-medium">โปรเจกต์ถูกยกเลิก กรุณาติดต่อทีมสนับสนุน</span>
                         </div>
                       )}
                     </div>
@@ -349,7 +349,7 @@ const MyProjects = () => {
                     <div className="flex items-center gap-[8px] shrink-0 mt-[10px] lg:mt-0">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleView(project.id, project.state); }}
-                        className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-[#F1F3F5] hover:bg-[#E9ECEF] transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"
+                        className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-surface-hover hover:bg-surface-raised transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"
                       >
                         <Eye size={16} /> ดู
                       </button>
@@ -357,7 +357,7 @@ const MyProjects = () => {
                       {hasEdit && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleEdit(project.id); }}
-                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-[#F1F3F5] hover:bg-[#E9ECEF] transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"
+                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-surface-hover hover:bg-surface-raised transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"
                         >
                           <Edit3 size={16} /> แก้ไข
                         </button>
@@ -366,7 +366,7 @@ const MyProjects = () => {
                       {hasMilestone && (
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/pioneer/dashboard/projects/${project.id}/milestones`); }}
-                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-[#8B5CF6] hover:bg-[#7C3AED] transition-colors rounded-[8px] text-[13px] font-medium text-white shadow-sm cursor-pointer"
+                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-brand-violet hover:bg-brand-violet-hover transition-colors rounded-[8px] text-[13px] font-medium text-white shadow-sm cursor-pointer"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
                           Milestone
@@ -385,7 +385,7 @@ const MyProjects = () => {
                       {hasCancel && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleCancel(project.id, project.title); }}
-                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-red-50 hover:bg-red-100 transition-colors rounded-[8px] text-[13px] font-medium text-[#EF4444] cursor-pointer"
+                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-red-50 hover:bg-red-100 transition-colors rounded-[8px] text-[13px] font-medium text-danger-bright cursor-pointer"
                         >
                           <XCircle size={16} /> ยกเลิกคำขอ
                         </button>
@@ -394,7 +394,7 @@ const MyProjects = () => {
                       {hasDelete && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(project.id, project.title); }}
-                          className="flex flex-col items-center justify-center w-[36px] h-[36px] text-[#EF4444] hover:bg-red-50 rounded-[8px] transition-colors ml-[4px] cursor-pointer"
+                          className="flex flex-col items-center justify-center w-[36px] h-[36px] text-danger-bright hover:bg-red-50 rounded-[8px] transition-colors ml-[4px] cursor-pointer"
                         >
                           <Trash2 size={18} />
                         </button>

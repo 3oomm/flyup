@@ -128,7 +128,7 @@ const Step4Agreement = () => {
 
             {/* ปุ่ม Checkbox สำหรับกดยอมรับข้อตกลง */}
             <div className="mt-[20px]">
-              <label className={`flex items-center gap-[12px] border border-border rounded-[8px] p-[16px] transition-colors ${alreadySubmitted ? 'bg-[#F3F4F6] cursor-not-allowed' : 'cursor-pointer hover:border-primary'}`}>
+              <label className={`flex items-center gap-[12px] border border-border rounded-[8px] p-[16px] transition-colors ${alreadySubmitted ? 'bg-surface-disabled cursor-not-allowed' : 'cursor-pointer hover:border-primary'}`}>
                 <input
                   type="checkbox"
                   checked={isAgreed}

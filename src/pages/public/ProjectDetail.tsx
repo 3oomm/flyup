@@ -23,6 +23,7 @@ import { useComplaintStore } from "../../store/useComplaintStore";
 import ComplaintModal from "../../components/ComplaintModal";
 import PreviewStory from "../../components/preview/PreviewStory";
 import { PreviewUpdate, PreviewComment, PreviewQuestion } from "../../components/preview/PreviewMisc";
+import { useCurrentTime } from "../../hooks/useCurrentTime";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -30,9 +31,8 @@ type Tab = "story" | "milestone" | "updates" | "comments" | "questions";
 
 const PLACEHOLDER_IMG = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800";
 
-const NOW = Date.now();
-
 function ProjectDetail() {
+  const now = useCurrentTime();
   const { slug } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("story");
@@ -83,8 +83,8 @@ function ProjectDetail() {
   }, [slug, fetchPublicProjectBySlug, fetchPublicProjectById, fetchMyInvestments, fetchMyComplaints, isLoggedIn]);
 
   useEffect(() => {
-    if (projectId) fetchAll(projectId);
-  }, [projectId, fetchAll]);
+    if (projectId) fetchAll(projectId, isLoggedIn);
+  }, [projectId, fetchAll, isLoggedIn]);
 
   const handlePostComment = async () => {
     if (!commentBody.trim() || !projectId) return;
@@ -129,7 +129,7 @@ function ProjectDetail() {
 
   const daysLeft = (() => {
     if (!project?.end_date) return project?.duration_days ?? 0;
-    const diff = new Date(project.end_date).getTime() - NOW;
+    const diff = new Date(project.end_date).getTime() - now;
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   })();
 
@@ -226,7 +226,7 @@ function ProjectDetail() {
   const investorCount = actualInvestorCount;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] overflow-x-hidden w-full mt-[100px] pb-[100px]">
+    <div className="min-h-screen bg-surface-soft overflow-x-hidden w-full mt-[100px] pb-[100px]">
       <Toaster
         toastOptions={{ duration: 3000 }}
         position="top-center"
@@ -298,7 +298,7 @@ function ProjectDetail() {
             )}
 
             {/* ── Tabs Navigation ── */}
-            <div className="flex flex-nowrap bg-[#F1F3F5] rounded-[8px] p-[4px] overflow-x-auto scrollbar-hide">
+            <div className="flex flex-nowrap bg-surface-hover rounded-[8px] p-[4px] overflow-x-auto scrollbar-hide">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -502,13 +502,18 @@ function ProjectDetail() {
 
               <div className="flex items-center justify-between border-y border-border py-[16px] mt-[24px]">
                 <button
-                  onClick={() => investorCount > 0 && setShowInvestorsModal(true)}
-                  className={`flex flex-col items-center flex-1 border-r border-border ${investorCount > 0 ? 'cursor-pointer hover:text-primary transition-colors' : 'cursor-default'}`}
+                  onClick={() => {
+                    if (!isLoggedIn) navigate('/login');
+                    else if (investorCount !== null && investorCount > 0) setShowInvestorsModal(true);
+                  }}
+                  className={`flex flex-col items-center flex-1 border-r border-border ${!isLoggedIn || (investorCount !== null && investorCount > 0) ? 'cursor-pointer hover:text-primary transition-colors' : 'cursor-default'}`}
                 >
                   <div className="flex items-center gap-[6px] text-foreground font-semibold text-[16px]">
-                    <Users size={16} /> {investorCount}
+                    <Users size={16} /> {investorCount ?? '—'}
                   </div>
-                  <span className={`text-[12px] ${investorCount > 0 ? 'text-primary underline underline-offset-2' : 'text-muted-foreground'}`}>ผู้สนับสนุน</span>
+                  <span className={`text-[12px] ${!isLoggedIn || (investorCount !== null && investorCount > 0) ? 'text-primary underline underline-offset-2' : 'text-muted-foreground'}`}>
+                    {isLoggedIn ? 'ผู้สนับสนุน' : 'เข้าสู่ระบบเพื่อดู'}
+                  </span>
                 </button>
                 <div className="flex flex-col items-center flex-1 border-r border-border">
                   <div className="flex items-center gap-[6px] text-foreground font-semibold text-[16px]">
@@ -692,7 +697,7 @@ function ProjectDetail() {
             <div className="flex items-center justify-between px-[24px] pt-[24px] pb-[16px] border-b border-border">
               <div>
                 <h2 className="text-[18px] font-bold text-foreground">ผู้สนับสนุน</h2>
-                <p className="text-[13px] text-muted-foreground mt-[2px]">{investorCount} คน · ฿{fundedAmount.toLocaleString()} รวมทั้งสิ้น</p>
+                <p className="text-[13px] text-muted-foreground mt-[2px]">{investorCount ?? '—'} คน · ฿{fundedAmount.toLocaleString()} รวมทั้งสิ้น</p>
               </div>
               <button
                 onClick={() => setShowInvestorsModal(false)}

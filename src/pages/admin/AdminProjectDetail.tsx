@@ -242,7 +242,7 @@ const AdminProjectDetail = () => {
                         )}
 
                         {/* Tabs */}
-                        <div className="flex flex-wrap md:flex-nowrap bg-[#F1F3F5] rounded-[8px] p-[4px] mt-[10px] overflow-x-auto">
+                        <div className="flex flex-wrap md:flex-nowrap bg-surface-hover rounded-[8px] p-[4px] mt-[10px] overflow-x-auto">
                             {(
                                 [
                                     { key: "story", label: "เรื่องราว" },

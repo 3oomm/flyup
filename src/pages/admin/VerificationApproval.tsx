@@ -108,7 +108,7 @@ const VerificationApproval = () => {
                     </div>
                 ) : tab === "student" ? (
                     <>
-                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] bg-[#f8f9fc] px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
+                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] bg-surface-table px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
                             <div className="text-center">ลำดับ</div>
                             <div>Email</div>
                             <div>Role</div>
@@ -160,7 +160,7 @@ const VerificationApproval = () => {
                     </>
                 ) : (
                     <>
-                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] bg-[#f8f9fc] px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
+                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] bg-surface-table px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
                             <div className="text-center">ลำดับ</div>
                             <div>Email</div>
                             <div>Role</div>

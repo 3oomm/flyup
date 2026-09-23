@@ -81,7 +81,7 @@ const NotificationTab = () => {
             onClick={() => handleToggle(item.key)}
             disabled={saving === item.key}
             className={`w-[48px] h-[26px] rounded-full transition-colors duration-200 relative cursor-pointer ${
-              toggles[item.key] ? "bg-primary" : "bg-[#E9ECEF]"
+              toggles[item.key] ? "bg-primary" : "bg-surface-raised"
             }`}
           >
             <span

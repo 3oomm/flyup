@@ -59,7 +59,7 @@ const Preview = () => {
     const selected = mediaList[selectedIndex] ?? null;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] pb-[100px] pt-[100px]">
+        <div className="min-h-screen bg-surface-soft pb-[100px] pt-[100px]">
             {/* Header (Exit Preview Button) */}
             <div className="w-full flex justify-end p-[20px] max-w-7xl mx-auto">
                 <button
@@ -128,7 +128,7 @@ const Preview = () => {
                         )}
 
                         {/* Tabs Navigation */}
-                        <div className="flex flex-wrap md:flex-nowrap bg-[#F1F3F5] rounded-[8px] p-[4px] mt-[10px] overflow-x-auto">
+                        <div className="flex flex-wrap md:flex-nowrap bg-surface-hover rounded-[8px] p-[4px] mt-[10px] overflow-x-auto">
                             <button
                                 onClick={() => setActiveTab('story')}
                                 className={`flex-1 min-w-[100px] flex justify-center py-[8px] px-[16px] rounded-[6px] text-[12px] transition-colors cursor-pointer ${activeTab === 'story' ? 'bg-white text-foreground font-semibold shadow-sm' : 'text-muted-foreground hover:text-foreground font-medium'}`}
@@ -191,7 +191,7 @@ const Preview = () => {
                             <div className="flex items-center justify-between border-y border-border py-[16px] mt-[24px]">
                                 <div className="flex flex-col items-center flex-1 border-r border-border">
                                     <div className="flex items-center gap-[6px] text-foreground font-semibold text-[16px]">
-                                        <Users size={16} /> {investorCount}
+                                        <Users size={16} /> {investorCount ?? '—'}
                                     </div>
                                     <span className="text-[12px] text-muted-foreground">ผู้สนับสนุน</span>
                                 </div>

@@ -47,6 +47,7 @@ interface InvestmentStoreState {
 
   createInvestment: (data: CreateInvestmentData) => Promise<boolean>;
   getInvestmentById: (id: number) => Promise<InvestmentStatusResponse>;
+  getContractHtml: (id: number) => Promise<string>;
   resumeInvestment: (id: number) => Promise<InvestmentData | null>;
   clearInvestmentData: () => void;
 }
@@ -81,6 +82,11 @@ export const useInvestmentStore = create<InvestmentStoreState>((set) => ({
       console.error(`Error fetching investment ${id}:`, error);
       throw error;
     }
+  },
+
+  getContractHtml: async (id: number) => {
+    const response = await api.get<string>(`/investments/${id}/contract`, { responseType: 'text' });
+    return response.data;
   },
 
   resumeInvestment: async (id: number) => {

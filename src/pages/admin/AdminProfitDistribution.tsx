@@ -202,7 +202,7 @@ function PoolDetailView({
 
             {/* investor table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-[#f8f9fc] px-2 md:px-4 py-3 text-[11px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-surface-table px-2 md:px-4 py-3 text-[11px] md:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>นักลงทุน</div>
                     <div className="hidden md:block text-center">ทุนที่ลงทุน</div>
@@ -323,7 +323,7 @@ const AdminProfitDistribution = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-[#f8f9fc] px-2 md:px-4 py-3 text-[12px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-surface-table px-2 md:px-4 py-3 text-[12px] md:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="hidden md:block text-center">Pioneer</div>

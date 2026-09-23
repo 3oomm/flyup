@@ -388,7 +388,7 @@ const BoosterVerifyTab = () => {
               <>
                 <BankFormFields form={editForm} setForm={setEditForm} />
                 <div className="flex gap-[8px] justify-end">
-                  <button data-testid="bank-edit-cancel-btn" onClick={() => setEditingBankId(null)} disabled={isSavingEdit} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium hover:bg-[#F1F3F5] transition-colors disabled:opacity-50 cursor-pointer">
+                  <button data-testid="bank-edit-cancel-btn" onClick={() => setEditingBankId(null)} disabled={isSavingEdit} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium hover:bg-surface-hover transition-colors disabled:opacity-50 cursor-pointer">
                     <X size={13} /> ยกเลิก
                   </button>
                   <button data-testid="bank-edit-save-btn" onClick={() => handleEditBank(acc.id!)} disabled={isSavingEdit} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] bg-primary hover:bg-primary-hover text-white text-[13px] font-medium transition-colors disabled:opacity-50 cursor-pointer">
@@ -417,7 +417,7 @@ const BoosterVerifyTab = () => {
                       data-testid={`bank-set-default-btn-${acc.id}`}
                       onClick={() => handleSetDefault(acc.id!)}
                       disabled={settingDefaultId === acc.id}
-                      className="flex items-center gap-[5px] px-[10px] py-[6px] rounded-[8px] border border-border text-[12px] font-medium text-foreground hover:bg-[#F1F3F5] transition-colors disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-[5px] px-[10px] py-[6px] rounded-[8px] border border-border text-[12px] font-medium text-foreground hover:bg-surface-hover transition-colors disabled:opacity-50 cursor-pointer"
                     >
                       {settingDefaultId === acc.id ? <Loader2 size={12} className="animate-spin" /> : <Star size={12} />}
                       ตั้งเป็นหลัก
@@ -426,7 +426,7 @@ const BoosterVerifyTab = () => {
                   <button
                     data-testid={`bank-edit-open-btn-${acc.id}`}
                     onClick={() => { setEditingBankId(acc.id!); setEditForm({ bank_name: acc.bank_name ?? "", account_name: acc.account_name ?? "", account_number: acc.account_number ?? "" }); setShowAddForm(false); }}
-                    className="flex items-center gap-[5px] px-[10px] py-[6px] rounded-[8px] border border-border text-[12px] font-medium text-foreground hover:bg-[#F1F3F5] transition-colors cursor-pointer"
+                    className="flex items-center gap-[5px] px-[10px] py-[6px] rounded-[8px] border border-border text-[12px] font-medium text-foreground hover:bg-surface-hover transition-colors cursor-pointer"
                   >
                     <Pencil size={12} /> แก้ไข
                   </button>
@@ -441,7 +441,7 @@ const BoosterVerifyTab = () => {
             <p className="text-[13px] font-semibold text-foreground">บัญชีใหม่</p>
             <BankFormFields form={addForm} setForm={setAddForm} />
             <div className="flex gap-[8px] justify-end">
-              <button data-testid="bank-add-cancel-btn" onClick={() => { setShowAddForm(false); setAddForm(emptyBankForm); }} disabled={isSavingAdd} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium hover:bg-[#F1F3F5] transition-colors disabled:opacity-50 cursor-pointer">
+              <button data-testid="bank-add-cancel-btn" onClick={() => { setShowAddForm(false); setAddForm(emptyBankForm); }} disabled={isSavingAdd} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium hover:bg-surface-hover transition-colors disabled:opacity-50 cursor-pointer">
                 <X size={13} /> ยกเลิก
               </button>
               <button data-testid="bank-add-save-btn" onClick={handleAddBank} disabled={isSavingAdd} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] bg-primary hover:bg-primary-hover text-white text-[13px] font-medium transition-colors disabled:opacity-50 cursor-pointer">

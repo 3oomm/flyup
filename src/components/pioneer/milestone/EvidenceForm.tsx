@@ -103,7 +103,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
       {/* Summary */}
       <div>
         <p className="text-[13px] font-semibold text-foreground mb-[4px]">
-          สรุปผลงาน <span className="text-[#EF4444]">*</span>
+          สรุปผลงาน <span className="text-danger-bright">*</span>
         </p>
         <p className="text-[12px] text-muted-foreground mb-[10px]">อธิบายสิ่งที่ทำสำเร็จใน Phase นี้โดยย่อ</p>
         <textarea
@@ -111,13 +111,13 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
           onChange={e => { setSummary(e.target.value); setSummaryError(false) }}
           rows={3}
           placeholder="เช่น พัฒนาระบบคลังข้อมูลเสร็จสมบูรณ์ พร้อมคู่มือแนะนำการใช้งาน..."
-          className={`w-full px-[12px] py-[10px] rounded-[10px] border text-[13px] outline-none resize-none transition-colors ${summaryError ? 'border-[#EF4444]' : 'border-border focus:border-primary'}`}
+          className={`w-full px-[12px] py-[10px] rounded-[10px] border text-[13px] outline-none resize-none transition-colors ${summaryError ? 'border-danger-bright' : 'border-border focus:border-primary'}`}
         />
         <p className={`text-[11px] mt-[4px] text-right ${Array.from(summary.trim()).length < MIN_SUMMARY_LENGTH ? 'text-muted-foreground' : 'text-primary'}`}>
           {Array.from(summary.trim()).length}/{MIN_SUMMARY_LENGTH} ตัวอักษรขั้นต่ำ
         </p>
         {summaryError && (
-          <p className="text-[12px] text-[#EF4444] mt-[4px]">กรุณาสรุปผลงานอย่างน้อย {MIN_SUMMARY_LENGTH} ตัวอักษร</p>
+          <p className="text-[12px] text-danger-bright mt-[4px]">กรุณาสรุปผลงานอย่างน้อย {MIN_SUMMARY_LENGTH} ตัวอักษร</p>
         )}
       </div>
 
@@ -125,7 +125,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
       {criteria.length > 0 && (
         <div>
           <p className="text-[13px] font-semibold text-foreground mb-[4px]">
-            เกณฑ์การยอมรับ <span className="text-[#EF4444]">*</span>
+            เกณฑ์การยอมรับ <span className="text-danger-bright">*</span>
           </p>
           <p className="text-[12px] text-muted-foreground mb-[10px]">ติ๊กทุกข้อที่ทำเสร็จเรียบร้อยแล้ว</p>
           <div className="flex flex-col gap-[8px]">
@@ -133,7 +133,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
               <button
                 key={i}
                 onClick={() => toggleCriteria(i)}
-                className="flex items-center gap-[10px] p-[12px] rounded-[10px] border border-border hover:bg-[#F8F9FA] transition-colors cursor-pointer text-left w-full"
+                className="flex items-center gap-[10px] p-[12px] rounded-[10px] border border-border hover:bg-surface-soft transition-colors cursor-pointer text-left w-full"
               >
                 {checkedCriteria[i]
                   ? <CheckCircle2 size={18} className="text-primary shrink-0" />
@@ -144,7 +144,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
             ))}
           </div>
           {criteriaError && (
-            <p className="text-[12px] text-[#EF4444] mt-[4px]">กรุณาติ๊กเกณฑ์การยอมรับให้ครบทุกข้อก่อนส่งหลักฐาน</p>
+            <p className="text-[12px] text-danger-bright mt-[4px]">กรุณาติ๊กเกณฑ์การยอมรับให้ครบทุกข้อก่อนส่งหลักฐาน</p>
           )}
         </div>
       )}
@@ -152,21 +152,21 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
       {/* File upload */}
       <div>
         <p className="text-[13px] font-semibold text-foreground mb-[4px]">
-          ไฟล์แนบ <span className="text-[#EF4444]">*</span>
+          ไฟล์แนบ <span className="text-danger-bright">*</span>
         </p>
         <p className="text-[12px] text-muted-foreground mb-[10px]">รูปภาพ (≤10MB) หรือ PDF (≤50MB)</p>
         <button
           type="button"
           disabled={isSubmitting}
           onClick={() => fileInputRef.current?.click()}
-          className={`w-full flex items-center justify-center gap-[8px] p-[20px] border-2 border-dashed rounded-[12px] cursor-pointer hover:bg-[#F8F9FA] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${filesError ? 'border-[#EF4444]' : 'border-border hover:border-primary/50'}`}
+          className={`w-full flex items-center justify-center gap-[8px] p-[20px] border-2 border-dashed rounded-[12px] cursor-pointer hover:bg-surface-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${filesError ? 'border-danger-bright' : 'border-border hover:border-primary/50'}`}
         >
           <Upload size={16} className="text-muted-foreground" />
           <span className="text-[13px] text-muted-foreground">อัปโหลดไฟล์</span>
         </button>
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileChange} accept="image/*,.pdf" />
         {filesError && (
-          <p className="text-[12px] text-[#EF4444] mt-[4px]">กรุณาอัปโหลดไฟล์อย่างน้อย 1 ไฟล์</p>
+          <p className="text-[12px] text-danger-bright mt-[4px]">กรุณาอัปโหลดไฟล์อย่างน้อย 1 ไฟล์</p>
         )}
         {files.length > 0 && (
           <div className="flex flex-col gap-[6px] mt-[10px]">
@@ -178,14 +178,14 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
                 : i === uploadProgress.current ? 'uploading'
                 : 'waiting'
               return (
-                <div key={i} className="flex items-center justify-between px-[12px] py-[8px] rounded-[8px] bg-[#F8F9FA] border border-border">
+                <div key={i} className="flex items-center justify-between px-[12px] py-[8px] rounded-[8px] bg-surface-soft border border-border">
                   <div className="flex items-center gap-[8px] min-w-0">
                     {fileStatus === 'uploading' && <Loader2 size={13} className="animate-spin text-primary shrink-0" />}
                     {fileStatus === 'done' && <CheckCircle2 size={13} className="text-[#2BA88E] shrink-0" />}
                     <span className={`text-[12px] truncate max-w-[220px] ${fileStatus === 'waiting' ? 'text-muted-foreground' : 'text-foreground'}`}>{f.name}</span>
                   </div>
                   {!isSubmitting && (
-                    <button onClick={() => removeFile(i)} className="text-muted-foreground hover:text-[#EF4444] transition-colors cursor-pointer">
+                    <button onClick={() => removeFile(i)} className="text-muted-foreground hover:text-danger-bright transition-colors cursor-pointer">
                       <X size={14} />
                     </button>
                   )}
@@ -199,7 +199,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
       {/* External links */}
       <div>
         <p className="text-[13px] font-semibold text-foreground mb-[4px]">
-          ลิงก์ภายนอก <span className="text-[#EF4444]">*</span>
+          ลิงก์ภายนอก <span className="text-danger-bright">*</span>
         </p>
         <p className="text-[12px] text-muted-foreground mb-[10px]">GitHub, Figma, วิดีโอ หรือลิงก์อื่นๆ</p>
         <div className="flex flex-col gap-[8px]">
@@ -212,7 +212,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
                 onChange={e => updateLink(i, 'name', e.target.value)}
                 className="w-[140px] shrink-0 px-[10px] py-[8px] rounded-[8px] border border-border text-[13px] outline-none focus:border-primary"
               />
-              <div className={`flex-1 flex items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-[#EF4444]' : 'border-border'}`}>
+              <div className={`flex-1 flex items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-danger-bright' : 'border-border'}`}>
                 <ExternalLink size={14} className="text-muted-foreground shrink-0" />
                 <input
                   type="url"
@@ -223,14 +223,14 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
                 />
               </div>
               {links.length > 1 && (
-                <button onClick={() => removeLink(i)} className="text-muted-foreground hover:text-[#EF4444] transition-colors cursor-pointer">
+                <button onClick={() => removeLink(i)} className="text-muted-foreground hover:text-danger-bright transition-colors cursor-pointer">
                   <X size={16} />
                 </button>
               )}
             </div>
           ))}
           {linksError && (
-            <p className="text-[12px] text-[#EF4444]">กรุณาใส่ลิงก์ HTTP/HTTPS ที่ถูกต้อง ไม่เกิน 2,048 ตัวอักษร และไม่มี username/password</p>
+            <p className="text-[12px] text-danger-bright">กรุณาใส่ลิงก์ HTTP/HTTPS ที่ถูกต้อง ไม่เกิน 2,048 ตัวอักษร และไม่มี username/password</p>
           )}
           <button
             onClick={addLink}
@@ -258,7 +258,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
         <button
           onClick={onCancel}
           disabled={isSubmitting}
-          className="px-[20px] py-[9px] rounded-[10px] border border-border text-[13px] font-medium text-foreground hover:bg-[#F8F9FA] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-[20px] py-[9px] rounded-[10px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-soft transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ยกเลิก
         </button>

@@ -175,7 +175,7 @@ const AdminUniversityDetail = () => {
                         <div className="w-full overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-[#f8f9fc] text-[13px] font-medium text-gray-500 border-b border-border">
+                                    <tr className="bg-surface-table text-[13px] font-medium text-gray-500 border-b border-border">
                                         <th className="px-[16px] py-[12px] font-medium whitespace-nowrap w-[60px] text-center">ลำดับ</th>
                                         <th className="px-[16px] py-[12px] font-medium whitespace-nowrap min-w-[200px]">โดเมน (Domain)</th>
                                         <th className="px-[16px] py-[12px] font-medium whitespace-nowrap w-[150px]">สถานะการใช้งาน</th>

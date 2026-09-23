@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router';
 import { ArrowLeft, Download, Loader2, Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useBoosterStore } from '../../store/useBoosterStore';
+import { useInvestmentStore } from '../../store/useInvestmentStore';
 import { useProjectDetailStore } from '../../store/useProjectDetailStore';
 import { sanitizeStoryHtml } from '../../lib/sanitizeStoryHtml';
 import { PreviewUpdate, PreviewQuestion, PreviewComment } from '../../components/preview/PreviewMisc';
@@ -41,6 +42,7 @@ const InvestmentDetail = () => {
   const navigate = useNavigate();
 
   const { currentInvestment, isDetailLoading: isInvLoading, fetchInvestmentById, requestRefund, profitPayouts, fetchProfitPayouts } = useBoosterStore();
+  const getContractHtml = useInvestmentStore((state) => state.getContractHtml);
   const { updates, threads, faqs, fetchAll } = useProjectDetailStore();
 
   const [activeTab, setActiveTab] = useState<'story' | 'milestone' | 'update' | 'comment' | 'question'>('story');
@@ -50,15 +52,13 @@ const InvestmentDetail = () => {
   const [refundReason, setRefundReason] = useState('');
   const [isRefunding, setIsRefunding] = useState(false);
   const [isPrintingPDF, setIsPrintingPDF] = useState(false);
+  const [loadedId, setLoadedId] = useState<string | null>(null);
 
   const handleDownloadPDF = async () => {
     setIsPrintingPDF(true);
     try {
-      const res = await import('../../services/api').then(m => m.default.get(
-        `/investments/${id}/contract`,
-        { responseType: 'text' }
-      ));
-      const blob = new Blob([res.data as string], { type: 'text/html; charset=utf-8' });
+      const html = await getContractHtml(Number(id));
+      const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const win = window.open(url, '_blank');
       if (!win) { toast.error('กรุณาอนุญาต popup เพื่อดาวน์โหลด PDF'); URL.revokeObjectURL(url); return; }
@@ -88,7 +88,15 @@ const InvestmentDetail = () => {
   };
 
   useEffect(() => {
-    if (id) fetchInvestmentById(Number(id));
+    let active = true;
+    if (!id || !/^\d+$/.test(id)) {
+      setLoadedId(id ?? '');
+      return;
+    }
+    fetchInvestmentById(Number(id)).finally(() => {
+      if (active) setLoadedId(id);
+    });
+    return () => { active = false; };
   }, [id, fetchInvestmentById]);
 
   useEffect(() => {
@@ -100,10 +108,19 @@ const InvestmentDetail = () => {
     fetchProfitPayouts();
   }, [fetchProfitPayouts]);
 
-  if (isInvLoading || !currentInvestment) {
+  if (loadedId !== id || isInvLoading) {
     return (
       <div className="flex items-center justify-center py-32">
         <Loader2 size={32} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!currentInvestment || currentInvestment.id !== Number(id)) {
+    return (
+      <div className="py-24 text-center">
+        <p className="mb-4 text-muted-foreground">ไม่พบรายการลงทุนนี้ หรือไม่สามารถโหลดข้อมูลได้</p>
+        <Link to="/booster/investments" className="text-primary hover:underline">กลับไปรายการลงทุน</Link>
       </div>
     );
   }
@@ -358,7 +375,7 @@ const InvestmentDetail = () => {
                     <span className="text-muted-foreground">VAT</span>
                     <span className="font-semibold text-foreground text-error">฿{inv.vat?.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center mt-2 bg-[#F8F9FA] p-3 rounded-xl border border-border">
+                <div className="flex justify-between items-center mt-2 bg-surface-soft p-3 rounded-xl border border-border">
                     <span className="text-muted-foreground font-semibold">ยอดชำระสุทธิ</span>
                     <span className="font-bold text-[16px] text-foreground">฿{(inv.net_amount || inv.amount)?.toLocaleString()}</span>
                 </div>

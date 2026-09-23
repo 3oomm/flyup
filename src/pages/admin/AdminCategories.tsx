@@ -233,7 +233,7 @@ const AdminCategories = () => {
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-[#f8f9fc] text-[13px] font-medium text-gray-500 border-b border-border">
+                                <tr className="bg-surface-table text-[13px] font-medium text-gray-500 border-b border-border">
                                     <th className="px-[16px] py-[12px] w-[60px] text-center">ลำดับ</th>
                                     <th className="px-[16px] py-[12px]">ชื่อหมวดหมู่</th>
                                     <th className="px-[16px] py-[12px] text-center w-[140px]">จัดการ</th>

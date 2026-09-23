@@ -108,7 +108,7 @@ export const PreviewUpdate = ({ updates, creatorName = 'ผู้พัฒนา
                   ? c.user_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
                   : '?';
                 return (
-                  <div key={c.id} className="flex gap-[10px] p-[14px] bg-[#F8F9FA] rounded-[12px]">
+                  <div key={c.id} className="flex gap-[10px] p-[14px] bg-surface-soft rounded-[12px]">
                     <div className="w-[32px] h-[32px] rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-[12px] flex-shrink-0 overflow-hidden">
                       {c.user_avatar
                         ? <img src={c.user_avatar} alt={c.user_name} className="w-full h-full object-cover" />

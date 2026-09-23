@@ -193,7 +193,7 @@ const AdminUserManagement = () => {
 
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-[#f8f9fc] px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>ชื่อ</div>
                     <div className="hidden md:block">อีเมล</div>

@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import LiveCamera from "../../components/verification/LiveCamera";
 import { useAuthStore } from "../../store/useAuthStore";
+import { getSafeReturnTo } from "../../lib/returnTo";
 
 export default function MobileKyc() {
   const [params] = useSearchParams();
@@ -18,13 +19,12 @@ export default function MobileKyc() {
   const [done, setDone] = useState(false);
   const [step, setStep] = useState<"id" | "selfie" | "review">("id");
 
-  const safeReturnTo = requestedReturnTo.startsWith("/") && !requestedReturnTo.startsWith("//")
-    ? requestedReturnTo
-    : authUser?.role === "booster"
+  const safeReturnTo = getSafeReturnTo(requestedReturnTo, window.location.origin)
+    || (authUser?.role === "booster"
       ? "/booster/profile"
       : authUser?.role === "pioneer"
         ? "/pioneer/profile"
-        : "";
+        : "");
 
   useEffect(() => {
     if (!done || !safeReturnTo) return;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSEO } from '../../hooks/useSEO';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import type { ElementType } from 'react';
 import {
   Search, ChevronDown, Flame, Sparkles,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { usePublicProjectStore } from '../../store/usePublicProjectStore';
 import { getProgress, getDaysLeft, getProjectTimingDisplay } from '../../lib/project';
+import { useCurrentTime } from '../../hooks/useCurrentTime';
 
 // ─── Category icon mapping ──────────────────────────────────────────────────
 
@@ -42,9 +43,9 @@ function getCategoryIcon(name: string | null): ElementType {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const NOW = Date.now();
-
 const Projects = () => {
+  const now = useCurrentTime();
+  const [searchParams, setSearchParams] = useSearchParams();
   useSEO({
     title: 'โปรเจกต์ทั้งหมด',
     description: 'ค้นหาและลงทุนในโปรเจกต์ซอฟต์แวร์ของนักศึกษาไทยที่น่าสนใจ หลากหลายหมวดหมู่ พร้อมระบบ Milestone โปร่งใส',
@@ -56,24 +57,19 @@ const Projects = () => {
     categories, isLoading, isFetchError, fetchPublicProjects, fetchHomeProjects, fetchCategories,
   } = usePublicProjectStore();
 
-  const [activeCategory, setActiveCategory] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('category') || 'ทั้งหมด';
-  });
-  const [searchQuery, setSearchQuery] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('q') || '';
-  });
-  const [sortOrder] = useState<'latest' | 'oldest' | 'ending_soon' | 'popular'>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sort = params.get('sort');
-    if (sort === 'oldest' || sort === 'ending_soon' || sort === 'popular') return sort;
-    return 'latest';
-  });
-  const [section, setSection] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('section') || '';
-  });
+  const activeCategory = searchParams.get('category') || 'ทั้งหมด';
+  const searchQuery = searchParams.get('q') || '';
+  const sort = searchParams.get('sort');
+  const sortOrder = sort === 'oldest' || sort === 'ending_soon' || sort === 'popular' ? sort : 'latest';
+  const section = searchParams.get('section') || '';
+  const setQueryParam = (key: string, value: string, replace = false) => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      if (value && !(key === 'category' && value === 'ทั้งหมด')) next.set(key, value);
+      else next.delete(key);
+      return next;
+    }, { replace });
+  };
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [minGoal, setMinGoal] = useState('');
@@ -152,14 +148,14 @@ const Projects = () => {
     if (!section) {
       result.sort((a, b) => {
         if (sortOrder === 'oldest') return a.id - b.id;
-        if (sortOrder === 'ending_soon') return getDaysLeft(a) - getDaysLeft(b);
+        if (sortOrder === 'ending_soon') return getDaysLeft(a, now) - getDaysLeft(b, now);
         if (sortOrder === 'popular') return (b.current_funding ?? 0) - (a.current_funding ?? 0);
         return b.id - a.id; // latest
       });
     }
 
     return result;
-  }, [sourceProjects, activeCategory, searchQuery, sortOrder, minGoal, maxGoal, section]);
+  }, [sourceProjects, activeCategory, searchQuery, sortOrder, minGoal, maxGoal, section, now]);
 
   if (isFetchError) {
     return (
@@ -214,7 +210,7 @@ const Projects = () => {
               type="text"
               placeholder="ค้นหาชื่อโปรเจกต์..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setQueryParam('q', e.target.value, true)}
               className="bg-transparent outline-none w-full text-sm placeholder:text-muted-foreground"
             />
           </div>
@@ -237,7 +233,7 @@ const Projects = () => {
                   <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">เรียงตาม</div>
                   {section && (
                     <div
-                      onClick={() => { setSection(''); setIsSortDropdownOpen(false); }}
+                      onClick={() => { setQueryParam('section', ''); setIsSortDropdownOpen(false); }}
                       className="px-4 py-2.5 text-sm cursor-pointer hover:bg-muted/30 whitespace-nowrap flex items-center gap-2 text-muted-foreground"
                     >
                       <LayoutGrid size={13} />
@@ -249,7 +245,7 @@ const Projects = () => {
                     return (
                       <div
                         key={opt.key}
-                        onClick={() => { setSection(opt.key); setIsSortDropdownOpen(false); }}
+                        onClick={() => { setQueryParam('section', opt.key); setIsSortDropdownOpen(false); }}
                         className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-muted/30 whitespace-nowrap flex items-center gap-2 ${section === opt.key ? 'text-primary font-medium bg-primary-light' : ''}`}
                       >
                         <Icon size={13} className={opt.color} />
@@ -332,7 +328,7 @@ const Projects = () => {
             return (
               <button
                 key={category.name}
-                onClick={() => setActiveCategory(category.name)}
+                onClick={() => setQueryParam('category', category.name)}
                 className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all border shadow-sm flex-shrink-0 cursor-pointer ${isActive
                     ? 'bg-primary-light text-primary border-primary'
                     : 'bg-card text-muted-foreground border-border hover:border-primary hover:text-foreground'
@@ -359,9 +355,9 @@ const Projects = () => {
                 : (rawCat as { name?: string } | null)?.name ?? null;
               const ProjectCategoryIcon = getCategoryIcon(categoryName);
               const progress = getProgress(project);
-              const timing = getProjectTimingDisplay(project, NOW);
+              const timing = getProjectTimingDisplay(project, now);
               const isHot = progress >= 70;
-              const isNew = (NOW - new Date(project.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000;
+              const isNew = (now - new Date(project.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000;
 
               return (
                 <Link
@@ -437,7 +433,7 @@ const Projects = () => {
             <h3 className="text-base md:text-lg font-bold mb-1">ไม่พบโปรเจกต์</h3>
             <p className="text-sm text-muted-foreground">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่ใหม่อีกครั้ง</p>
             <button
-              onClick={() => { setSearchQuery(''); setActiveCategory('ทั้งหมด'); setMinGoal(''); setMaxGoal(''); }}
+              onClick={() => { setSearchParams(previous => { const next = new URLSearchParams(previous); next.delete('q'); next.delete('category'); return next; }); setMinGoal(''); setMaxGoal(''); }}
               className="mt-4 text-primary text-sm font-medium hover:underline p-2"
             >
               ล้างตัวกรอง

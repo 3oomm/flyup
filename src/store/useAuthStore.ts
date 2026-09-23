@@ -150,7 +150,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({ isRegistering: true })
         try {
             await api.post('/signup', data)
-            console.log(data)
             toast.success('สร้างบัญชีสำเร็จ กรุณายืนยันอีเมล์ก่อนเข้าสู่ระบบ')
             return true
         } catch (error: unknown) {

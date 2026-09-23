@@ -99,7 +99,7 @@ const MilestonePage = () => {
           <span className="text-[13px] font-medium text-foreground">ความคืบหน้ารวม</span>
           <span className="text-[13px] font-semibold text-primary">{completedCount}/{milestones.length} สำเร็จ</span>
         </div>
-        <div className="h-[8px] rounded-full bg-[#F1F3F5] overflow-hidden">
+        <div className="h-[8px] rounded-full bg-surface-hover overflow-hidden">
           <div
             className="h-full rounded-full bg-primary transition-all"
             style={{ width: `${milestones.length > 0 ? (completedCount / milestones.length) * 100 : 0}%` }}

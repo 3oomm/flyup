@@ -1,5 +1,4 @@
 ﻿import { useCallback, useEffect } from 'react'
-import api from '../services/api'
 import { useAuthStore } from '../store/useAuthStore'
 import { useNotificationStore, type Notification } from '../store/useNotificationStore'
 import { useBoosterStore } from '../store/useBoosterStore'
@@ -108,11 +107,9 @@ const useNotificationSSE = () => {
         let retryTimer: ReturnType<typeof setTimeout> | null = null
 
         const connect = () => {
-            api.post('/notifications/sse-token')
-                .then((res: { data?: { token?: string } }) => {
+            useNotificationStore.getState().issueSseToken()
+                .then((sseToken) => {
                     if (cancelled) return
-                    const sseToken: string = res.data?.token ?? ''
-                    if (!sseToken) throw new Error('missing SSE token')
 
                     const url = `${import.meta.env.VITE_BASE_URL}/notifications/stream?sse_token=${encodeURIComponent(sseToken)}`
                     es = new EventSource(url)

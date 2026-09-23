@@ -67,9 +67,9 @@ const Investment = () => {
 
   const pollingRef = useRef<number | null>(null);
 
-  const { authUser } = useAuthStore();
+  const { authUser, isCheckingAuth } = useAuthStore();
   const { currentPublicProject, fetchPublicProjectBySlug, fetchPublicProjectById } = usePublicProjectStore();
-  const { createInvestment, getInvestmentById, resumeInvestment, isSubmitting, investmentData, clearInvestmentData } = useInvestmentStore();
+  const { createInvestment, getInvestmentById, getContractHtml, resumeInvestment, isSubmitting, investmentData, clearInvestmentData } = useInvestmentStore();
 
   const project = currentPublicProject;
 
@@ -109,15 +109,21 @@ const Investment = () => {
     return () => { cancelled = true; };
   }, [searchParams, resumeInvestment, clearInvestmentData]);
 
-  // Guard: ต้องยืนยันตัวตน / ไม่ใช่เจ้าของ / ไม่ใช่ admin
+  // Guard direct URLs as well as navigation from the project detail page.
   useEffect(() => {
-    if (!authUser) return;
+    if (isCheckingAuth) return;
+    if (!authUser) {
+      toast.error('กรุณาเข้าสู่ระบบก่อนลงทุน', { id: 'investment-login-required' });
+      navigate('/login', { replace: true });
+      return;
+    }
     const isAdmin = authUser.role === 'admin';
+    const isPioneer = authUser.role === 'pioneer';
     const isOwner = !!project?.owner_user_id && authUser.id === project.owner_user_id;
     const kycApproved = authUser.id_card_verification?.status === 'approved';
 
-    if (isAdmin) {
-      toast.error('ผู้ดูแลระบบไม่สามารถลงทุนได้');
+    if (isAdmin || isPioneer) {
+      toast.error(isAdmin ? 'ผู้ดูแลระบบไม่สามารถลงทุนได้' : 'บัญชี Pioneer ไม่สามารถลงทุนได้');
       navigate(`/projects/${slug}`, { replace: true });
     } else if (isOwner) {
       toast.error('เจ้าของโปรเจกต์ไม่สามารถลงทุนในโปรเจกต์ของตัวเองได้');
@@ -126,7 +132,7 @@ const Investment = () => {
       toast.error('กรุณายืนยันตัวตนด้วยบัตรประชาชนก่อนลงทุน', { duration: 4000 });
       navigate('/booster/profile?tab=verify', { replace: true });
     }
-  }, [project, authUser, slug, navigate]);
+  }, [project, authUser, isCheckingAuth, slug, navigate]);
 
   // Timer countdown
   useEffect(() => {
@@ -185,9 +191,10 @@ const Investment = () => {
   const maxAmount = Math.min(
     MAX_PER_TRANSACTION,
     project?.max_invest_amount && project.max_invest_amount > 0
-      ? Math.min(project.max_invest_amount, remaining > 0 ? remaining : project.max_invest_amount)
-      : remaining > 0 ? remaining : 14000
+      ? Math.min(project.max_invest_amount, remaining)
+      : remaining
   );
+  const canInvest = project?.state === 'funding' && maxAmount >= effectiveMinAmount;
   const platformFeeRate = (project?.platform_fee || 5) / 100;
   const vatRate = 0.07;
 
@@ -238,14 +245,10 @@ const Investment = () => {
     if (!completedInvestmentId) return;
     setIsPrintingPDF(true);
     try {
-      const res = await import('../../services/api').then(m => m.default.get(
-        `/investments/${completedInvestmentId}/contract`,
-        { responseType: 'text' }
-      ));
-      const blob = new Blob([res.data as string], { type: 'text/html; charset=utf-8' });
+      const html = await getContractHtml(completedInvestmentId);
+      const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const win = window.open(url, '_blank');
-      console.log('Opened contract window:', win);
       if (!win) { toast.error('กรุณาอนุญาต popup เพื่อดาวน์โหลด PDF'); URL.revokeObjectURL(url); return; }
       win.addEventListener('load', () => { win.print(); URL.revokeObjectURL(url); });
     } catch {
@@ -286,8 +289,11 @@ const Investment = () => {
   }
 };
 
- console.log("investmentData:", investmentData);
   const handleNextStep1 = () => {
+    if (!canInvest) {
+      toast.error('โปรเจกต์นี้ปิดรับการลงทุนแล้ว หรือยอดคงเหลือต่ำกว่าขั้นต่ำ');
+      return;
+    }
     if (!agreed) {
       toast.error("กรุณากด ยอมรับสัญญาการลงทุนและเงื่อนไข", {
         style: {
@@ -303,6 +309,10 @@ const Investment = () => {
   };
 
   const handleNextStep2 = () => {
+    if (!canInvest) {
+      toast.error('โปรเจกต์นี้ปิดรับการลงทุนแล้ว หรือยอดคงเหลือต่ำกว่าขั้นต่ำ');
+      return;
+    }
     if (parsedAmount < effectiveMinAmount) {
       toast.error(`จำนวนเงินขั้นต่ำคือ ฿${effectiveMinAmount.toLocaleString()}`);
       return;
@@ -315,7 +325,11 @@ const Investment = () => {
   };
 
   const handleConfirmInvestment = async () => {
-    if (!authUser || !project?.id) return;
+    if (!authUser || !project?.id || !canInvest || parsedAmount < effectiveMinAmount || parsedAmount > maxAmount) {
+      toast.error('ไม่สามารถลงทุนด้วยจำนวนเงินนี้ได้ กรุณาตรวจสอบยอดคงเหลือ');
+      setShowConfirm(false);
+      return;
+    }
 
     const success = await createInvestment({
       project_id: project.id,
@@ -457,7 +471,7 @@ const Investment = () => {
                     <h2 className="text-xl font-bold text-foreground">เงื่อนไขการลงทุน</h2>
                   </div>
 
-                  <div className="bg-[#F8F9FA] rounded-2xl p-5 sm:p-6 mb-6">
+                  <div className="bg-surface-soft rounded-2xl p-5 sm:p-6 mb-6">
                     <div className="grid grid-cols-[1.2fr_0.3fr_1.5fr] gap-4 py-2 border-b border-border/50 items-center">
                       <span className="font-bold text-foreground text-sm">สัญญาการลงทุน</span>
                       <span className="text-muted-foreground text-center">—</span>
@@ -506,7 +520,7 @@ const Investment = () => {
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-3 p-5 bg-[#F8F9FA] rounded-[18px] cursor-pointer hover:bg-[#F1F3F5] transition-all mb-8 group border border-transparent hover:border-primary/20">
+                  <label className="flex items-center gap-3 p-5 bg-surface-soft rounded-[18px] cursor-pointer hover:bg-surface-hover transition-all mb-8 group border border-transparent hover:border-primary/20">
                     <div className="relative flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -527,9 +541,13 @@ const Investment = () => {
                     </span>
                   </label>
 
+                  {!canInvest && project && (
+                    <p className="mb-4 text-center text-sm font-medium text-error">โปรเจกต์นี้ปิดรับการลงทุนแล้ว หรือยอดคงเหลือต่ำกว่าขั้นต่ำ</p>
+                  )}
                   <button
                     onClick={handleNextStep1}
-                    className="w-full py-3.5 bg-primary text-white-foreground rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 cursor-pointer"
+                    disabled={!canInvest}
+                    className="w-full py-3.5 bg-primary text-white-foreground rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     ยอมรับและดำเนินการต่อ
                   </button>
@@ -564,7 +582,7 @@ const Investment = () => {
                            }}
                           inputMode="numeric"
                           placeholder={isSoftcapReached ? `สูงสุด ${maxAmount.toLocaleString()}` : `ขั้นต่ำ ${minAmount.toLocaleString()}`}
-                          className="w-full pl-10 pr-4 py-5 rounded-[20px] border-2 border-[#E9ECEF] focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all placeholder:text-[#ADB5BD] font-bold text-2xl text-foreground"
+                          className="w-full pl-10 pr-4 py-5 rounded-[20px] border-2 border-surface-raised focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all placeholder:text-[#ADB5BD] font-bold text-2xl text-foreground"
                         />
                       </div>
                     </div>
@@ -581,13 +599,18 @@ const Investment = () => {
                       ))}
                       <button
                         onClick={() => setAmount(maxAmount.toLocaleString())}
+                        disabled={!canInvest}
                         className="px-6 py-3 border border-primary/30 rounded-[14px] font-bold text-primary bg-primary/5 hover:bg-primary hover:text-white transition-all shadow-sm active:scale-95 cursor-pointer"
                       >
                         สูงสุด
                       </button>
                     </div>
 
-                    <div className="bg-[#F8F9FA] rounded-[24px] p-6 border border-border/40">
+                    {!canInvest && project && (
+                      <p className="text-sm font-medium text-error">โปรเจกต์นี้ปิดรับการลงทุนแล้ว หรือยอดคงเหลือต่ำกว่าขั้นต่ำ</p>
+                    )}
+
+                    <div className="bg-surface-soft rounded-[24px] p-6 border border-border/40">
                       <h4 className="font-bold text-foreground mb-4 flex items-center gap-2">
                          <span className="w-1.5 h-1.5 rounded-full bg-primary" /> สรุปรายการ
                       </h4>
@@ -617,7 +640,8 @@ const Investment = () => {
 
                     <button
                       onClick={handleNextStep2}
-                      className="w-full py-3.5 bg-primary text-white-foreground rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 mt-4 cursor-pointer"
+                      disabled={!canInvest}
+                      className="w-full py-3.5 bg-primary text-white-foreground rounded-xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 mt-4 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       ดำเนินการชำระเงิน
                     </button>

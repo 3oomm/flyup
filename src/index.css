@@ -22,6 +22,17 @@
     --color-muted-foreground: #6E6E7A;
     --color-muted: #EBEBF0;
     --color-border: #DDDDE6;
+    /* Shared surfaces and accents used across page layouts. */
+    --color-surface-soft: #F8F9FA;
+    --color-surface-hover: #F1F3F5;
+    --color-surface-disabled: #F3F4F6;
+    --color-surface-field: #F8F9FB;
+    --color-surface-table: #F8F9FC;
+    --color-surface-raised: #E9ECEF;
+    --color-border-strong: #E5E7EB;
+    --color-brand-violet: #8B5CF6;
+    --color-brand-violet-hover: #7C3AED;
+    --color-danger-bright: #EF4444;
     --color-sidebar: #1A1525;
     --color-sidebar-primary: #A855F7;
     --color-sidebar-accent: #2D2640;

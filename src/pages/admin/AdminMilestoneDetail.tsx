@@ -161,7 +161,7 @@ const AdminMilestoneDetail = () => {
                     <div className="flex items-center gap-[8px] justify-end">
                         <button
                             onClick={() => { setShowRejectForm(false); setRejectNote('') }}
-                            className="px-[16px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-[#F8F9FA] transition-colors cursor-pointer"
+                            className="px-[16px] py-[8px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-soft transition-colors cursor-pointer"
                         >
                             ยกเลิก
                         </button>
@@ -212,7 +212,7 @@ const AdminMilestoneDetail = () => {
                             return (
                                 <div
                                     key={i}
-                                    className={`flex items-center gap-[10px] p-[12px] rounded-[10px] border ${checked ? 'border-primary/30 bg-primary/5' : 'border-border bg-[#F8F9FA]'}`}
+                                    className={`flex items-center gap-[10px] p-[12px] rounded-[10px] border ${checked ? 'border-primary/30 bg-primary/5' : 'border-border bg-surface-soft'}`}
                                 >
                                     {checked
                                         ? <CheckCircle2 size={18} className="text-primary shrink-0" />

@@ -33,18 +33,18 @@ const SEARCH_PLACEHOLDERS = [
 
 const ROLE_MENU_ITEMS: Record<string, { icon: React.ReactNode; label: string; path: string }[]> = {
     pioneer: [
-        { icon: <Files size={18} className="text-[#8B5CF6]" />, label: 'โปรเจกต์ของฉัน', path: '/pioneer/dashboard/projects' },
-        { icon: <Flag size={18} className="text-[#8B5CF6]" />, label: 'Milestone', path: '/pioneer/dashboard/milestones' },
-        { icon: <Banknote size={18} className="text-[#8B5CF6]" />, label: 'การรับเงิน', path: '/pioneer/dashboard/payouts' },
+        { icon: <Files size={18} className="text-brand-violet" />, label: 'โปรเจกต์ของฉัน', path: '/pioneer/dashboard/projects' },
+        { icon: <Flag size={18} className="text-brand-violet" />, label: 'Milestone', path: '/pioneer/dashboard/milestones' },
+        { icon: <Banknote size={18} className="text-brand-violet" />, label: 'การรับเงิน', path: '/pioneer/dashboard/payouts' },
     ],
     booster: [
-        { icon: <Wallet size={18} className="text-[#8B5CF6]" />, label: 'การลงทุน', path: '/booster/investments' },
-        { icon: <TrendingUp size={18} className="text-[#8B5CF6]" />, label: 'กำไร', path: '/booster/profits' },
-        { icon: <RotateCcw size={18} className="text-[#8B5CF6]" />, label: 'คืนเงิน', path: '/booster/refunds' },
+        { icon: <Wallet size={18} className="text-brand-violet" />, label: 'การลงทุน', path: '/booster/investments' },
+        { icon: <TrendingUp size={18} className="text-brand-violet" />, label: 'กำไร', path: '/booster/profits' },
+        { icon: <RotateCcw size={18} className="text-brand-violet" />, label: 'คืนเงิน', path: '/booster/refunds' },
     ],
     admin: [
-        { icon: <MailSearch size={18} className="text-[#8B5CF6]" />, label: 'ตรวจสอบโปรเจกต์', path: '/admin/projects-approval' },
-        { icon: <Users size={18} className="text-[#8B5CF6]" />, label: 'จัดการผู้ใช้', path: '/admin/users' },
+        { icon: <MailSearch size={18} className="text-brand-violet" />, label: 'ตรวจสอบโปรเจกต์', path: '/admin/projects-approval' },
+        { icon: <Users size={18} className="text-brand-violet" />, label: 'จัดการผู้ใช้', path: '/admin/users' },
     ],
 };
 
@@ -257,7 +257,7 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center gap-4">
                         {authUser ? (
                             <>
-                                <Link to={`/${authUser?.role}/dashboard`} className="flex items-center justify-center w-11 h-11 bg-[#8B5CF6] hover:bg-[#7C3AED] text-white rounded-full transition-all shadow-sm active:scale-95">
+                                <Link to={`/${authUser?.role}/dashboard`} className="flex items-center justify-center w-11 h-11 bg-brand-violet hover:bg-brand-violet-hover text-white rounded-full transition-all shadow-sm active:scale-95">
                                     <LayoutDashboard size={22} />
                                 </Link>
                                 <NotificationBell open={showNotif} onOpenChange={handleNotifChange} />
@@ -272,7 +272,7 @@ const Navbar = () => {
                                             lastName={authUser.last_name as string}
                                             className="w-11 h-11 rounded-full object-cover border-2 border-transparent shadow-sm"
                                         />
-                                        <div className="absolute -bottom-1 -right-1 bg-[#8B5CF6] text-white rounded-full p-[2px] border-2 border-white">
+                                        <div className="absolute -bottom-1 -right-1 bg-brand-violet text-white rounded-full p-[2px] border-2 border-white">
                                             <ChevronDown size={12} strokeWidth={3} />
                                         </div>
                                     </button>
@@ -310,14 +310,14 @@ const Navbar = () => {
                                                 onClick={() => setShowProfileMenu(false)}
                                                 className="flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors text-[14px] text-foreground"
                                             >
-                                                <Settings size={18} className="text-[#8B5CF6]" />
+                                                <Settings size={18} className="text-brand-violet" />
                                                 การตั้งค่าและความเป็นส่วนตัว
                                             </Link>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleLogout(); }}
                                                 className="w-full flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors text-[14px] text-foreground cursor-pointer"
                                             >
-                                                <LogOut size={18} className="text-[#8B5CF6]" />
+                                                <LogOut size={18} className="text-brand-violet" />
                                                 ออกจากระบบ
                                             </button>
                                         </div>
@@ -410,7 +410,7 @@ const Navbar = () => {
                                 </div>
                                 <div className="border-t border-border mb-1" />
                                 <Link to={`/${authUser?.role}/dashboard`} onClick={closeMenu} className="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-muted transition-colors text-[14px] text-foreground">
-                                    <LayoutDashboard size={18} className="text-[#8B5CF6]" /> แดชบอร์ด
+                                    <LayoutDashboard size={18} className="text-brand-violet" /> แดชบอร์ด
                                 </Link>
                                 {(ROLE_MENU_ITEMS[authUser?.role as string] ?? []).map((item) => (
                                     <Link key={item.path} to={item.path} onClick={closeMenu} className="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-muted transition-colors text-[14px] text-foreground">
@@ -418,10 +418,10 @@ const Navbar = () => {
                                     </Link>
                                 ))}
                                 <Link to={`/${authUser?.role}/profile`} onClick={closeMenu} className="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-muted transition-colors text-[14px] text-foreground">
-                                    <Settings size={18} className="text-[#8B5CF6]" /> การตั้งค่าและความเป็นส่วนตัว
+                                    <Settings size={18} className="text-brand-violet" /> การตั้งค่าและความเป็นส่วนตัว
                                 </Link>
                                 <button onClick={() => { handleLogout(); closeMenu(); }} className="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-muted transition-colors text-[14px] text-foreground cursor-pointer w-full">
-                                    <LogOut size={18} className="text-[#8B5CF6]" /> ออกจากระบบ
+                                    <LogOut size={18} className="text-brand-violet" /> ออกจากระบบ
                                 </button>
                             </div>
                         )}

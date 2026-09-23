@@ -14,30 +14,13 @@ import toast from 'react-hot-toast'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useAdminBadgeStore } from '@/store/useAdminBadgeStore'
 import { useFinanceStore, type FinancialSummary, type ProjectFinancial } from '@/store/useFinanceStore'
-import api from '@/services/api'
-import type { AdminLogItem } from '@/store/useAdminLogStore'
+import { useAdminLogStore, type AdminLogItem } from '@/store/useAdminLogStore'
 
 // ─── กราฟรายเดือน: คำนวณจาก /admin/logs (audit log จริง) แทนข้อมูล mock ────────────
 
 const THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
 
 const toDateParam = (d: Date) => d.toISOString().slice(0, 10) // YYYY-MM-DD
-
-/** เอาทุก log ในช่วงวันที่ที่กำหนด — วน page จนกว่าจะครบ meta.total (กันลูปเกินจริงด้วย safety cap) */
-async function fetchAllAdminLogs(from: string, to: string): Promise<AdminLogItem[]> {
-  const pageSize = 200
-  let page = 1
-  const all: AdminLogItem[] = []
-  for (; page <= 50; page++) {
-    const params = new URLSearchParams({ page: String(page), page_size: String(pageSize), from, to })
-    const res = await api.get(`/admin/logs?${params.toString()}`)
-    const data: AdminLogItem[] = res.data?.data ?? []
-    all.push(...data)
-    const total: number = res.data?.meta?.total ?? all.length
-    if (data.length === 0 || all.length >= total) break
-  }
-  return all
-}
 
 /** รวม log 6 เดือนล่าสุดเป็นข้อมูลกราฟ "กิจกรรมรายเดือน" และ "ผลการตรวจสอบ" */
 function buildMonthlyCharts(logs: AdminLogItem[]) {
@@ -106,6 +89,7 @@ type Tab = typeof TABS[number]
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 const AdminDashboard = () => {
+  const fetchChartLogs = useAdminLogStore((state) => state.fetchChartLogs)
   const { counts, fetchBadges } = useAdminBadgeStore()
   const { summary, projects, isLoadingSummary, isLoadingProjects, fetchSummary, fetchProjects } = useFinanceStore()
   const [tab, setTab] = useState<Tab>('ภาพรวม')
@@ -126,14 +110,14 @@ const AdminDashboard = () => {
     const now = new Date()
     const from = toDateParam(new Date(now.getFullYear(), now.getMonth() - 5, 1))
     const to = toDateParam(now)
-    fetchAllAdminLogs(from, to)
+    fetchChartLogs(from, to)
       .then(logs => setCharts(buildMonthlyCharts(logs)))
       .catch(() => {
         setCharts(buildMonthlyCharts([]))
         toast.error('โหลดข้อมูลกิจกรรมสำหรับกราฟไม่สำเร็จ')
       })
       .finally(() => setIsLoadingCharts(false))
-  }, [])
+  }, [fetchChartLogs])
 
   return (
     <div className="flex flex-col gap-6 pb-10">
