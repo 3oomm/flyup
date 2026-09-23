@@ -115,13 +115,15 @@ const ProfileTab = () => {
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-foreground truncate">{authUser?.first_name as string} {authUser?.last_name as string}</p>
-          <p className="text-[13px] text-muted-foreground">{authUser?.email as string}</p>
+          <p className="truncate text-[13px] text-muted-foreground" title={(authUser?.email as string) ?? ""}>
+            {authUser?.email as string}
+          </p>
         </div>
         {!isEditing && (
           <button
             data-testid="profile-edit-btn"
             onClick={handleEdit}
-            className="flex items-center gap-[6px] px-[12px] py-[7px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-hover transition-colors cursor-pointer"
+            className="flex shrink-0 items-center gap-[6px] px-[12px] py-[7px] rounded-[8px] border border-border text-[13px] font-medium text-foreground hover:bg-surface-hover transition-colors cursor-pointer"
           >
             <Pencil size={13} />
             แก้ไขโปรไฟล์

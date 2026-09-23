@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router'
 import {
     BellIcon,
@@ -150,9 +151,11 @@ function NotificationItem({ notif, path, onRead, onNavigate }: NotificationItemP
 interface NotificationBellProps {
     open?: boolean
     onOpenChange?: (open: boolean) => void
+    mobile?: boolean
+    desktopOnly?: boolean
 }
 
-const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProps = {}) => {
+const NotificationBell = ({ open: openProp, onOpenChange, mobile = false, desktopOnly = false }: NotificationBellProps = {}) => {
     const { notifications, unread, bellUnread, isLoading, fetchNotifications, markAsRead, markAllAsRead, clearUnreadCount } =
         useNotificationStore()
     const { authUser } = useAuthStore()
@@ -166,6 +169,9 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
         else setInternalOpen(next)
     }
     const panelRef = useRef<HTMLDivElement>(null)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+    const bellRef = useRef<HTMLButtonElement>(null)
+    const [mobilePanelTop, setMobilePanelTop] = useState(0)
 
     useNotificationSSE()
 
@@ -175,17 +181,23 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
-            if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+            // The navbar mounts both bells; only the visible one should handle outside clicks.
+            if (typeof window.matchMedia === 'function') {
+                const narrowScreen = window.matchMedia('(max-width: 767px)').matches
+                if ((mobile && !narrowScreen) || (desktopOnly && narrowScreen)) return
+            }
+            if (panelRef.current && !panelRef.current.contains(e.target as Node) && !dropdownRef.current?.contains(e.target as Node)) {
                 setOpen(false)
             }
         }
         document.addEventListener('mousedown', handler)
         return () => document.removeEventListener('mousedown', handler)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isControlled, onOpenChange])
+    }, [desktopOnly, isControlled, mobile, onOpenChange])
 
     const handleBellClick = () => {
         const next = !open
+        if (next && mobile) setMobilePanelTop((bellRef.current?.getBoundingClientRect().bottom ?? 0) + 8)
         setOpen(next)
         if (next && bellUnread > 0) clearUnreadCount()
     }
@@ -197,10 +209,46 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
         navigate(path)
     }
 
+    const dropdown = open && (
+        <div
+            ref={dropdownRef}
+            className={mobile
+                ? 'fixed left-4 right-4 z-[100] flex flex-col overflow-hidden rounded-xl border border-border bg-white font-kanit shadow-xl'
+                : 'absolute right-0 top-full z-50 mt-2 flex w-[360px] flex-col overflow-hidden rounded-xl border border-border bg-white font-kanit shadow-xl'}
+            style={mobile ? { top: mobilePanelTop, maxHeight: `calc(100dvh - ${mobilePanelTop + 16}px)` } : undefined}
+        >
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2">
+                    <span className="whitespace-nowrap text-[15px] font-semibold text-foreground">การแจ้งเตือน</span>
+                    {unread > 0 && <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-white">{unread} ใหม่</span>}
+                </div>
+                {unread > 0 && (
+                    <button onClick={markAllAsRead} className="shrink-0 cursor-pointer text-[11px] text-primary hover:underline">อ่านทั้งหมด</button>
+                )}
+            </div>
+            <div className="min-h-0 max-h-[420px] overflow-y-auto divide-y divide-border">
+                {isLoading ? (
+                    <div className="py-10 text-center text-[13px] text-muted-foreground">กำลังโหลด...</div>
+                ) : notifications.length === 0 ? (
+                    <div className="py-10 text-center text-[13px] text-muted-foreground">ไม่มีการแจ้งเตือน</div>
+                ) : notifications.map((notif) => (
+                    <NotificationItem
+                        key={notif.id}
+                        notif={notif}
+                        path={getNotifPath(notif, role)}
+                        onRead={markAsRead}
+                        onNavigate={handleNavigate}
+                    />
+                ))}
+            </div>
+        </div>
+    )
+
     return (
         <div className="relative" ref={panelRef}>
             {/* Bell button */}
             <button
+                ref={bellRef}
                 onClick={handleBellClick}
                 className="p-2 text-foreground hover:bg-background rounded-full transition-colors relative cursor-pointer"
                 aria-label="การแจ้งเตือน"
@@ -214,56 +262,7 @@ const NotificationBell = ({ open: openProp, onOpenChange }: NotificationBellProp
             </button>
 
             {/* Dropdown panel */}
-            {open && (
-                <div className="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-xl shadow-xl border border-border z-50 overflow-hidden font-kanit">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                        <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[15px] text-foreground">
-                                การแจ้งเตือน
-                            </span>
-                            {unread > 0 && (
-                                <span className="bg-primary text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
-                                    {unread} ใหม่
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {unread > 0 && (
-                                <button
-                                    onClick={markAllAsRead}
-                                    className="text-[11px] text-primary hover:underline cursor-pointer"
-                                >
-                                    อ่านทั้งหมด
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* List */}
-                    <div className="max-h-[420px] overflow-y-auto divide-y divide-border">
-                        {isLoading ? (
-                            <div className="py-10 text-center text-[13px] text-muted-foreground">
-                                กำลังโหลด...
-                            </div>
-                        ) : notifications.length === 0 ? (
-                            <div className="py-10 text-center text-[13px] text-muted-foreground">
-                                ไม่มีการแจ้งเตือน
-                            </div>
-                        ) : (
-                            notifications.map((notif) => (
-                                <NotificationItem
-                                    key={notif.id}
-                                    notif={notif}
-                                    path={getNotifPath(notif, role)}
-                                    onRead={markAsRead}
-                                    onNavigate={handleNavigate}
-                                />
-                            ))
-                        )}
-                    </div>
-                </div>
-            )}
+            {mobile ? dropdown && createPortal(dropdown, document.body) : dropdown}
         </div>
     )
 }

@@ -260,7 +260,7 @@ const Navbar = () => {
                                 <Link to={`/${authUser?.role}/dashboard`} className="flex items-center justify-center w-11 h-11 bg-brand-violet hover:bg-brand-violet-hover text-white rounded-full transition-all shadow-sm active:scale-95">
                                     <LayoutDashboard size={22} />
                                 </Link>
-                                <NotificationBell open={showNotif} onOpenChange={handleNotifChange} />
+                                <NotificationBell open={showNotif} onOpenChange={handleNotifChange} desktopOnly />
                                 <div className="relative" ref={profileMenuRef}>
                                     <button
                                         onClick={handleProfileToggle}
@@ -355,7 +355,7 @@ const Navbar = () => {
                             </div>
                             {authUser && (
                                 <>
-                                    <NotificationBell open={showNotif} onOpenChange={handleNotifChange} />
+                                    <NotificationBell open={showNotif} onOpenChange={handleNotifChange} mobile />
                                     <button
                                         onClick={handleProfileToggle}
                                         className="flex-shrink-0 w-[48px] h-[48px] rounded-full overflow-hidden border-2 border-transparent focus:outline-none cursor-pointer"
