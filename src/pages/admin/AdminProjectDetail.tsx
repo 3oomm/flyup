@@ -132,7 +132,7 @@ const AdminProjectDetail = () => {
     return (
         <div className="min-h-screen pb-[80px]">
             {/* Sticky top bar */}
-            <div className="sticky top-0 z-[1] px-[24px] py-[12px] flex items-center justify-between">
+            <div className="sticky top-0 z-[1] flex flex-wrap items-center justify-between gap-2 px-1 py-3 sm:px-6">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-[6px] text-[13px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -142,7 +142,7 @@ const AdminProjectDetail = () => {
                 </button>
 
                 {project?.state === "pending_review" && (
-                    <div className="flex items-center gap-[8px]">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                         <button
                             onClick={() => handleAction("reject")}
                             disabled={!!actionLoading}
@@ -171,7 +171,7 @@ const AdminProjectDetail = () => {
                 )}
             </div>
 
-            <main className="max-w-7xl mx-auto px-[20px] pt-[32px]">
+            <main className="mx-auto w-full min-w-0 max-w-7xl px-1 pt-5 sm:px-5 sm:pt-8">
                 {/* Project Header */}
                 <div className="flex flex-col gap-[10px] mb-[30px]">
                     <div className="flex items-center gap-[8px] flex-wrap">
@@ -184,7 +184,7 @@ const AdminProjectDetail = () => {
                             </span>
                         )}
                     </div>
-                    <h1 className="text-[36px] font-bold text-foreground leading-tight">
+                    <h1 className="break-words text-2xl font-bold leading-tight text-foreground sm:text-4xl">
                         {project.title}
                     </h1>
                     {project.description && (
@@ -194,7 +194,7 @@ const AdminProjectDetail = () => {
                     )}
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-[30px]">
+                <div className="flex min-w-0 flex-col gap-5 xl:flex-row xl:gap-8">
                     {/* ── Left Column ──────────────────────────────────────── */}
                     <div className="flex-1 flex flex-col gap-[20px]">
                         {/* Main Media */}
@@ -292,7 +292,7 @@ const AdminProjectDetail = () => {
                     </div>
 
                     {/* ── Right Column ─────────────────────────────────────── */}
-                    <div className="w-full lg:w-[380px] flex flex-col gap-[20px]">
+                    <div className="flex w-full min-w-0 flex-col gap-5 xl:w-[380px] xl:shrink-0">
                         {/* Funding Card */}
                         <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col shadow-sm relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-pink-500 to-purple-600" />

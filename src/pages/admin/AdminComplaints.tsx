@@ -286,13 +286,13 @@ const AdminComplaints = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 bg-muted/40 font-medium text-[12px] text-muted-foreground border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,2fr)_minmax(0,1.5fr)_88px] xl:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-2 xl:px-4 py-3 bg-muted/40 font-medium text-[11px] xl:text-[12px] text-muted-foreground border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>หัวข้อ</div>
-                    <div className="hidden sm:block">ผู้ร้องเรียน</div>
+                    <div className="hidden xl:block">ผู้ร้องเรียน</div>
                     <div>โปรเจกต์</div>
-                    <div className="hidden sm:block text-center">รายงาน</div>
-                    <div className="hidden sm:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">รายงาน</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -313,21 +313,21 @@ const AdminComplaints = () => {
                             <div
                                 key={c.id}
                                 onClick={() => setSelected(c)}
-                                className="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,1.5fr)_auto] sm:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-4 py-3 items-center border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                                className="grid grid-cols-[44px_minmax(0,2fr)_minmax(0,1.5fr)_88px] xl:grid-cols-[60px_2fr_1.5fr_1.5fr_80px_120px_130px] px-2 xl:px-4 py-3 items-center border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
                             >
                                 <div className="text-center text-[12px] text-muted-foreground">{index + 1}</div>
                                 <div className="flex flex-col gap-0.5 pr-3">
                                     <span className="font-medium text-[13px] truncate">{c.subject}</span>
                                     <span className="text-[11px] text-muted-foreground">{fmtDate(c.created_at)}</span>
                                 </div>
-                                <div className="hidden sm:flex flex-col gap-0.5 pr-3">
+                                <div className="hidden xl:flex flex-col gap-0.5 pr-3">
                                     <span className="text-[13px] truncate">{fullname}</span>
                                     <span className="text-[11px] text-muted-foreground truncate">{c.complainant?.email ?? ''}</span>
                                 </div>
                                 <div className="pr-3">
                                     <span className="text-[13px] truncate block">{c.project?.title ?? `ID: ${c.project_id}`}</span>
                                 </div>
-                                <div className="hidden sm:flex justify-center">
+                                <div className="hidden xl:flex justify-center">
                                     {c.total_reports > 0 && (
                                         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
                                             c.resolved_reports >= COMPLAINT_THRESHOLD
@@ -340,7 +340,7 @@ const AdminComplaints = () => {
                                         </span>
                                     )}
                                 </div>
-                                <div className="hidden sm:flex justify-center">
+                                <div className="hidden xl:flex justify-center">
                                     <StatusBadge label={status.label} className={status.className} icon={status.icon} />
                                 </div>
                                 <div className="flex justify-center">

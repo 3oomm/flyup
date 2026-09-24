@@ -75,12 +75,12 @@ const AdminRefunds = () => {
 
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_84px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(180px,1fr)_minmax(140px,1fr)_120px_160px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_84px_88px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(180px,1fr)_minmax(140px,1fr)_120px_160px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                     <div className="text-center">ลำดับ</div>
-                    <div className="hidden md:block">โปรเจกต์</div>
+                    <div className="hidden xl:block">โปรเจกต์</div>
                     <div className="text-center">Booster</div>
                     <div className="text-center">จำนวนเงิน</div>
-                    <div className="hidden md:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -104,25 +104,25 @@ const AdminRefunds = () => {
                         return (
                             <div
                                 key={r.investment_id}
-                                className="grid grid-cols-[44px_minmax(0,1fr)_84px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(180px,1fr)_minmax(140px,1fr)_120px_160px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4"
+                                className="grid grid-cols-[44px_minmax(0,1fr)_84px_88px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(180px,1fr)_minmax(140px,1fr)_120px_160px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 xl:px-4"
                             >
                                 <div className="h-14 flex justify-center items-center text-muted-foreground text-[13px]">
                                     {idx + 1}
                                 </div>
-                                <div className="hidden md:flex h-14 flex-col justify-center pr-3">
+                                <div className="hidden xl:flex h-14 flex-col justify-center pr-3">
                                     <span className="font-medium text-[13px] truncate">{r.project_title || '-'}</span>
                                     <span className="text-[11px] text-muted-foreground">
                                         ขอคืน {fmtDate(r.requested_at)}
                                     </span>
                                 </div>
                                 <div className="h-14 min-w-0 flex flex-col justify-center items-center gap-[2px] px-1">
-                                    <span className="block max-w-full text-[12px] md:text-[13px] truncate">{r.booster_name || '-'}</span>
-                                    <span className="block max-w-full text-[10px] md:text-[11px] text-muted-foreground truncate">{r.booster_email}</span>
+                                    <span className="block max-w-full text-[12px] xl:text-[13px] truncate">{r.booster_name || '-'}</span>
+                                    <span className="block max-w-full text-[10px] xl:text-[11px] text-muted-foreground truncate">{r.booster_email}</span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center font-semibold text-primary text-[11px] md:text-[14px]">
+                                <div className="h-14 flex justify-center items-center font-semibold text-primary text-[11px] xl:text-[14px]">
                                     ฿{(r.refund_amount ?? 0).toLocaleString('th-TH')}
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center">
+                                <div className="hidden xl:flex h-14 justify-center items-center">
                                     <StatusBadge label={status.label} className={status.className} icon={status.icon} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
@@ -130,7 +130,7 @@ const AdminRefunds = () => {
                                         <button
                                             onClick={() => handleApprove(r)}
                                             disabled={isApproving}
-                                            className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-[11px] md:text-[12px] font-medium transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed whitespace-nowrap"
+                                            className="flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-[11px] xl:text-[12px] font-medium transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed whitespace-nowrap"
                                         >
                                             {isApproving ? (
                                                 <Loader2 size={12} className="animate-spin" />

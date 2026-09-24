@@ -179,11 +179,11 @@ const AdminProjectSuspension = () => {
             )}
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
-                    <div className="hidden md:block text-center">หมวดหมู่</div>
-                    <div className="hidden md:block text-center">เป้าหมาย</div>
+                    <div className="hidden xl:block text-center">หมวดหมู่</div>
+                    <div className="hidden xl:block text-center">เป้าหมาย</div>
                     <div className="text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
@@ -206,41 +206,41 @@ const AdminProjectSuspension = () => {
                         const isTerminal   = TERMINAL.has(p.state)
 
                         return (
-                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4">
+                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_92px_88px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(140px,1fr)_minmax(160px,1fr)_120px_180px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 xl:px-4">
                                 <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
-                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:pr-3">
-                                    <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{p.title}</span>
-                                    <span className="hidden md:block text-[11px] text-muted-foreground">ID: {p.id}</span>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 xl:pr-3">
+                                    <span className="block min-w-0 font-medium text-[12px] xl:text-[13px] truncate">{p.title}</span>
+                                    <span className="hidden xl:block text-[11px] text-muted-foreground">ID: {p.id}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center text-[12px] text-muted-foreground">
+                                <div className="hidden xl:flex h-14 justify-center items-center text-[12px] text-muted-foreground">
                                     {(typeof p.category === 'string' ? p.category : (p.category as unknown as { name?: string } | null)?.name) ?? '-'}
                                 </div>
-                                <div className="hidden md:flex h-14 flex-col justify-center items-center text-[12px]">
+                                <div className="hidden xl:flex h-14 flex-col justify-center items-center text-[12px]">
                                     <span className="font-semibold text-primary">฿{(p.funding_goal ?? 0).toLocaleString('th-TH')}</span>
                                     <span className="text-muted-foreground text-[11px]">ระดมแล้ว ฿{(p.current_funding ?? 0).toLocaleString('th-TH')}</span>
                                 </div>
-                                <div className="h-14 min-w-0 overflow-hidden flex justify-center items-center [&>span]:max-w-full [&>span]:overflow-hidden [&>span]:text-[10px] md:[&>span]:text-[12px]">
+                                <div className="h-14 min-w-0 overflow-hidden flex justify-center items-center [&>span]:max-w-full [&>span]:overflow-hidden [&>span]:text-[10px] xl:[&>span]:text-[12px]">
                                     <StatusBadge label={stateLabel} className={stateBadge} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
                                     {isSuspended ? (
                                         <button data-testid={`project-unsuspend-open-btn-${p.id}`} onClick={() => setUnsuspendTarget(p)}
-                                            className="flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-[11px] md:text-[12px] font-medium whitespace-nowrap">
-                                            <ShieldCheck size={13} className="hidden md:block" />
-                                            <span className="md:hidden">ยกเลิก</span>
-                                            <span className="hidden md:inline">ยกเลิกระงับ</span>
+                                            className="flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-[11px] xl:text-[12px] font-medium whitespace-nowrap">
+                                            <ShieldCheck size={13} className="hidden xl:block" />
+                                            <span className="xl:hidden">ยกเลิก</span>
+                                            <span className="hidden xl:inline">ยกเลิกระงับ</span>
                                         </button>
                                     ) : canSuspend ? (
                                         <button data-testid={`project-suspend-open-btn-${p.id}`} onClick={() => setSelected(p)}
-                                            className="flex items-center gap-1 px-2 md:px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[11px] md:text-[12px] font-medium whitespace-nowrap">
-                                            <ShieldBan size={13} className="hidden md:block" /> ระงับ
+                                            className="flex items-center gap-1 px-2 xl:px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[11px] xl:text-[12px] font-medium whitespace-nowrap">
+                                            <ShieldBan size={13} className="hidden xl:block" /> ระงับ
                                         </button>
                                     ) : isTerminal ? (
                                         <span className="text-[12px] text-muted-foreground">—</span>
                                     ) : (
                                         <span className="text-[12px] text-muted-foreground">
-                                            <span className="md:hidden">—</span>
-                                            <span className="hidden md:inline">ไม่สามารถระงับได้</span>
+                                            <span className="xl:hidden">—</span>
+                                            <span className="hidden xl:inline">ไม่สามารถระงับได้</span>
                                         </span>
                                     )}
                                 </div>

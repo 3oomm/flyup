@@ -83,7 +83,7 @@ const VerificationApproval = () => {
         <div className="flex flex-col gap-[16px]">
             <PageHeader title="ตรวจสอบการยืนยันตัวตน" subtitle="อนุมัติหรือปฏิเสธการยืนยันตัวตนของผู้ใช้งาน (Pioneer และ Booster)" />
 
-            <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center justify-between gap-2 xl:gap-4">
                 <SearchBar
                     value={search}
                     onChange={setSearch}
@@ -108,21 +108,21 @@ const VerificationApproval = () => {
                     </div>
                 ) : tab === "student" ? (
                     <>
-                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] bg-surface-table px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
+                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] xl:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                             <div className="text-center">ลำดับ</div>
                             <div>Email</div>
                             <div>Role</div>
-                            <div className="hidden sm:block">วันที่ส่ง</div>
-                            <div className="hidden sm:block">เอกสาร</div>
+                            <div className="hidden xl:block">วันที่ส่ง</div>
+                            <div className="hidden xl:block">เอกสาร</div>
                             <div className="text-center">จัดการ</div>
                         </div>
                         {students.length === 0 ? (
                             <div className="py-[60px] text-center text-muted-foreground">ไม่มีรายการรออนุมัติ</div>
                         ) : (
                             students.map((s, index) => (
-                                <div key={s.id} className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] px-2 sm:px-4 items-center border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                                <div key={s.id} className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] xl:grid-cols-[60px_minmax(220px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(100px,1fr)_200px] px-2 xl:px-4 items-center border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                     <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
-                                    <div className="h-14 min-w-0 flex items-center pr-2 text-[11px] sm:text-[13px]">
+                                    <div className="h-14 min-w-0 flex items-center pr-2 text-[11px] xl:text-[13px]">
                                         <span className="block min-w-0 truncate">{s.User?.email ?? '-'}</span>
                                     </div>
                                     <div className="h-14 flex items-center">
@@ -130,8 +130,8 @@ const VerificationApproval = () => {
                                             {s.User?.role ?? '-'}
                                         </span>
                                     </div>
-                                    <div className="hidden sm:flex h-14 items-center text-[13px]">{formatDate(s.CreatedAt)}</div>
-                                    <div className="hidden sm:flex h-14 items-center">
+                                    <div className="hidden xl:flex h-14 items-center text-[13px]">{formatDate(s.CreatedAt)}</div>
+                                    <div className="hidden xl:flex h-14 items-center">
                                         <button
                                             onClick={() => setPreview({ url: s.document, label: "บัตรนักศึกษา" })}
                                             className="flex items-center gap-1 text-primary hover:underline"
@@ -142,11 +142,11 @@ const VerificationApproval = () => {
                                     <div className="h-14 flex items-center justify-center">
                                         <button
                                             onClick={() => setDetail({ type: "student", item: s })}
-                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                                            className="xl:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                         >
                                             ดูรายละเอียด
                                         </button>
-                                        <div className="hidden sm:block">
+                                        <div className="hidden xl:block">
                                             <ApproveRejectButtons
                                                 isLoading={actionLoading === s.user_id}
                                                 onApprove={() => handleStudentAction(s.user_id, "approve")}
@@ -160,23 +160,23 @@ const VerificationApproval = () => {
                     </>
                 ) : (
                     <>
-                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] bg-surface-table px-2 sm:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] sm:text-[13px]">
+                        <div className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] xl:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                             <div className="text-center">ลำดับ</div>
                             <div>Email</div>
                             <div>Role</div>
-                            <div className="hidden sm:block">วันที่ส่ง</div>
-                            <div className="hidden sm:block">บัตรประชาชน</div>
-                            <div className="hidden sm:block">เซลฟี่</div>
-                            <div className="hidden sm:block text-center">Face Score</div>
+                            <div className="hidden xl:block">วันที่ส่ง</div>
+                            <div className="hidden xl:block">บัตรประชาชน</div>
+                            <div className="hidden xl:block">เซลฟี่</div>
+                            <div className="hidden xl:block text-center">Face Score</div>
                             <div className="text-center">จัดการ</div>
                         </div>
                         {idCards.length === 0 ? (
                             <div className="py-[60px] text-center text-muted-foreground">ไม่มีรายการรออนุมัติ</div>
                         ) : (
                             idCards.map((c, index) => (
-                                <div key={c.id} className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] sm:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] px-2 sm:px-4 items-center border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                                <div key={c.id} className="grid grid-cols-[44px_minmax(0,1fr)_68px_96px] xl:grid-cols-[60px_minmax(200px,2fr)_minmax(90px,1fr)_minmax(120px,1fr)_minmax(110px,1fr)_minmax(90px,1fr)_100px_200px] px-2 xl:px-4 items-center border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                     <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
-                                    <div className="h-14 min-w-0 flex items-center pr-2 text-[11px] sm:text-[13px]">
+                                    <div className="h-14 min-w-0 flex items-center pr-2 text-[11px] xl:text-[13px]">
                                         <span className="block min-w-0 truncate">{c.User?.email ?? '-'}</span>
                                     </div>
                                     <div className="h-14 flex items-center">
@@ -184,8 +184,8 @@ const VerificationApproval = () => {
                                             {c.User?.role ?? '-'}
                                         </span>
                                     </div>
-                                    <div className="hidden sm:flex h-14 items-center text-[13px]">{formatDate(c.CreatedAt)}</div>
-                                    <div className="hidden sm:flex h-14 items-center">
+                                    <div className="hidden xl:flex h-14 items-center text-[13px]">{formatDate(c.CreatedAt)}</div>
+                                    <div className="hidden xl:flex h-14 items-center">
                                         <button
                                             onClick={() => setPreview({ url: c.document, label: "บัตรประชาชน" })}
                                             className="flex items-center gap-1 text-primary hover:underline"
@@ -193,7 +193,7 @@ const VerificationApproval = () => {
                                             <ExternalLink size={13} /> ดูบัตร
                                         </button>
                                     </div>
-                                    <div className="hidden sm:flex h-14 items-center">
+                                    <div className="hidden xl:flex h-14 items-center">
                                         {c.selfie_url ? (
                                             <button
                                                 onClick={() => setPreview({ url: c.selfie_url!, label: "เซลฟี่" })}
@@ -205,7 +205,7 @@ const VerificationApproval = () => {
                                             <span className="text-muted-foreground">-</span>
                                         )}
                                     </div>
-                                    <div className="hidden sm:flex h-14 items-center justify-center">
+                                    <div className="hidden xl:flex h-14 items-center justify-center">
                                         {c.face_score != null ? (
                                             <span className={`text-[12px] px-[10px] py-[2px] rounded-full font-medium border ${c.face_score >= 80 ? 'bg-green-50 text-green-600 border-green-200' : c.face_score >= 50 ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
                                                 {c.face_score.toFixed(1)}%
@@ -217,11 +217,11 @@ const VerificationApproval = () => {
                                     <div className="h-14 flex items-center justify-center">
                                         <button
                                             onClick={() => setDetail({ type: "idcard", item: c })}
-                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                                            className="xl:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                         >
                                             ดูรายละเอียด
                                         </button>
-                                        <div className="hidden sm:block">
+                                        <div className="hidden xl:block">
                                             <ApproveRejectButtons
                                                 isLoading={actionLoading === c.user_id}
                                                 onApprove={() => handleIDCardAction(c.user_id, "approve")}

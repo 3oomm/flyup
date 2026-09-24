@@ -202,13 +202,13 @@ function PoolDetailView({
 
             {/* investor table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-surface-table px-2 md:px-4 py-3 text-[11px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-surface-table px-2 xl:px-4 py-3 text-[11px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>นักลงทุน</div>
-                    <div className="hidden md:block text-center">ทุนที่ลงทุน</div>
-                    <div className="hidden md:block text-center">สัดส่วน</div>
+                    <div className="hidden xl:block text-center">ทุนที่ลงทุน</div>
+                    <div className="hidden xl:block text-center">สัดส่วน</div>
                     <div className="text-center">กำไรที่ได้รับ</div>
-                    <div className="hidden md:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -221,24 +221,24 @@ function PoolDetailView({
                     current.payouts.map((p, index) => {
                         const payStatus = STATUS_PAYOUT[p.status] ?? STATUS_PAYOUT['pending']
                         return (
-                            <div key={p.id} className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] md:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] px-2 md:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                            <div key={p.id} className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                 <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
-                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:px-4">
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 xl:px-4">
                                     <span className="block min-w-0 font-medium truncate">{p.first_name} {p.last_name}</span>
-                                    <span className="block min-w-0 text-[10px] md:text-[11px] text-muted-foreground truncate">{p.email}</span>
+                                    <span className="block min-w-0 text-[10px] xl:text-[11px] text-muted-foreground truncate">{p.email}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center text-foreground">
+                                <div className="hidden xl:flex h-14 justify-center items-center text-foreground">
                                     {fmtBaht(p.principal_amount)}
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center">
+                                <div className="hidden xl:flex h-14 justify-center items-center">
                                     <span className="bg-primary/10 text-primary text-[12px] font-semibold px-2 py-0.5 rounded-full">
                                         {p.share_pct.toFixed(2)}%
                                     </span>
                                 </div>
-                                <div className="h-14 flex justify-center items-center font-bold text-primary text-[11px] md:text-[13px]">
+                                <div className="h-14 flex justify-center items-center font-bold text-primary text-[11px] xl:text-[13px]">
                                     {fmtBaht(p.amount)}
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center">
+                                <div className="hidden xl:flex h-14 justify-center items-center">
                                     <StatusBadge label={payStatus.label} className={payStatus.className} icon={payStatus.icon} />
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
@@ -323,14 +323,14 @@ const AdminProfitDistribution = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-surface-table px-2 md:px-4 py-3 text-[12px] md:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-surface-table px-2 xl:px-4 py-3 text-[12px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
-                    <div className="hidden md:block text-center">Pioneer</div>
-                    <div className="hidden md:block text-center">ไตรมาส</div>
+                    <div className="hidden xl:block text-center">Pioneer</div>
+                    <div className="hidden xl:block text-center">ไตรมาส</div>
                     <div className="text-center">ยอดรวม</div>
-                    <div className="hidden md:block text-center">นักลงทุน</div>
-                    <div className="hidden md:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">นักลงทุน</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -347,38 +347,38 @@ const AdminProfitDistribution = () => {
                     filtered.map((pool, index) => {
                         const st = STATUS_POOL[pool.status] ?? STATUS_POOL['pending']
                         return (
-                            <div key={pool.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] md:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] px-2 md:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                            <div key={pool.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                 <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
-                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 md:px-4">
-                                    <span className="block min-w-0 font-medium text-[12px] md:text-[13px] truncate">{pool.project_title}</span>
-                                    <span className="hidden md:block text-[11px] text-muted-foreground">{fmtDate(pool.created_at)}</span>
+                                <div className="h-14 min-w-0 flex flex-col justify-center pr-2 xl:px-4">
+                                    <span className="block min-w-0 font-medium text-[12px] xl:text-[13px] truncate">{pool.project_title}</span>
+                                    <span className="hidden xl:block text-[11px] text-muted-foreground">{fmtDate(pool.created_at)}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 items-center justify-center">
+                                <div className="hidden xl:flex h-14 items-center justify-center">
                                     <span className="text-[13px]">{pool.pioneer_name}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 items-center justify-center">
+                                <div className="hidden xl:flex h-14 items-center justify-center">
                                     {pool.quarter_no > 0 ? (
                                         <span className="text-[11px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">Q{pool.quarter_no}</span>
                                     ) : (
                                         <span className="text-[11px] text-muted-foreground">—</span>
                                     )}
                                 </div>
-                                <div className="h-14 flex items-center justify-center font-semibold text-primary text-[12px] md:text-[13px]">
+                                <div className="h-14 flex items-center justify-center font-semibold text-primary text-[12px] xl:text-[13px]">
                                     {fmtBaht(pool.total_amount)}
                                 </div>
-                                <div className="hidden md:flex h-14 items-center justify-center gap-1 text-[13px]">
+                                <div className="hidden xl:flex h-14 items-center justify-center gap-1 text-[13px]">
                                     <Building2 size={13} className="text-muted-foreground" />
                                     {pool.confirmed_count}/{pool.investor_count} คน
                                 </div>
-                                <div className="hidden md:flex h-14 items-center justify-center">
+                                <div className="hidden xl:flex h-14 items-center justify-center">
                                     <StatusBadge label={st.label} className={st.className} icon={st.icon} />
                                 </div>
                                 <div className="h-14 flex items-center justify-center">
                                     <button
                                         onClick={() => handleOpenDetail(pool.id)}
-                                        className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors"
+                                        className="flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] xl:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors"
                                     >
-                                        <TrendingUp size={12} className="hidden md:block" />
+                                        <TrendingUp size={12} className="hidden xl:block" />
                                         ดูรายละเอียด
                                     </button>
                                 </div>

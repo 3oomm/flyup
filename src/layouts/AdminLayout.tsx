@@ -12,7 +12,7 @@ const AdminLayout = () => {
     }, [location])
 
     return (
-        <div className='flex min-h-screen bg-background'>
+        <div className='admin-responsive flex min-h-screen bg-background overflow-x-hidden'>
             <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <SidebarAdmin />
             </div>
@@ -23,8 +23,8 @@ const AdminLayout = () => {
 
             <div className='flex-1 flex flex-col min-w-0'>
                 <NavbarDashboard onOpenSidebar={() => setIsSidebarOpen(true)} />
-                <main className='flex-1 p-[16px] lg:p-[32px] overflow-y-auto'>
-                    <div className='mx-auto max-w-7xl'>
+                <main className='flex-1 min-w-0 overflow-x-hidden overflow-y-auto p-3 sm:p-4 xl:p-8'>
+                    <div className='mx-auto w-full min-w-0 max-w-7xl'>
                         <Outlet />
                     </div>
                 </main>

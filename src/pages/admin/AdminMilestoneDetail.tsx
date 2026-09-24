@@ -99,7 +99,7 @@ const AdminMilestoneDetail = () => {
     }
 
     return (
-        <div className="flex flex-col gap-[24px] pb-[40px] max-w-[860px] mx-auto">
+        <div className="mx-auto flex w-full min-w-0 max-w-[860px] flex-col gap-4 pb-8 sm:gap-6 sm:pb-10">
             {/* Back */}
             <button
                 onClick={() => navigate(-1)}
@@ -122,7 +122,7 @@ const AdminMilestoneDetail = () => {
                 </div>
 
                 {milestone.status === 'submitted' && !showRejectForm && (
-                    <div className="flex items-center gap-[8px] shrink-0">
+                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
                         <button
                             onClick={() => setShowRejectForm(true)}
                             disabled={!!actionLoading}
@@ -182,7 +182,7 @@ const AdminMilestoneDetail = () => {
             )}
 
             {/* Info cards row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-[12px]">
+            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
                 <InfoCard label="ช่วงเวลา" value={`${fmt(milestone.start_date)} – ${fmt(milestone.end_date)}`} icon={<Calendar size={14} />} />
                 <InfoCard label="งบประมาณ" value={fmtBaht(milestone.funding_goal)} />
                 <InfoCard label="ความคืบหน้า" value={`${milestone.progress_pct}%`} />
@@ -194,7 +194,7 @@ const AdminMilestoneDetail = () => {
 
             {/* Pioneer submission summary */}
             {milestone.submission_summary && (
-                <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[10px]">
+                <div className="flex flex-col gap-2.5 rounded-2xl border border-border bg-white p-4 sm:p-6">
                     <h2 className="font-semibold text-foreground">สรุปผลงาน</h2>
                     <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-wrap break-words">
                         {milestone.submission_summary}
@@ -204,7 +204,7 @@ const AdminMilestoneDetail = () => {
 
             {/* Acceptance criteria */}
             {criteria.length > 0 && (
-                <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[14px]">
+                <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-white p-4 sm:p-6">
                     <h2 className="font-semibold text-foreground">เกณฑ์การยอมรับ</h2>
                     <div className="flex flex-col gap-[8px]">
                         {criteria.map((c, i) => {
@@ -228,7 +228,7 @@ const AdminMilestoneDetail = () => {
 
             {/* Evidence files */}
             {(milestone.evidence_files?.length ?? 0) > 0 && (
-                <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[14px]">
+                <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-white p-4 sm:p-6">
                     <h2 className="font-semibold text-foreground">ไฟล์แนบ</h2>
                     <div className="flex flex-col gap-[8px]">
                         {milestone.evidence_files!.map((file) => (
@@ -250,7 +250,7 @@ const AdminMilestoneDetail = () => {
 
             {/* Evidence links */}
             {(milestone.evidence_links?.length ?? 0) > 0 && (
-                <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[14px]">
+                <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-white p-4 sm:p-6">
                     <h2 className="font-semibold text-foreground">ลิงก์ภายนอก</h2>
                     <div className="flex flex-col gap-[8px]">
                         {milestone.evidence_links!.map((link, i) => (

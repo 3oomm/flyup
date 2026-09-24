@@ -45,13 +45,13 @@ const ProjectApproval = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
                 {/* Header */}
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
-                    <div className="hidden md:block text-center">Pioneer</div>
+                    <div className="hidden xl:block text-center">Pioneer</div>
                     <div className="text-center">เป้าหมาย</div>
-                    <div className="hidden md:block text-center">วันที่ส่ง</div>
-                    <div className="hidden md:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">วันที่ส่ง</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -77,30 +77,30 @@ const ProjectApproval = () => {
                               })
                             : '-'
                         return (
-                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] md:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4">
+                            <div key={p.id} className="grid grid-cols-[44px_minmax(0,1fr)_82px_96px] xl:grid-cols-[60px_minmax(240px,2fr)_minmax(150px,1fr)_minmax(130px,1fr)_minmax(130px,1fr)_120px_140px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 xl:px-4">
                                 <div className="h-14 flex justify-center items-center text-muted-foreground text-[13px]">
                                     {idx + 1}
                                 </div>
                                 <div className="h-14 flex items-center pr-3 font-medium min-w-0">
                                     <span className="truncate">{p.title}</span>
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center text-[13px] min-w-0 px-1">
+                                <div className="hidden xl:flex h-14 justify-center items-center text-[13px] min-w-0 px-1">
                                     <span className="truncate text-center">{fullname}</span>
                                 </div>
-                                <div className="flex h-14 justify-center items-center text-[12px] md:text-[13px]">
+                                <div className="flex h-14 justify-center items-center text-[12px] xl:text-[13px]">
                                     ฿{p.funding_goal.toLocaleString()}
                                 </div>
-                                <div className="hidden md:flex h-14 justify-center items-center text-[13px]">{dateStr}</div>
-                                <div className="hidden md:flex h-14 justify-center items-center">
+                                <div className="hidden xl:flex h-14 justify-center items-center text-[13px]">{dateStr}</div>
+                                <div className="hidden xl:flex h-14 justify-center items-center">
                                     <span className="rounded-full px-2.5 py-0.5 bg-amber-50 text-amber-600 border border-amber-200 text-[12px] font-medium whitespace-nowrap">
-                                        <span className="md:hidden">รอ</span>
-                                        <span className="hidden md:inline">รอตรวจสอบ</span>
+                                        <span className="xl:hidden">รอ</span>
+                                        <span className="hidden xl:inline">รอตรวจสอบ</span>
                                     </span>
                                 </div>
                                 <div className="h-14 flex justify-center items-center">
                                     <Link
                                         to={`/admin/projects/${p.id}`}
-                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors text-[11px] md:text-[12px] font-medium whitespace-nowrap cursor-pointer"
+                                        className="px-2.5 xl:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors text-[11px] xl:text-[12px] font-medium whitespace-nowrap cursor-pointer"
                                     >
                                         ดูรายละเอียด
                                     </Link>

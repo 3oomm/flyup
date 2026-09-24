@@ -117,10 +117,10 @@ const AdminUniversities = () => {
 
     return (
         <div className="flex flex-col gap-[16px]">
-            <div className="flex justify-between items-start md:items-end flex-col md:flex-row gap-4 mb-2">
+            <div className="flex justify-between items-start xl:items-end flex-col xl:flex-row gap-4 mb-2">
                 <PageHeader title="จัดการมหาวิทยาลัย" subtitle="เพิ่ม ลบ แก้ไข ข้อมูลมหาวิทยาลัยที่อนุญาตในระบบ" />
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative w-full md:w-[280px]">
+                <div className="flex items-center gap-3 w-full xl:w-auto">
+                    <div className="relative w-full xl:w-[280px]">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
@@ -148,15 +148,15 @@ const AdminUniversities = () => {
                 ) : (
                     <>
                         <div className="w-full overflow-x-auto">
-                            <table className="w-full table-fixed md:table-auto text-left border-collapse">
+                            <table className="w-full table-fixed xl:table-auto text-left border-collapse">
                                 <thead>
                                     <tr className="bg-surface-table text-[13px] font-medium text-gray-500 border-b border-border">
-                                        <th className="w-[44px] md:w-[60px] px-2 md:px-4 py-3 font-medium whitespace-nowrap text-center">ลำดับ</th>
-                                        <th className="px-2 md:px-4 py-3 font-medium whitespace-nowrap md:min-w-[200px]">ชื่อมหาวิทยาลัย (TH)</th>
-                                        <th className="hidden md:table-cell px-4 py-3 font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (EN)</th>
-                                        <th className="w-[80px] md:w-auto px-2 md:px-4 py-3 font-medium whitespace-nowrap md:min-w-[120px]">จังหวัด</th>
-                                        <th className="hidden md:table-cell px-4 py-3 font-medium whitespace-nowrap text-center w-[80px]">โดเมน</th>
-                                        <th className="w-[100px] md:w-[150px] px-2 md:px-4 py-3 font-medium whitespace-nowrap text-center">จัดการ</th>
+                                        <th className="w-[44px] xl:w-[60px] px-2 xl:px-4 py-3 font-medium whitespace-nowrap text-center">ลำดับ</th>
+                                        <th className="px-2 xl:px-4 py-3 font-medium whitespace-nowrap xl:min-w-[200px]">ชื่อมหาวิทยาลัย (TH)</th>
+                                        <th className="hidden xl:table-cell px-4 py-3 font-medium whitespace-nowrap min-w-[200px]">ชื่อมหาวิทยาลัย (EN)</th>
+                                        <th className="w-[80px] xl:w-auto px-2 xl:px-4 py-3 font-medium whitespace-nowrap xl:min-w-[120px]">จังหวัด</th>
+                                        <th className="hidden xl:table-cell px-4 py-3 font-medium whitespace-nowrap text-center w-[80px]">โดเมน</th>
+                                        <th className="w-[100px] xl:w-[150px] px-2 xl:px-4 py-3 font-medium whitespace-nowrap text-center">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -172,31 +172,31 @@ const AdminUniversities = () => {
                                     ) : (
                                         paginatedUniversities.map((uni, index) => (
                                         <tr key={uni.id} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
-                                            <td className="px-2 md:px-4 py-3.5 text-center text-[12px]">
+                                            <td className="px-2 xl:px-4 py-3.5 text-center text-[12px]">
                                                 <span className="text-muted-foreground">{((currentPage - 1) * itemsPerPage) + index + 1}</span>
                                             </td>
-                                            <td className="min-w-0 px-2 md:px-4 py-3.5">
-                                                <div className="block max-w-full md:max-w-[250px] truncate text-[12px] md:text-[13px] font-medium">{uni.name_th ?? '-'}</div>
+                                            <td className="min-w-0 px-2 xl:px-4 py-3.5">
+                                                <div className="block max-w-full xl:max-w-[250px] truncate text-[12px] xl:text-[13px] font-medium">{uni.name_th ?? '-'}</div>
                                             </td>
-                                            <td className="hidden md:table-cell px-4 py-3.5">
+                                            <td className="hidden xl:table-cell px-4 py-3.5">
                                                 <div className="text-[13px] text-gray-600 truncate max-w-[250px]">{uni.name_en ?? '-'}</div>
                                             </td>
-                                            <td className="min-w-0 px-2 md:px-4 py-3.5">
-                                                <div className="block max-w-full truncate text-[11px] md:text-[13px] text-gray-600">{uni.province ?? '-'}</div>
+                                            <td className="min-w-0 px-2 xl:px-4 py-3.5">
+                                                <div className="block max-w-full truncate text-[11px] xl:text-[13px] text-gray-600">{uni.province ?? '-'}</div>
                                             </td>
-                                            <td className="hidden md:table-cell px-4 py-3.5 text-center">
+                                            <td className="hidden xl:table-cell px-4 py-3.5 text-center">
                                                 <span className="text-[12px] px-[8px] py-[2px] rounded-full border bg-blue-50 text-blue-600 border-blue-200 font-medium inline-block">
                                                     {uni.domains?.length || 0}
                                                 </span>
                                             </td>
-                                            <td className="px-2 md:px-4 py-3.5">
+                                            <td className="px-2 xl:px-4 py-3.5">
                                                 <button
                                                     onClick={() => setDetailUni(uni)}
-                                                    className="md:hidden mx-auto px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                                                    className="xl:hidden mx-auto px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                                 >
                                                     ดูรายละเอียด
                                                 </button>
-                                                <div className="hidden md:flex justify-center gap-1">
+                                                <div className="hidden xl:flex justify-center gap-1">
                                                     <Link
                                                         to={`/admin/universities/${uni.id}`}
                                                         className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"

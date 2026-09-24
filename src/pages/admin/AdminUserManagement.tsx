@@ -193,12 +193,12 @@ const AdminUserManagement = () => {
 
             {/* Table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[14px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-surface-table px-2 md:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] md:text-[13px]">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] xl:grid-cols-[60px_1fr_1fr_90px_90px_120px] bg-surface-table px-2 xl:px-4 py-3 font-medium text-gray-500 border-b border-border text-[12px] xl:text-[13px]">
                     <div className="text-center">ลำดับ</div>
                     <div>ชื่อ</div>
-                    <div className="hidden md:block">อีเมล</div>
+                    <div className="hidden xl:block">อีเมล</div>
                     <div className="text-center">Role</div>
-                    <div className="hidden md:block text-center">สถานะ</div>
+                    <div className="hidden xl:block text-center">สถานะ</div>
                     <div className="text-center">จัดการ</div>
                 </div>
 
@@ -214,23 +214,23 @@ const AdminUserManagement = () => {
                     users.map((u, index) => (
                         <div
                             key={u.id}
-                            className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] md:grid-cols-[60px_1fr_1fr_90px_90px_120px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 md:px-4"
+                            className="grid grid-cols-[44px_minmax(0,1fr)_72px_96px] xl:grid-cols-[60px_1fr_1fr_90px_90px_120px] border-b border-border last:border-0 hover:bg-gray-50 transition-colors px-2 xl:px-4"
                         >
                             <div className="h-12 flex items-center justify-center text-[12px] text-muted-foreground">
                                 {(page - 1) * pageSize + index + 1}
                             </div>
-                            <div className="h-12 min-w-0 flex items-center pr-2 text-[12px] md:text-[13px] font-medium">
+                            <div className="h-12 min-w-0 flex items-center pr-2 text-[12px] xl:text-[13px] font-medium">
                                 <span className="block min-w-0 truncate">{u.first_name} {u.last_name}</span>
                             </div>
-                            <div className="hidden md:flex h-12 items-center text-[13px] text-muted-foreground truncate pr-2">
+                            <div className="hidden xl:flex h-12 items-center text-[13px] text-muted-foreground truncate pr-2">
                                 {u.email}
                             </div>
                             <div className="h-12 flex items-center justify-center">
-                                <span className={`max-w-full truncate text-[10px] md:text-[11px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[u.role]?.cls ?? 'bg-gray-100 text-gray-600'}`}>
+                                <span className={`max-w-full truncate text-[10px] xl:text-[11px] font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[u.role]?.cls ?? 'bg-gray-100 text-gray-600'}`}>
                                     {ROLE_BADGE[u.role]?.label ?? u.role}
                                 </span>
                             </div>
-                            <div className="hidden md:flex h-12 items-center justify-center">
+                            <div className="hidden xl:flex h-12 items-center justify-center">
                                 <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${STATUS_BADGE[u.status] ?? ''}`}>
                                     {u.status === 'active' ? 'Active' : 'Suspended'}
                                 </span>
@@ -238,11 +238,11 @@ const AdminUserManagement = () => {
                             <div className="h-12 flex items-center justify-center gap-1.5">
                                 <button
                                     onClick={() => setDetailUser(u)}
-                                    className="md:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                                    className="xl:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                 >
                                     ดูรายละเอียด
                                 </button>
-                                <div className="hidden md:block">
+                                <div className="hidden xl:block">
                                     {u.status === 'active' ? (
                                         <button
                                             data-testid={`user-suspend-open-btn-${u.id}`}

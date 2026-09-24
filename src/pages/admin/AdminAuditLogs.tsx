@@ -76,28 +76,28 @@ const LogRow = ({ log, sequence, onView }: { log: AdminLogItem; sequence: number
         : `Admin #${log.admin_id}`
 
     return (
-        <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] md:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 md:px-4 py-3 items-start border-b border-border last:border-0 hover:bg-muted/30 transition-colors text-[13px]">
+        <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] xl:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 xl:px-4 py-3 items-start border-b border-border last:border-0 hover:bg-muted/30 transition-colors text-[13px]">
             <div className="text-center text-muted-foreground text-[12px] pt-0.5">{sequence}</div>
             <div className="text-muted-foreground text-[12px] pt-0.5">{formatDate(log.created_at)}</div>
-            <div className="hidden md:block">
+            <div className="hidden xl:block">
                 <p className="font-medium text-foreground">{adminName}</p>
                 {log.admin?.email && (
                     <p className="text-[11px] text-muted-foreground truncate">{log.admin.email}</p>
                 )}
             </div>
             <div className="min-w-0 overflow-hidden">
-                <span className={`inline-block max-w-full truncate text-[10px] md:text-[11px] font-semibold px-2 py-0.5 rounded-full border ${badgeClass}`}>
+                <span className={`inline-block max-w-full truncate text-[10px] xl:text-[11px] font-semibold px-2 py-0.5 rounded-full border ${badgeClass}`}>
                     {actionLabel}
                 </span>
             </div>
-            <div className="hidden md:block text-muted-foreground">{targetLabel}</div>
-            <div className="hidden md:block text-muted-foreground">
+            <div className="hidden xl:block text-muted-foreground">{targetLabel}</div>
+            <div className="hidden xl:block text-muted-foreground">
                 {log.target_id ? `#${log.target_id}` : '—'}
             </div>
-            <div className="hidden md:block text-muted-foreground text-[12px] wrap-break-word">
+            <div className="hidden xl:block text-muted-foreground text-[12px] wrap-break-word">
                 {log.note ?? '—'}
             </div>
-            <div className="flex md:hidden justify-center">
+            <div className="flex xl:hidden justify-center">
                 <button
                     onClick={onView}
                     className="px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
@@ -206,15 +206,15 @@ const AdminAuditLogs = () => {
             {/* Table */}
             <div className="bg-white rounded-xl border border-border mx-2.5 overflow-hidden">
                 {/* Header */}
-                <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] md:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 md:px-4 py-3 bg-muted/40 font-medium text-[11px] md:text-[12px] text-muted-foreground border-b border-border">
+                <div className="grid grid-cols-[40px_92px_minmax(0,1fr)_92px] xl:grid-cols-[60px_160px_180px_1fr_120px_80px_1fr] px-2 xl:px-4 py-3 bg-muted/40 font-medium text-[11px] xl:text-[12px] text-muted-foreground border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>วันที่/เวลา</div>
-                    <div className="hidden md:block">Admin</div>
+                    <div className="hidden xl:block">Admin</div>
                     <div>Action</div>
-                    <div className="hidden md:block">ประเภท</div>
-                    <div className="hidden md:block">ID</div>
-                    <div className="hidden md:block">หมายเหตุ</div>
-                    <div className="md:hidden text-center">จัดการ</div>
+                    <div className="hidden xl:block">ประเภท</div>
+                    <div className="hidden xl:block">ID</div>
+                    <div className="hidden xl:block">หมายเหตุ</div>
+                    <div className="xl:hidden text-center">จัดการ</div>
                 </div>
 
                 {isLoading ? (
