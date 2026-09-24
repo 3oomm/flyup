@@ -3,7 +3,7 @@ import { useProjectStore } from '../../store/useProjectStore';
 import { useMeetingStore } from '../../store/useMeetingStore';
 import CreateMeetingForm from '../../components/pioneer/meeting/CreateMeetingForm';
 import MeetingList from '../../components/pioneer/meeting/MeetingList';
-import Swal from 'sweetalert2';
+import Swal from '../../lib/swal';
 import EditMeetingModal from '../../components/pioneer/meeting/EditMeetingModal';
 import {
   MEETING_ELIGIBLE_PROJECT_STATES,

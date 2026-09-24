@@ -238,7 +238,7 @@ const AdminUserManagement = () => {
                             <div className="h-12 flex items-center justify-center gap-1.5">
                                 <button
                                     onClick={() => setDetailUser(u)}
-                                    className="md:hidden px-2 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[10px] font-medium whitespace-nowrap"
+                                    className="md:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                 >
                                     ดูรายละเอียด
                                 </button>

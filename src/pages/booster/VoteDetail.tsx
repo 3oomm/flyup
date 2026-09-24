@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
+import Swal from '../../lib/swal';
 import { ArrowLeft, CheckCircle2, ChevronRight, FileText, Image as ImageIcon, Link2, XCircle, Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-hot-toast';
@@ -219,11 +219,9 @@ const VoteDetail = () => {
               <h3 className="font-bold text-foreground text-sm mb-4">เกณฑ์การยอมรับ</h3>
               <ul className="space-y-3">
                 {criteria.map((c, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <div className="bg-primary/10 rounded-full p-0.5 mt-0.5">
-                      <CheckCircle2 size={14} className="text-primary fill-primary/20" />
-                    </div>
-                    <span className="text-sm text-foreground">{c}</span>
+                  <li key={i} className="flex items-center gap-[10px] p-[12px] rounded-[10px] border border-green-200 bg-green-50">
+                    <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+                    <span className="text-[13px] font-medium text-green-800">{c}</span>
                   </li>
                 ))}
               </ul>

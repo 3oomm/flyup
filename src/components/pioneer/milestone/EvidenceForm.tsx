@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { Upload, X, Plus, CheckCircle2, Circle, ExternalLink, Loader2, Send } from 'lucide-react'
-import Swal from 'sweetalert2'
+import Swal from '../../../lib/swal'
 import toast from 'react-hot-toast'
 import type { EvidenceLink, MilestoneData } from './types'
 import { useMilestoneStore } from '../../../store/useMilestoneStore'
@@ -140,13 +140,13 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
               <button
                 key={i}
                 onClick={() => toggleCriteria(i)}
-                className="flex items-center gap-[10px] p-[12px] rounded-[10px] border border-border hover:bg-surface-soft transition-colors cursor-pointer text-left w-full"
+                className={`flex items-center gap-[10px] p-[12px] rounded-[10px] border transition-colors cursor-pointer text-left w-full ${checkedCriteria[i] ? 'border-green-200 bg-green-50 hover:bg-green-100' : 'border-border hover:bg-surface-soft'}`}
               >
                 {checkedCriteria[i]
-                  ? <CheckCircle2 size={18} className="text-primary shrink-0" />
+                  ? <CheckCircle2 size={18} className="text-green-600 shrink-0" />
                   : <Circle size={18} className="text-muted-foreground shrink-0" />
                 }
-                <span className="text-[13px] text-foreground">{c}</span>
+                <span className={`text-[13px] ${checkedCriteria[i] ? 'font-medium text-green-800' : 'text-foreground'}`}>{c}</span>
               </button>
             ))}
           </div>
@@ -217,6 +217,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
                 placeholder="ชื่อ (เช่น GitHub)"
                 value={link.name}
                 onChange={e => updateLink(i, 'name', e.target.value)}
+                maxLength={100}
                 className="w-[140px] shrink-0 px-[10px] py-[8px] rounded-[8px] border border-border text-[13px] outline-none focus:border-primary"
               />
               <div className={`flex-1 flex items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-danger-bright' : 'border-border'}`}>

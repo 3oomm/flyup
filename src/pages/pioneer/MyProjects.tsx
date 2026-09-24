@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { Search, Plus, SlidersHorizontal, ChevronDown, Eye, Edit3, Trash2, Loader2, ChevronLeft, ChevronRight, XCircle, Ban } from "lucide-react";
 import { useProjectStore } from "../../store/useProjectStore";
 import useCreateProjectGuard from "../../hooks/useCreateProjectGuard";
-import Swal from "sweetalert2";
+import Swal from "../../lib/swal";
 
 type StateType = "funding" | "pending_review" | "draft" | "closed" | "cancelled" | "executing" | "pending_cancel" | "suspended" | "pending_edit_review";
 
@@ -139,7 +139,7 @@ const MyProjects = () => {
         await updateProjectStatus(id);
         await fetchMyProjects();
       } catch {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถยกเลิกได้ กรุณาลองใหม่', confirmButtonColor: '#16A34A' });
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถยกเลิกได้ กรุณาลองใหม่' });
       }
     }
   };

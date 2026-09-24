@@ -100,7 +100,7 @@ const LogRow = ({ log, sequence, onView }: { log: AdminLogItem; sequence: number
             <div className="flex md:hidden justify-center">
                 <button
                     onClick={onView}
-                    className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                    className="px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                 >
                     ดูรายละเอียด
                 </button>

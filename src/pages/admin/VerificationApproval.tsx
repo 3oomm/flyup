@@ -142,7 +142,7 @@ const VerificationApproval = () => {
                                     <div className="h-14 flex items-center justify-center">
                                         <button
                                             onClick={() => setDetail({ type: "student", item: s })}
-                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                         >
                                             ดูรายละเอียด
                                         </button>
@@ -217,7 +217,7 @@ const VerificationApproval = () => {
                                     <div className="h-14 flex items-center justify-center">
                                         <button
                                             onClick={() => setDetail({ type: "idcard", item: c })}
-                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                                            className="sm:hidden px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                         >
                                             ดูรายละเอียด
                                         </button>

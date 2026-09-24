@@ -104,10 +104,9 @@ const AdminMilestoneApproval = () => {
                                     <span className="hidden md:inline text-[11px] text-muted-foreground">{dateStr}</span>
                                     <Link
                                         to={`/admin/milestones/${m.id}`}
-                                        className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground transition-colors text-[11px] font-medium whitespace-nowrap md:px-3 md:rounded-[6px] md:bg-primary md:hover:bg-primary-hover md:text-white md:text-[12px]"
+                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors text-[11px] md:text-[12px] font-medium whitespace-nowrap cursor-pointer"
                                     >
-                                        <span className="md:hidden">ดูรายละเอียด</span>
-                                        <span className="hidden md:inline">ตรวจสอบ</span>
+                                        ดูรายละเอียด
                                     </Link>
                                 </div>
                             </div>

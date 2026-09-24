@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CheckCircle2, Calendar, Undo2, Vote, Loader2, ChevronUp, ChevronDown, Users } from 'lucide-react'
 import { useNavigate } from 'react-router'
-import Swal from 'sweetalert2'
+import Swal from '../../../lib/swal'
 import { STATUS_CONFIG, fmtDateRange, fmtBaht } from './types'
 import type { MilestoneData, EvidenceLink } from './types'
 import EvidenceForm from './EvidenceForm'

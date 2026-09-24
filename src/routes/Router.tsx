@@ -269,7 +269,7 @@ const Router = () => {
                     containerStyle={{ top: 20, right: 20, zIndex: 100000 }}
                     toastOptions={{
                         duration: 4000,
-                        className: 'admin-action-toast',
+                        className: 'app-toast',
                         style: {
                             maxWidth: 420,
                             padding: '12px 16px',

@@ -100,10 +100,9 @@ const ProjectApproval = () => {
                                 <div className="h-14 flex justify-center items-center">
                                     <Link
                                         to={`/admin/projects/${p.id}`}
-                                        className="px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground transition-colors text-[11px] font-medium whitespace-nowrap md:px-3 md:rounded-md md:bg-primary md:hover:bg-primary-hover md:text-white md:text-[12px]"
+                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors text-[11px] md:text-[12px] font-medium whitespace-nowrap cursor-pointer"
                                     >
-                                        <span className="md:hidden">ดูรายละเอียด</span>
-                                        <span className="hidden md:inline">รายละเอียด</span>
+                                        ดูรายละเอียด
                                     </Link>
                                 </div>
                             </div>

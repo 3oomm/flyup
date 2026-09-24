@@ -212,13 +212,13 @@ const AdminMilestoneDetail = () => {
                             return (
                                 <div
                                     key={i}
-                                    className={`flex items-center gap-[10px] p-[12px] rounded-[10px] border ${checked ? 'border-primary/30 bg-primary/5' : 'border-border bg-surface-soft'}`}
+                                    className={`flex items-center gap-[10px] p-[12px] rounded-[10px] border ${checked ? 'border-green-200 bg-green-50' : 'border-border bg-surface-soft'}`}
                                 >
                                     {checked
-                                        ? <CheckCircle2 size={18} className="text-primary shrink-0" />
+                                        ? <CheckCircle2 size={18} className="text-green-600 shrink-0" />
                                         : <Circle size={18} className="text-muted-foreground shrink-0" />
                                     }
-                                    <span className={`text-[13px] ${checked ? 'text-foreground' : 'text-muted-foreground'}`}>{c}</span>
+                                    <span className={`text-[13px] ${checked ? 'font-medium text-green-800' : 'text-muted-foreground'}`}>{c}</span>
                                 </div>
                             )
                         })}

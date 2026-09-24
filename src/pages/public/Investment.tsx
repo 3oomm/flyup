@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
   ArrowLeft,
   FileText,
@@ -350,7 +350,6 @@ const Investment = () => {
 
   return (
     <div className="h-full min-h-screen w-full flex-1 bg-[url('/bg-investment.png')] bg-cover bg-center bg-no-repeat bg-fixed flex flex-col pt-24 relative before:absolute before:inset-0 before:bg-white/30 before:pointer-events-none">
-      <Toaster position="top-center" containerStyle={{ top: 80 }} />
       <ContractModal isOpen={showContract} onClose={() => setShowContract(false)} />
 
       {/* Confirmation Modal */}

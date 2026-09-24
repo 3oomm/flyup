@@ -233,11 +233,11 @@ function MilestoneCard({
                       key={i}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                         completed
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          ? "bg-green-50 text-green-800 border-green-200"
                           : "bg-gray-50 text-gray-700 border-gray-200"
                       }`}
                     >
-                      {completed && <CheckCircle2 size={12} />}
+                      {completed && <CheckCircle2 size={12} className="text-green-600" />}
                       {c}
                     </span>
                   ))}

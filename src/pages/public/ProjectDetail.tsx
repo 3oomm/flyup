@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useSEO } from "../../hooks/useSEO";
-import Swal from "sweetalert2";
+import Swal from "../../lib/swal";
 import {
   Calendar,
   Users,
@@ -227,12 +227,6 @@ function ProjectDetail() {
 
   return (
     <div className="min-h-screen bg-surface-soft overflow-x-hidden w-full mt-[100px] pb-[100px]">
-      <Toaster
-        toastOptions={{ duration: 3000 }}
-        position="top-center"
-        containerStyle={{ top: 80 }}
-      />
-
       {/* ── Main Content ── */}
       <div className="max-w-7xl mx-auto px-[20px] pt-[40px]">
         {/* Header */}
@@ -388,7 +382,10 @@ function ProjectDetail() {
                                       <span className="text-[12px] font-semibold text-foreground">สิ่งที่ส่งมอบ:</span>
                                       <div className="flex flex-wrap gap-[6px]">
                                         {criteria.map((c: string, i: number) => (
-                                          <span key={i} className="px-[10px] py-[3px] border border-border rounded-full text-[12px] text-foreground bg-white whitespace-nowrap">{c}</span>
+                                          <span key={i} className={`inline-flex items-center gap-1.5 px-[10px] py-[3px] border rounded-full text-[12px] whitespace-nowrap ${done ? 'border-green-200 bg-green-50 font-medium text-green-800' : 'border-border bg-white text-foreground'}`}>
+                                            {done && <CheckCircle2 size={12} className="text-green-600" />}
+                                            {c}
+                                          </span>
                                         ))}
                                       </div>
                                     </div>

@@ -210,17 +210,12 @@ const AdminDisbursements = () => {
                                 <div className="h-14 flex justify-center items-center">
                                     <button
                                         onClick={() => setSelected(d)}
-                                        className={`flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors ${
-                                            isPending
-                                                ? 'bg-muted hover:bg-muted/70 text-foreground md:bg-green-600 md:hover:bg-green-700 md:text-white'
-                                                : 'bg-muted hover:bg-muted/70 text-foreground'
-                                        }`}
+                                        className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors"
                                     >
-                                        <span className="md:hidden">ดูรายละเอียด</span>
                                         <span className="hidden md:flex items-center gap-1">
                                             {isPending && <CheckCircle size={13} />}
-                                            {isPending ? 'จัดการ' : 'ดูรายละเอียด'}
                                         </span>
+                                        ดูรายละเอียด
                                     </button>
                                 </div>
                             </div>

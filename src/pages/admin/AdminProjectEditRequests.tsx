@@ -3,7 +3,7 @@ import { Loader2, FileEdit, CheckCircle, XCircle, X, ExternalLink } from 'lucide
 import { useNavigate } from 'react-router'
 import { AxiosError } from 'axios'
 import toast from 'react-hot-toast'
-import Swal from 'sweetalert2'
+import Swal from '../../lib/swal'
 import SearchBar from '../../components/admin/SearchBar'
 import PageHeader from '../../components/admin/PageHeader'
 import { useAdminStore, type PendingEditProject, type ProjectEditSnapshot } from '../../store/useAdminStore'
@@ -248,7 +248,7 @@ const AdminProjectEditRequests = () => {
                             <div className="h-14 flex justify-center items-center">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setSelected(r) }}
-                                    className="px-2.5 md:px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface-raised text-[11px] md:text-[12px] font-medium text-foreground cursor-pointer whitespace-nowrap"
+                                    className="px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] md:text-[12px] font-medium transition-colors cursor-pointer whitespace-nowrap"
                                 >
                                     ดูรายละเอียด
                                 </button>

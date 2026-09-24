@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router'
-import Swal from 'sweetalert2'
+import Swal from '../lib/swal'
 import { useAuthStore } from '../store/useAuthStore'
 import { useProjectStore } from '../store/useProjectStore'
 

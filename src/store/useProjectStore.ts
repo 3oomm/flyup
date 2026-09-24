@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
-import Swal from 'sweetalert2';
+import Swal from '../lib/swal';
 import { AxiosError } from 'axios';
 
 export interface ProjectMedia {

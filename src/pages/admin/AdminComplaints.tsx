@@ -346,7 +346,7 @@ const AdminComplaints = () => {
                                 <div className="flex justify-center">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setSelected(c) }}
-                                        className="px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[12px] font-medium text-foreground transition-colors whitespace-nowrap"
+                                        className="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[12px] font-medium transition-colors whitespace-nowrap cursor-pointer"
                                     >
                                         ดูรายละเอียด
                                     </button>

@@ -192,7 +192,7 @@ const AdminUniversities = () => {
                                             <td className="px-2 md:px-4 py-3.5">
                                                 <button
                                                     onClick={() => setDetailUni(uni)}
-                                                    className="md:hidden mx-auto px-2.5 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-[11px] font-medium whitespace-nowrap"
+                                                    className="md:hidden mx-auto px-2.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                                                 >
                                                     ดูรายละเอียด
                                                 </button>

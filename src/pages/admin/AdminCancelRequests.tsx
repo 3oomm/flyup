@@ -388,7 +388,7 @@ const AdminCancelRequests = () => {
                                     <button
                                         data-testid={`cancel-request-detail-btn-${r.id}`}
                                         onClick={(e) => { e.stopPropagation(); openDetail(r) }}
-                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-surface-hover hover:bg-surface-raised text-[11px] md:text-[12px] font-medium text-foreground cursor-pointer whitespace-nowrap"
+                                        className="px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] md:text-[12px] font-medium transition-colors cursor-pointer whitespace-nowrap"
                                     >
                                         ดูรายละเอียด
                                     </button>

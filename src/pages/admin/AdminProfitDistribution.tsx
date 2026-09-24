@@ -376,11 +376,10 @@ const AdminProfitDistribution = () => {
                                 <div className="h-14 flex items-center justify-center">
                                     <button
                                         onClick={() => handleOpenDetail(pool.id)}
-                                        className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/70 text-foreground md:bg-primary/10 md:hover:bg-primary/20 md:text-primary text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap"
+                                        className="flex items-center gap-1 px-2.5 md:px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-[11px] md:text-[12px] font-medium cursor-pointer whitespace-nowrap transition-colors"
                                     >
                                         <TrendingUp size={12} className="hidden md:block" />
-                                        <span className="md:hidden">ดูรายละเอียด</span>
-                                        <span className="hidden md:inline">ดู</span>
+                                        ดูรายละเอียด
                                     </button>
                                 </div>
                             </div>
