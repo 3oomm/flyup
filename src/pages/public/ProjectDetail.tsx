@@ -407,7 +407,7 @@ function ProjectDetail() {
                         );
                       })}
                       <div className="flex justify-center mt-2">
-                        <Link to={`/projects/${slug}/milestones`} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/5 text-primary rounded-xl font-semibold text-sm hover:bg-primary/10 transition-colors border border-primary/20">
+                        <Link to={`/projects/${slug}/milestones`} className="inline-flex items-center gap-2 px-[32px] py-[10px] bg-foreground text-background rounded-[8px] font-medium text-[14px] hover:opacity-80 transition-opacity">
                           ดูแผนงาน Milestone ทั้งหมด →
                         </Link>
                       </div>
