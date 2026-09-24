@@ -502,7 +502,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
         try {
             const payload = {
-                title: m.title,
+                // PATCH rejects an explicitly blank title. Media and other fields must
+                // still be saveable while the user has not filled the milestone title yet.
+                title: m.title.trim() || undefined,
                 description: m.description || undefined,
                 acceptance_criteria: acceptanceCriteria,
                 duration: m.duration || undefined,
