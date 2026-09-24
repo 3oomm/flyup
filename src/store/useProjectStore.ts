@@ -328,6 +328,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             toast.error('เป้าหมายเงินทุนขั้นต่ำ 1,000 บาท');
             return false;
         }
+        if (data.fundingGoal !== undefined && (!Number.isFinite(data.fundingGoal) || data.fundingGoal > 10_000_000)) {
+            toast.error('เป้าหมายเงินทุนสูงสุด 10,000,000 บาท');
+            return false;
+        }
         // map store field names → API field names
         const payload: Record<string, unknown> = {};
         if (data.title !== undefined) payload.title = data.title;
@@ -461,6 +465,11 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         // รวม URL จริง (ไม่ใช่ blob) จาก videos หรือ files
         const videoUrls = (m.videos ?? []).filter(v => v.url && !v.url.startsWith('blob:')).map(v => v.url);
         const fileUrls = (m.files ?? []).filter(f => f.url && !f.url.startsWith('blob:')).map(f => f.url);
+
+        if ((m.videos ?? []).length > 5 || videoUrls.length > 5) {
+            toast.error('อัปโหลดวิดีโอได้สูงสุด 5 ไฟล์ต่อ Milestone');
+            return false;
+        }
 
         const hasMedia = videoUrls.length > 0 || fileUrls.length > 0;
         const hasAnyData = !!(m?.title || m?.description || m?.duration || acceptanceCriteria || hasMedia);

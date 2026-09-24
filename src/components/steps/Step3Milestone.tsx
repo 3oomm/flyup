@@ -5,6 +5,10 @@ import StepNavigation from "../StepNavigation"
 import toast from 'react-hot-toast'
 import { useParams, useSearchParams } from 'react-router'
 
+const MAX_VIDEOS_PER_MILESTONE = 5
+const MAX_VIDEO_SIZE_MB = 10
+const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024
+
 const Step3Milestone = () => {
   const { projectId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -260,6 +264,12 @@ const Step3Milestone = () => {
     const file = e.target.files?.[0]
     if (!file) return
     const phase = activePhase
+    const currentVideos = useProjectStore.getState().currentProject.milestones[phase]?.videos ?? []
+    if (currentVideos.length >= MAX_VIDEOS_PER_MILESTONE) {
+      toast.error(`อัปโหลดวิดีโอได้สูงสุด ${MAX_VIDEOS_PER_MILESTONE} ไฟล์ต่อ Milestone`)
+      e.target.value = ""
+      return
+    }
     const supportedVideoExtensions = ['mp4', 'webm', 'mov', 'avi']
     const extension = file.name.split('.').pop()?.toLowerCase() ?? ''
     if (!supportedVideoExtensions.includes(extension)) {
@@ -267,8 +277,8 @@ const Step3Milestone = () => {
       e.target.value = ""
       return
     }
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error(`วิดีโอต้องมีขนาดไม่เกิน 50MB`)
+    if (file.size > MAX_VIDEO_SIZE_BYTES) {
+      toast.error(`วิดีโอต้องมีขนาดไม่เกิน ${MAX_VIDEO_SIZE_MB}MB`)
       e.target.value = ""
       return
     }
@@ -391,7 +401,21 @@ const Step3Milestone = () => {
           <div className="flex flex-col gap-[20px]">
             {/* กล่อง input สำหรับ ชื่อ Milestone */}
             <div className="flex flex-col gap-[8px]">
-              <label className="text-[14px] font-semibold text-foreground">ชื่อ Milestone <span className="text-error">*</span></label>
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-[14px] font-semibold text-foreground">ชื่อ Milestone <span className="text-error">*</span></label>
+                <span
+                  className={`text-[12px] tabular-nums ${
+                    currentData.title.length >= 50
+                      ? 'font-semibold text-error'
+                      : currentData.title.length >= 40
+                        ? 'font-medium text-amber-600'
+                        : 'text-muted-foreground'
+                  }`}
+                  aria-live="polite"
+                >
+                  {currentData.title.length}/50 ตัวอักษร
+                </span>
+              </div>
               <input
                 type="text"
                 value={currentData.title}
@@ -662,16 +686,25 @@ const Step3Milestone = () => {
             <div className="flex flex-col gap-[8px]">
               <label className="text-[14px] font-semibold text-foreground flex items-center">
                 <Video size={16} className="mr-2" /> ไฟล์วิดีโอ (ไม่บังคับ)
+                <span className={`ml-auto text-[12px] font-normal tabular-nums ${(currentData.videos?.length ?? 0) >= MAX_VIDEOS_PER_MILESTONE ? 'text-error' : 'text-muted-foreground'}`}>
+                  {currentData.videos?.length ?? 0}/{MAX_VIDEOS_PER_MILESTONE} ไฟล์
+                </span>
               </label>
               {!isLocked && (
                 <>
                   <input type="file" accept=".mp4,.webm,.mov,.avi,video/mp4,video/webm,video/quicktime,video/x-msvideo" hidden ref={videoInputRef} onChange={handleVideoChange} />
                   <div
-                    onClick={() => videoInputRef.current?.click()}
-                    className="border-[1.5px] border-dashed border-[#C084FC] rounded-[12px] p-[40px] flex flex-col items-center justify-center bg-[#F9F5FF] hover:bg-[#F3E8FF] transition-all cursor-pointer group"
+                    onClick={() => {
+                      if ((currentData.videos?.length ?? 0) >= MAX_VIDEOS_PER_MILESTONE) {
+                        toast.error(`อัปโหลดวิดีโอได้สูงสุด ${MAX_VIDEOS_PER_MILESTONE} ไฟล์ต่อ Milestone`)
+                        return
+                      }
+                      videoInputRef.current?.click()
+                    }}
+                    className={`border-[1.5px] border-dashed rounded-[12px] p-[40px] flex flex-col items-center justify-center transition-all group ${(currentData.videos?.length ?? 0) >= MAX_VIDEOS_PER_MILESTONE ? 'border-border bg-surface-disabled cursor-not-allowed opacity-70' : 'border-[#C084FC] bg-[#F9F5FF] hover:bg-[#F3E8FF] cursor-pointer'}`}
                   >
                     <Upload className="text-muted-foreground mb-2 group-hover:-translate-y-1 transition-transform" size={24} />
-                    <span className="text-[13px] text-muted-foreground">.mp4, .webm, .mov, .avi (สูงสุด 50MB)</span>
+                    <span className="text-[13px] text-muted-foreground">.mp4, .webm, .mov, .avi (สูงสุด {MAX_VIDEO_SIZE_MB}MB)</span>
                   </div>
                 </>
               )}
@@ -687,9 +720,19 @@ const Step3Milestone = () => {
                             <Loader2 size={18} className="text-white animate-spin" />
                           </div>
                         )}
+                        {!isLocked && uploading && (
+                          <button
+                            type="button"
+                            aria-label={`ยกเลิกและลบ ${vid.name}`}
+                            onClick={() => removeVideo(i)}
+                            className="absolute -top-2 -right-2 z-10 rounded-full bg-error p-1 text-white shadow-md cursor-pointer hover:opacity-90"
+                          >
+                            <X size={13} />
+                          </button>
+                        )}
                       </div>
                       <span className={`max-w-[150px] truncate ${uploading ? 'text-muted-foreground' : ''}`}>{vid.name}</span>
-                      {!isLocked && (
+                      {!uploading && !isLocked && (
                         <button type="button" aria-label={`ลบ ${vid.name}`} onClick={() => removeVideo(i)} className="ml-2 hover:text-error cursor-pointer">
                           <X size={14} />
                         </button>

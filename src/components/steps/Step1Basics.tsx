@@ -8,6 +8,10 @@ import toast from "react-hot-toast";
 // backend validator บังคับ description ไม่เกิน 40 ตัวอักษร (PATCH คืน 400 ถ้าเกิน)
 const DESCRIPTION_MAX_LENGTH = 40;
 const MIN_FUNDING_GOAL = 1_000;
+const MAX_FUNDING_GOAL = 10_000_000;
+// Production Nginx rejects larger multipart requests before they reach the API.
+const MAX_VIDEO_SIZE_MB = 10;
+const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 
 const Step1Basics = () => {
   const { projectId } = useParams();
@@ -138,6 +142,10 @@ const Step1Basics = () => {
   const coverImageRef = useRef<HTMLInputElement>(null);
   const additionalImagesRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const videoUploadControllerRef = useRef<AbortController | null>(null);
+  const additionalImageCount = currentProject?.files?.length ?? 0;
+  const hasProjectVideo = Boolean(currentProject?.video);
+  const maxAdditionalImages = 5;
 
   // แสดงสถานะ "บันทึกแล้ว" ชั่วคราวแล้วเปลี่ยนกลับเป็น idle หลังจาก 2.5 วิ
   const triggerSaved = () => {
@@ -168,12 +176,13 @@ const Step1Basics = () => {
   };
 
   // upload ไฟล์สื่อ (รูป/วิดีโอ) ขึ้น server เป็น 3 ขั้นตอน: upload ไฟล์ -> ผูกกับโปรเจกต์ -> ดึง media list กลับมาเพื่อเอา id ใน DB
-  const uploadMediaToServer = async (file: File): Promise<{ url: string; mediaId?: number } | null> => {
+  const uploadMediaToServer = async (file: File, signal?: AbortSignal): Promise<{ url: string; mediaId?: number } | null> => {
     if (!projectId) return null;
     try {
       // Step 1: upload file to Cloudinary via /upload
-      const uploaded = await uploadFile(file);
+      const uploaded = await uploadFile(file, signal);
       if (!uploaded?.url || !uploaded.type) return null;
+      if (signal?.aborted) return null;
 
       // Step 2: attach uploaded URL to project
       await attachProjectMedia(projectId, uploaded.url, uploaded.type);
@@ -238,14 +247,15 @@ const Step1Basics = () => {
   // เลือกรูปประกอบหลายรูป (สูงสุดรวม 5 รูป): validate type + จำกัดจำนวนที่เหลือ
   // โชว์ blob preview ของทุกไฟล์ก่อน แล้ว upload ทีละไฟล์ใน background
   const handleMultipleFilesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+    const selectedFiles = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (selectedFiles.length === 0) return;
 
     const currentImages = currentProject?.files || [];
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    const typeValidFiles = Array.from(files).filter(file => allowedTypes.includes(file.type));
+    const typeValidFiles = selectedFiles.filter(file => allowedTypes.includes(file.type));
 
-    if (typeValidFiles.length !== files.length) {
+    if (typeValidFiles.length !== selectedFiles.length) {
       toast.error("อนุญาตเฉพาะไฟล์ PNG, JPEG และ WEBP เท่านั้น");
     }
     const validFiles = typeValidFiles.filter(file => file.size <= 5 * 1024 * 1024);
@@ -254,10 +264,14 @@ const Step1Basics = () => {
     }
     if (validFiles.length === 0) return;
 
-    const remainingSlots = 5 - currentImages.length;
+    const remainingSlots = maxAdditionalImages - currentImages.length;
     if (remainingSlots <= 0) {
       toast.error("คุณสามารถอัปโหลดได้สูงสุด 5 รูป");
       return;
+    }
+
+    if (validFiles.length > remainingSlots) {
+      toast.error(`รูปภาพประกอบอัปโหลดได้สูงสุด ${maxAdditionalImages} รูป ขณะนี้เพิ่มได้อีก ${remainingSlots} รูป`);
     }
 
     const filesToUpload = validFiles.slice(0, remainingSlots);
@@ -310,32 +324,51 @@ const Step1Basics = () => {
   // ✅ จัดการวิดีโอ (คลิปเดียว)
   const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
-    const supportedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
-    if (!supportedVideoTypes.includes(file.type)) {
-      toast.error("รองรับเฉพาะไฟล์ MP4, WebM, OGG, MOV เท่านั้น");
-      if (videoInputRef.current) videoInputRef.current.value = "";
+    if (currentProject?.video) {
+      toast.error('อัปโหลดวิดีโอได้สูงสุด 1 ไฟล์ กรุณาลบไฟล์เดิมก่อน');
       return;
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error("วิดีโอต้องมีขนาดไม่เกิน 50MB");
+    const supportedVideoExtensions = ['mp4', 'webm', 'mov', 'avi'];
+    const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!supportedVideoExtensions.includes(extension)) {
+      toast.error("รองรับเฉพาะไฟล์ MP4, WebM, MOV และ AVI เท่านั้น");
+      return;
+    }
+
+    if (file.size > MAX_VIDEO_SIZE_BYTES) {
+      toast.error(`วิดีโอต้องมีขนาดไม่เกิน ${MAX_VIDEO_SIZE_MB}MB`);
       return;
     }
 
     const blobUrl = URL.createObjectURL(file);
+    const controller = new AbortController();
+    videoUploadControllerRef.current = controller;
     updateProjectInfo({ video: { name: file.name, url: blobUrl, file } });
 
     toast.loading('กำลังอัปโหลดวิดีโอ...', { id: 'upload-video' })
-    const result = await uploadMediaToServer(file);
+    const result = await uploadMediaToServer(file, controller.signal);
+    if (videoUploadControllerRef.current === controller) videoUploadControllerRef.current = null;
+    if (controller.signal.aborted) {
+      toast.dismiss('upload-video');
+      return;
+    }
     if (result) {
       URL.revokeObjectURL(blobUrl);
-      useProjectStore.setState((state) => ({
-        currentProject: { ...state.currentProject, video: { id: result.mediaId, name: file.name, url: result.url } },
-      }));
-      toast.success('อัปโหลดวิดีโอสำเร็จ', { id: 'upload-video', duration: 2000 })
-      triggerSaved();
+      const isStillSelected = useProjectStore.getState().currentProject.video?.url === blobUrl;
+      if (isStillSelected) {
+        useProjectStore.setState((state) => ({
+          currentProject: { ...state.currentProject, video: { id: result.mediaId, name: file.name, url: result.url } },
+        }));
+        toast.success('อัปโหลดวิดีโอสำเร็จ', { id: 'upload-video', duration: 2000 })
+        triggerSaved();
+      } else {
+        if (result.mediaId) await deleteProjectMedia(result.mediaId).catch(console.error);
+        toast.dismiss('upload-video');
+      }
     } else {
       URL.revokeObjectURL(blobUrl);
       updateProjectInfo({ video: null });
@@ -362,6 +395,12 @@ const Step1Basics = () => {
   // ลบวิดีโอ: เคลียร์ state/input ก่อน แล้วลบใน DB ถ้ามี media id แล้ว
   const removeVideo = async () => {
     const vid = currentProject?.video;
+    if (vid?.url?.startsWith('blob:')) {
+      videoUploadControllerRef.current?.abort();
+      videoUploadControllerRef.current = null;
+      URL.revokeObjectURL(vid.url);
+      toast.dismiss('upload-video');
+    }
     updateProjectInfo({ video: null });
     if (videoInputRef.current) videoInputRef.current.value = "";
 
@@ -474,11 +513,15 @@ const Step1Basics = () => {
             <input
               data-testid="basics-funding-goal-input"
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={8}
               value={numVal('fundingGoal', localData.fundingGoal)}
               onFocus={() => setActiveField('fundingGoal')}
               onChange={(e) => {
                 if (isFundingLocked) return;
-                const newGoal = parseNum(e.target.value);
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+                const newGoal = Math.min(Number(digits) || 0, MAX_FUNDING_GOAL);
                 const autoSoftCap = Math.ceil(newGoal * 0.7);
                 const autoMinInvest = Math.ceil(newGoal * 0.01);
                 setLocalData({
@@ -492,7 +535,10 @@ const Step1Basics = () => {
               onBlur={async () => {
                 setActiveField(null);
                 if (isFundingLocked) return;
-                const fundingGoal = Math.max(localData.fundingGoal, MIN_FUNDING_GOAL);
+                const fundingGoal = Math.min(
+                  Math.max(localData.fundingGoal, MIN_FUNDING_GOAL),
+                  MAX_FUNDING_GOAL,
+                );
                 const softCap = Math.ceil(fundingGoal * 0.7);
                 const minInvestAmount = Math.ceil(fundingGoal * 0.01);
                 if (localData.fundingGoal < MIN_FUNDING_GOAL) {
@@ -527,7 +573,7 @@ const Step1Basics = () => {
               }}
               disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
-            <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1,000 บาท</span>
+            <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1,000 บาท และสูงสุด 10,000,000 บาท</span>
           </div>
           <div className="flex flex-col gap-[4px]">
             <label className="text-foreground text-[14px]">ระยะเวลาโปรเจกต์ (เดือน) <span className="text-error">*</span></label>
@@ -696,12 +742,24 @@ const Step1Basics = () => {
 
           {/* รูปภาพประกอบ */}
           <div className="space-y-3">
-            <label className="text-foreground text-[14px] flex items-center gap-[10px]"><FileImage size={16} />รูปภาพประกอบ (สูงสุด 5 รูป) <span className="text-error">*</span></label>
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-foreground text-[14px] flex items-center gap-[10px]"><FileImage size={16} />รูปภาพประกอบ (สูงสุด 5 รูป) <span className="text-error">*</span></label>
+              <span className={`text-[12px] ${additionalImageCount >= maxAdditionalImages ? 'text-error' : 'text-muted-foreground'}`}>
+                {additionalImageCount}/{maxAdditionalImages} รูป
+              </span>
+            </div>
             <div
               data-testid="basics-additional-images-dropzone"
-              onClick={() => !isLocked && additionalImagesRef.current?.click()}
-              aria-disabled={isLocked}
-              className={`border-2 border-dashed border-purple-200 rounded-2xl p-10 flex flex-col items-center justify-center bg-primary/10 transition-all group ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-50 cursor-pointer'}`}
+              onClick={() => {
+                if (isLocked) return;
+                if (additionalImageCount >= maxAdditionalImages) {
+                  toast.error(`รูปภาพประกอบอัปโหลดได้สูงสุด ${maxAdditionalImages} รูป กรุณาลบรูปเดิมก่อน`);
+                  return;
+                }
+                additionalImagesRef.current?.click();
+              }}
+              aria-disabled={isLocked || additionalImageCount >= maxAdditionalImages}
+              className={`border-2 border-dashed border-purple-200 rounded-2xl p-10 flex flex-col items-center justify-center bg-primary/10 transition-all group ${isLocked || additionalImageCount >= maxAdditionalImages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-50 cursor-pointer'}`}
             >
               <input
                 data-testid="basics-additional-images-input"
@@ -751,26 +809,38 @@ const Step1Basics = () => {
 
           {/* วิดีโอ */}
           <div className="space-y-3">
-            <label className="text-[14px] text-foreground flex items-center gap-[10px]">
-              <Video size={16} /> ไฟล์วิดีโอ (ไม่บังคับ)
-            </label>
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-[14px] text-foreground flex items-center gap-[10px]">
+                <Video size={16} /> ไฟล์วิดีโอ (ไม่บังคับ)
+              </label>
+              <span className={`text-[12px] ${hasProjectVideo ? 'text-error' : 'text-muted-foreground'}`}>
+                {hasProjectVideo ? 1 : 0}/1 ไฟล์
+              </span>
+            </div>
             <div
               data-testid="basics-video-dropzone"
-              onClick={() => !isLocked && videoInputRef.current?.click()}
-              aria-disabled={isLocked}
-              className={`border-2 border-dashed border-purple-200 rounded-2xl p-10 flex flex-col items-center justify-center bg-primary/10 transition-all group ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-50 cursor-pointer'}`}
+              onClick={() => {
+                if (isLocked) return;
+                if (hasProjectVideo) {
+                  toast.error('อัปโหลดวิดีโอได้สูงสุด 1 ไฟล์ กรุณาลบไฟล์เดิมก่อน');
+                  return;
+                }
+                videoInputRef.current?.click();
+              }}
+              aria-disabled={isLocked || hasProjectVideo}
+              className={`border-2 border-dashed border-purple-200 rounded-2xl p-10 flex flex-col items-center justify-center bg-primary/10 transition-all group ${isLocked || hasProjectVideo ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-50 cursor-pointer'}`}
             >
               <input
                 data-testid="basics-video-input"
                 type="file"
-                accept="video/*"
+                accept=".mp4,.webm,.mov,.avi,video/mp4,video/webm,video/quicktime,video/x-msvideo"
                 hidden
                 ref={videoInputRef}
                 onChange={handleVideoChange} />
               <div className="flex flex-col items-center gap-[14px] justify-center mb-3 text-primary text-[12px]">
                 <Upload className="" size={24} />
                 <p>อัปโหลดวีดีโอโปรเจกต์</p>
-                <p>MP4 (สูงสุด 50MB)</p>
+                <p>MP4, WEBM, MOV, AVI (สูงสุด {MAX_VIDEO_SIZE_MB}MB)</p>
               </div>
             </div>
             {currentProject.video && (() => {
@@ -788,6 +858,17 @@ const Step1Basics = () => {
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded">
                         <Loader2 size={18} className="text-white animate-spin" />
                       </div>
+                    )}
+                    {!isLocked && videoUploading && (
+                      <button
+                        data-testid="basics-video-upload-cancel-btn"
+                        type="button"
+                        aria-label="ยกเลิกและลบวิดีโอที่กำลังอัปโหลด"
+                        onClick={(e) => { e.stopPropagation(); removeVideo(); }}
+                        className="absolute -top-2 -right-2 z-10 rounded-full bg-error p-1 text-white shadow-md cursor-pointer hover:opacity-90"
+                      >
+                        <X size={13} />
+                      </button>
                     )}
                   </div>
                   <span className={videoUploading ? 'text-muted-foreground' : ''}>{currentProject.video!.name}</span>
