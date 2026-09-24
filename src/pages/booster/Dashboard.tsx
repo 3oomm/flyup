@@ -364,6 +364,7 @@ const toggleProject = (name: string) =>
                       closed:    {label:'เสร็จสิ้น',       cls:'bg-green-100 text-green-700'},
                       refunded:  {label:'คืนเงินแล้ว',    cls:'bg-gray-100 text-gray-600'},
                       cancelled: {label:'ยกเลิก',          cls:'bg-red-100 text-red-700'},
+                      rejected:  {label:'ชำระเงินไม่สำเร็จ', cls:'bg-red-100 text-red-700'},
                       refund_pending: {label:'รอคืนเงิน', cls:'bg-orange-100 text-orange-700'},
                       pending:   {label:'รอชำระ',          cls:'bg-yellow-100 text-yellow-700'},
                       pending_payment: {label:'รอชำระเงิน', cls:'bg-yellow-100 text-yellow-700'},

@@ -17,6 +17,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   completed: { label: 'เสร็จสิ้น', color: 'bg-green-100 text-green-700' },
   refunded: { label: 'คืนเงิน', color: 'bg-orange-100 text-orange-700' },
   cancelled: { label: 'ยกเลิก', color: 'bg-red-100 text-red-700' },
+  rejected: { label: 'ชำระเงินไม่สำเร็จ', color: 'bg-red-100 text-red-700' },
 };
 
 const getMilestoneStatus = (s: string) => {
@@ -128,6 +129,7 @@ const InvestmentDetail = () => {
   const inv = currentInvestment;
   const project = inv.project ?? null;
   const statusCfg = statusConfig[inv.status] || { label: inv.status, color: 'bg-gray-100 text-gray-600' };
+  const canDownloadContract = inv.status !== 'rejected' && inv.payment_status !== 'failed';
   const dateStr = new Date(inv.created_at).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 
   const title = project?.title || '—';
@@ -392,14 +394,16 @@ const InvestmentDetail = () => {
                 </div>
              </div>
 
-             <button
-               onClick={handleDownloadPDF}
-               disabled={isPrintingPDF}
-               className="w-full mt-6 bg-background hover:bg-muted border border-border text-foreground h-11 rounded-[10px] flex justify-center items-center gap-2 font-medium transition-colors text-[14px] cursor-pointer disabled:opacity-60"
-             >
-               {isPrintingPDF ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-               <span>{isPrintingPDF ? 'กำลังเตรียม PDF...' : 'ดาวน์โหลดสัญญา (PDF)'}</span>
-             </button>
+             {canDownloadContract && (
+               <button
+                 onClick={handleDownloadPDF}
+                 disabled={isPrintingPDF}
+                 className="w-full mt-6 bg-background hover:bg-muted border border-border text-foreground h-11 rounded-[10px] flex justify-center items-center gap-2 font-medium transition-colors text-[14px] cursor-pointer disabled:opacity-60"
+               >
+                 {isPrintingPDF ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                 <span>{isPrintingPDF ? 'กำลังเตรียม PDF...' : 'ดาวน์โหลดสัญญา (PDF)'}</span>
+               </button>
+             )}
 
              {inv.status === 'refund_pending' ? (
                <div className="w-full mt-3 bg-amber-50 border border-amber-200 text-amber-700 h-[44px] rounded-[10px] flex justify-center items-center gap-[8px] font-medium text-[14px]">

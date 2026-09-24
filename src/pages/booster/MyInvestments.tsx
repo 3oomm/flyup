@@ -14,7 +14,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   refund_pending: { label: 'รอคืนเงิน',       color: 'bg-orange-100 text-orange-700' },
   refunded:       { label: 'คืนเงินแล้ว',     color: 'bg-orange-100 text-orange-700' },
   cancelled:      { label: 'ยกเลิก',          color: 'bg-red-100 text-red-700' },
-  rejected:       { label: 'ไม่ผ่าน',         color: 'bg-red-100 text-red-700' },
+  rejected:       { label: 'ชำระเงินไม่สำเร็จ', color: 'bg-red-100 text-red-700' },
 };
 
 // สถานะที่ดูจาก project.state เมื่อ investment = verified
@@ -48,7 +48,7 @@ const TABS: { key: string; label: string }[] = [
   { key: 'closed',        label: 'เสร็จสิ้น' },
   { key: 'refund_pending',label: 'รอคืนเงิน' },
   { key: 'refunded',      label: 'คืนเงินแล้ว' },
-  { key: 'cancelled',     label: 'ยกเลิก/หมดอายุ' },
+  { key: 'cancelled',     label: 'ยกเลิก/หมดอายุ/ชำระไม่สำเร็จ' },
 ];
 
 // ─── Grouping ─────────────────────────────────────────────────────────────────

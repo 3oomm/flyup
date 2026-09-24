@@ -290,11 +290,11 @@ const VoteDetail = () => {
 
           {/* Vote Action Box */}
           {isVoted ? (
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
+            <div className="bg-green-50/50 border border-green-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 size={24} />
               </div>
-              <h3 className="font-bold text-foreground text-lg mb-2">บันทึกการลงคะแนนสำเร็จ</h3>
+              <h3 className="font-bold text-green-800 text-lg mb-2">บันทึกการลงคะแนนสำเร็จ</h3>
               <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
                 คุณโหวต: {voteValue === 'approve' ? 'ยอมรับ' : 'ไม่ยอมรับ'}
                 {voteValue === 'approve' ? <CheckCircle2 size={16} className="text-green-500" /> : <XCircle size={16} className="text-red-500" />}
