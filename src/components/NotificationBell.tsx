@@ -10,6 +10,7 @@ import {
     Banknote,
     CalendarDays,
     Clock,
+    XCircle,
 } from 'lucide-react'
 import { useNotificationStore, type Notification } from '../store/useNotificationStore'
 import { useAuthStore } from '../store/useAuthStore'
@@ -88,22 +89,54 @@ function getNotifPath(notif: Notification, role: string): string {
     return '/'
 }
 
-const NOTIF_CONFIG: Record<string, { icon: React.ReactNode; bg: string }> = {
+type NotificationVisual = { icon: React.ReactNode; bg: string }
+
+const NOTIF_CONFIG: Record<string, NotificationVisual> = {
     new_investment:      { icon: <TrendingUp size={16} />, bg: 'bg-emerald-500' },
     milestone:           { icon: <CheckSquare size={16} />, bg: 'bg-violet-500' },
-    milestone_submitted: { icon: <CheckSquare size={16} />, bg: 'bg-violet-600' },
-    milestone_rejected:  { icon: <CheckSquare size={16} />, bg: 'bg-red-500' },
+    milestone_submitted: { icon: <Clock size={16} />, bg: 'bg-amber-500' },
+    milestone_rejected:  { icon: <XCircle size={16} />, bg: 'bg-red-500' },
     vote:                { icon: <ThumbsUp size={16} />, bg: 'bg-blue-500' },
     project_status:      { icon: <FileText size={16} />, bg: 'bg-orange-500' },
     profit:              { icon: <Banknote size={16} />, bg: 'bg-teal-500' },
     meeting:             { icon: <CalendarDays size={16} />, bg: 'bg-sky-500' },
+    payment_failed:      { icon: <XCircle size={16} />, bg: 'bg-red-500' },
+    verification_approved: { icon: <CheckSquare size={16} />, bg: 'bg-green-500' },
+    verification_rejected: { icon: <XCircle size={16} />, bg: 'bg-red-500' },
+    complaint:           { icon: <FileText size={16} />, bg: 'bg-amber-500' },
+    user_status:         { icon: <FileText size={16} />, bg: 'bg-blue-500' },
 }
 
-function NotifIcon({ type }: { type: string }) {
-    const config = NOTIF_CONFIG[type]
+const FAILED_PATTERN = /ไม่ผ่าน|ปฏิเสธ|ล้มเหลว|ไม่สำเร็จ|ถูกระงับ|ระงับบัญชี|ยกเลิก|failed|failure|rejected|suspended|cancelled/i
+const SUCCESS_PATTERN = /สำเร็จ|อนุมัติแล้ว|ได้รับการอนุมัติ|ผ่านการโหวต|ได้รับเงิน|ได้รับการโอน|โอนเงินแล้ว|ลงทุนใหม่|approved|success|completed|paid/i
+const PENDING_PATTERN = /รอตรวจสอบ|รออนุมัติ|กำลังตรวจสอบ|ส่งหลักฐาน|submitted|pending|waiting/i
+
+function getNotifVisual(notif: Notification): NotificationVisual {
+    const content = `${notif.title} ${notif.body}`
+
+    // Result wording is more specific than the broad notification type.
+    if (FAILED_PATTERN.test(content)) {
+        return { icon: <XCircle size={16} />, bg: 'bg-red-500' }
+    }
+    if (SUCCESS_PATTERN.test(content)) {
+        const icon = notif.type === 'profit'
+            ? <Banknote size={16} />
+            : notif.type === 'new_investment'
+                ? <TrendingUp size={16} />
+                : <CheckSquare size={16} />
+        return { icon, bg: 'bg-green-500' }
+    }
+    if (PENDING_PATTERN.test(content)) {
+        return { icon: <Clock size={16} />, bg: 'bg-amber-500' }
+    }
+
+    return NOTIF_CONFIG[notif.type] ?? { icon: <BellIcon size={16} />, bg: 'bg-primary' }
+}
+
+function NotifIcon({ config }: { config: NotificationVisual }) {
     return (
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0 ${config?.bg ?? 'bg-primary'}`}>
-            {config?.icon ?? <BellIcon size={16} />}
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0 ${config.bg}`}>
+            {config.icon}
         </div>
     )
 }
@@ -118,6 +151,7 @@ interface NotificationItemProps {
 }
 
 function NotificationItem({ notif, path, onRead, onNavigate }: NotificationItemProps) {
+    const visual = getNotifVisual(notif)
     const handleClick = () => {
         if (!notif.is_read) onRead(notif.id)
         onNavigate(path)
@@ -128,7 +162,7 @@ function NotificationItem({ notif, path, onRead, onNavigate }: NotificationItemP
             onClick={handleClick}
             className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
         >
-            <NotifIcon type={notif.type} />
+            <NotifIcon config={visual} />
             <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-medium text-foreground leading-snug">{notif.title}</p>
                 <p className="text-[12px] text-muted-foreground leading-snug mt-0.5 line-clamp-2">
@@ -140,7 +174,7 @@ function NotificationItem({ notif, path, onRead, onNavigate }: NotificationItemP
                 </div>
             </div>
             {!notif.is_read && (
-                <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1" />
+                <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ${visual.bg}`} />
             )}
         </div>
     )

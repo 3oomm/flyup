@@ -106,6 +106,7 @@ export default function MeetingFormFields({
             value={meetingUrl}
             onChange={e => setField('meetingUrl', e.target.value)}
             placeholder="https://meet.google.com/..."
+            maxLength={2048}
             className="border border-border rounded-[8px] px-3 py-2.5 text-[14px] outline-none focus:border-primary transition-colors"
           />
         </div>

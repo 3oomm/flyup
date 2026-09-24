@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { isValidHttpUrl } from '../../../lib/validation';
 import type { CreateMeetingPayload, Meeting, MeetingType } from './types';
 
 export interface MeetingFormValues {
@@ -60,6 +61,10 @@ export function useMeetingForm(initial?: Meeting) {
     if (!values.meetingType) { toast.error('กรุณาเลือกรูปแบบการประชุม'); return null; }
     if ((values.meetingType === 'online' || values.meetingType === 'hybrid') && !values.meetingUrl.trim()) {
       toast.error('กรุณาระบุลิงก์ประชุม');
+      return null;
+    }
+    if ((values.meetingType === 'online' || values.meetingType === 'hybrid') && !isValidHttpUrl(values.meetingUrl)) {
+      toast.error('ลิงก์ประชุมไม่ถูกต้อง กรุณาใช้ URL ที่ขึ้นต้นด้วย http:// หรือ https://');
       return null;
     }
     if ((values.meetingType === 'onsite' || values.meetingType === 'hybrid') && !values.location.trim()) {
