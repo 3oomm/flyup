@@ -40,6 +40,15 @@ function investmentDestination(inv: BoosterInvestment): string {
   return `/booster/investments/${inv.id}`;
 }
 
+function canRequestRefund(inv: BoosterInvestment): boolean {
+  const projectState = inv.project?.state;
+  return inv.status === 'verified' && projectState === 'funding';
+}
+
+function refundDestination(inv: BoosterInvestment): string {
+  return `/booster/investments/${inv.id}?refund=1`;
+}
+
 const TABS: { key: string; label: string }[] = [
   { key: 'all',           label: 'ทั้งหมด' },
   { key: 'pending_payment', label: 'รอชำระเงิน' },
@@ -103,10 +112,11 @@ function matchesTab(inv: BoosterInvestment, tab: string): boolean {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment; onClose: () => void }) {
+function MultipleInvestmentsModal({ group, refundMode, onClose }: { group: GroupedInvestment; refundMode: boolean; onClose: () => void }) {
   const sorted = useMemo(() =>
-    [...group.all].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
-    [group]
+    [...(refundMode ? group.all.filter(canRequestRefund) : group.all)]
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+    [group, refundMode]
   );
 
   const dateStr = (d: string) => new Date(d).toLocaleDateString('th-TH', {
@@ -121,7 +131,9 @@ function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment
         <div className="flex items-start justify-between p-5 border-b border-border">
           <div>
             <h3 className="font-bold text-foreground text-base">{group.primary.project?.title || '—'}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">การลงทุนทั้งหมด {group.all.length} รายการ</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {refundMode ? `เลือกรายการที่ต้องการขอคืนเงิน (${sorted.length} รายการ)` : `การลงทุนทั้งหมด ${group.all.length} รายการ`}
+            </p>
           </div>
           <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-lg transition-colors cursor-pointer flex-shrink-0">
             <X size={18} />
@@ -151,10 +163,14 @@ function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment
                   <td className="px-4 py-4 text-right font-bold text-primary">฿{(inv.amount ?? 0).toLocaleString()}</td>
                   <td className="px-5 py-4">
                     <Link
-                      to={investmentDestination(inv)}
+                      to={refundMode ? refundDestination(inv) : investmentDestination(inv)}
                       className="text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                     >
-                      {inv.status === 'pending_payment' || inv.status === 'pending' ? 'ชำระเงิน →' : 'ดูรายละเอียด →'}
+                      {refundMode
+                        ? 'ขอเงินคืน →'
+                        : inv.status === 'pending_payment' || inv.status === 'pending'
+                          ? 'ชำระเงิน →'
+                          : 'ดูรายละเอียด →'}
                     </Link>
                   </td>
                 </tr>
@@ -165,7 +181,7 @@ function MultipleInvestmentsModal({ group, onClose }: { group: GroupedInvestment
 
         {/* Summary Footer */}
         <div className="px-5 py-3.5 border-t border-border bg-muted/30 flex justify-between items-center">
-          <span className="text-xs text-muted-foreground">ยอดลงทุนที่ชำระสำเร็จ</span>
+          <span className="text-xs text-muted-foreground">{refundMode ? 'ยอดที่เลือกขอคืนได้' : 'ยอดลงทุนที่ชำระสำเร็จ'}</span>
           <span className="font-bold text-foreground">฿{group.totalAmount.toLocaleString()}</span>
         </div>
       </div>
@@ -182,7 +198,7 @@ function StatusBadge({ inv }: { inv: BoosterInvestment }) {
   );
 }
 
-function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowAll: (g: GroupedInvestment) => void }) {
+function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowAll: (g: GroupedInvestment, refundMode: boolean) => void }) {
   const inv = group.primary;
   const project = inv.project;
   const title = project?.title || '—';
@@ -205,11 +221,8 @@ function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowA
   });
   const isMultiple = group.all.length > 1;
   const projectState = inv.project?.state
-  const canRefund =
-    inv.status !== 'refund_pending' &&
-    inv.status !== 'refunded' &&
-    inv.status !== 'cancelled' &&
-    (projectState === 'failed' || projectState === 'cancelled')
+  const refundableInvestments = group.all.filter(canRequestRefund);
+  const canRefund = refundableInvestments.length > 0;
 
   return (
     <div className="bg-card border border-border rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -270,7 +283,7 @@ function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowA
         </Link>
         {isMultiple ? (
           <button
-            onClick={() => onShowAll(group)}
+            onClick={() => onShowAll(group, canRefund)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity cursor-pointer ${
               canRefund
                 ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
@@ -281,7 +294,7 @@ function InvestmentRow({ group, onShowAll }: { group: GroupedInvestment; onShowA
           </button>
         ) : (
           <Link
-            to={investmentDestination(inv)}
+            to={canRefund ? refundDestination(refundableInvestments[0]) : investmentDestination(inv)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity ${
               canRefund
                 ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
@@ -340,6 +353,7 @@ const MyInvestments = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [page, setPage] = useState(1);
   const [modalGroup, setModalGroup] = useState<GroupedInvestment | null>(null);
+  const [refundMode, setRefundMode] = useState(false);
 
   useEffect(() => { fetchMyInvestments(); }, [fetchMyInvestments]);
   useEffect(() => { fetchProfitPayouts(); }, [fetchProfitPayouts]);
@@ -366,6 +380,10 @@ const MyInvestments = () => {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleTabChange = (key: string) => { setActiveTab(key); setPage(1); };
+  const handleShowAll = (group: GroupedInvestment, isRefundMode: boolean) => {
+    setModalGroup(group);
+    setRefundMode(isRefundMode);
+  };
 
   const ALWAYS_SHOW = new Set(['all', 'funding', 'executing']);
   const visibleTabs = TABS.filter(t =>
@@ -442,7 +460,7 @@ const MyInvestments = () => {
       {/* List */}
       <div className="space-y-4">
         {paginated.length > 0 ? (
-          paginated.map(g => <InvestmentRow key={g.project_id} group={g} onShowAll={setModalGroup} />)
+          paginated.map(g => <InvestmentRow key={g.project_id} group={g} onShowAll={handleShowAll} />)
         ) : (
           <div className="text-center py-20 bg-card border border-border rounded-2xl flex flex-col items-center">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -469,7 +487,14 @@ const MyInvestments = () => {
       <Pagination page={page} totalPages={totalPages} onChange={setPage} />
 
       {modalGroup && (
-        <MultipleInvestmentsModal group={modalGroup} onClose={() => setModalGroup(null)} />
+        <MultipleInvestmentsModal
+          group={modalGroup}
+          refundMode={refundMode}
+          onClose={() => {
+            setModalGroup(null);
+            setRefundMode(false);
+          }}
+        />
       )}
     </div>
   );

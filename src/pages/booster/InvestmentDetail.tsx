@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router';
 import { ArrowLeft, Download, Loader2, Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useBoosterStore } from '../../store/useBoosterStore';
@@ -41,6 +41,7 @@ type MediaItem = { type: 'video' | 'image'; url: string; name: string };
 const InvestmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { currentInvestment, isDetailLoading: isInvLoading, fetchInvestmentById, requestRefund, profitPayouts, fetchProfitPayouts } = useBoosterStore();
   const getContractHtml = useInvestmentStore((state) => state.getContractHtml);
@@ -108,6 +109,16 @@ const InvestmentDetail = () => {
   useEffect(() => {
     fetchProfitPayouts();
   }, [fetchProfitPayouts]);
+
+  useEffect(() => {
+    const projectState = currentInvestment?.project?.state;
+    const isRefundEligible =
+      currentInvestment?.status === 'verified' && projectState === 'funding';
+
+    if (searchParams.get('refund') === '1' && isRefundEligible) {
+      setShowRefundModal(true);
+    }
+  }, [currentInvestment, searchParams]);
 
   if (loadedId !== id || isInvLoading) {
     return (
@@ -409,7 +420,7 @@ const InvestmentDetail = () => {
                <div className="w-full mt-3 bg-amber-50 border border-amber-200 text-amber-700 h-[44px] rounded-[10px] flex justify-center items-center gap-[8px] font-medium text-[14px]">
                    <Clock size={16} /> <span>กำลังดำเนินการขอคืนเงิน</span>
                </div>
-             ) : (inv.status === 'funding' || (inv.status === 'verified' && (project?.state === 'failed' || project?.state === 'cancelled'))) && (
+             ) : (inv.status === 'verified' && project?.state === 'funding') && (
                <button
                  onClick={() => setShowRefundModal(true)}
                  className="w-full mt-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 h-[44px] rounded-[10px] flex justify-center items-center gap-[8px] font-medium transition-colors text-[14px] cursor-pointer"

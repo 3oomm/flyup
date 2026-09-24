@@ -186,8 +186,8 @@ const Investment = () => {
   const isSoftcapReached = softcap > 0 && currentFunding >= softcap;
   const MIN_PAYMENT_GATEWAY = 20; // PromptPay QR ต้องการขั้นต่ำ 20 บาท
   const effectiveMinAmount = Math.max(isSoftcapReached ? 1 : minAmount, MIN_PAYMENT_GATEWAY);
-  // เพดานต่อรายการของ payment gateway (Stripe จำกัดที่ ~999,999.99 — ตั้ง 500,000 ตามมาตรฐาน fintech ไทย)
-  const MAX_PER_TRANSACTION = 500_000;
+  // ระบบรับเฉพาะจำนวนเต็มบาท และคงยอดไม่ให้เกินเพดานของ Stripe
+  const MAX_PER_TRANSACTION = 999_999;
   const maxAmount = Math.min(
     MAX_PER_TRANSACTION,
     project?.max_invest_amount && project.max_invest_amount > 0
@@ -229,7 +229,7 @@ const Investment = () => {
     return leadingPreset ? [leadingPreset, ...picks] : picks;
   })();
 
-  const parsedAmount = parseInt(amount.replace(/,/g, "")) || 0;
+  const parsedAmount = parseInt(amount.replace(/,/g, ""), 10) || 0;
   const fee = parsedAmount * platformFeeRate;
   const vat = fee * vatRate;
   const investedValue = parsedAmount - fee - vat;
@@ -567,7 +567,10 @@ const Investment = () => {
                           type="text"
                           value={amount}
                           onChange={(e) => {
-                            const digits = e.target.value.replace(/\D/g, "");
+                            const digits = e.target.value
+                              .replace(/,/g, "")
+                              .split(".")[0]
+                              .replace(/\D/g, "");
                             if (!digits) {
                               setAmount("");
                               return;

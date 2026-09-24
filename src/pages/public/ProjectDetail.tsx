@@ -358,7 +358,7 @@ function ProjectDetail() {
                               )}
                             </div>
                             {/* Card */}
-                            <div className={`flex-1 mb-[20px] bg-white border rounded-[16px] p-[20px] shadow-sm flex flex-col gap-[16px] ${
+                            <div className={`flex-1 min-w-0 mb-[20px] bg-white border rounded-[16px] p-[20px] shadow-sm flex flex-col gap-[16px] ${
                               current ? 'border-primary/30 shadow-primary/5' :
                               done    ? 'border-emerald-200' :
                                         'border-border'
@@ -380,11 +380,11 @@ function ProjectDetail() {
                                   {criteria.length > 0 && (
                                     <div className="flex flex-col gap-[6px] mt-[4px]">
                                       <span className="text-[12px] font-semibold text-foreground">สิ่งที่ส่งมอบ:</span>
-                                      <div className="flex flex-wrap gap-[6px]">
+                                      <div className="flex flex-wrap gap-[6px] min-w-0 max-w-full">
                                         {criteria.map((c: string, i: number) => (
-                                          <span key={i} className={`inline-flex items-center gap-1.5 px-[10px] py-[3px] border rounded-full text-[12px] whitespace-nowrap ${done ? 'border-green-200 bg-green-50 font-medium text-green-800' : 'border-border bg-white text-foreground'}`}>
-                                            {done && <CheckCircle2 size={12} className="text-green-600" />}
-                                            {c}
+                                          <span key={i} className={`inline-flex items-start gap-1.5 max-w-full px-[10px] py-[3px] border rounded-[12px] text-[12px] whitespace-normal break-all leading-relaxed ${done ? 'border-green-200 bg-green-50 font-medium text-green-800' : 'border-border bg-white text-foreground'}`}>
+                                            {done && <CheckCircle2 size={12} className="text-green-600 shrink-0 mt-[2px]" />}
+                                            <span className="min-w-0">{c}</span>
                                           </span>
                                         ))}
                                       </div>
@@ -537,7 +537,7 @@ function ProjectDetail() {
                   <span className="text-muted-foreground">ลงทุนได้สูงสุด</span>
                   <span className="font-semibold text-foreground">{(() => {
                     const remaining = Math.max(0, targetAmount - fundedAmount);
-                    const MAX_PER_TRANSACTION = 500_000;
+                    const MAX_PER_TRANSACTION = 999_999;
                     const projectMax = project?.max_invest_amount && project.max_invest_amount > 0
                       ? Math.min(project.max_invest_amount, remaining)
                       : remaining;
