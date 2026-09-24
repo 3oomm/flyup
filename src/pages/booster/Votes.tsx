@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { CheckSquare, Loader2, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { CheckSquare, Loader2, ChevronLeft, ChevronRight, ArrowLeft, ImageIcon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 import { useBoosterStore } from '../../store/useBoosterStore';
 import { useMilestoneStore, type ProjectMilestoneRaw } from '../../store/useMilestoneStore';
@@ -10,6 +10,7 @@ interface VoteMilestone {
   id: number;
   project_id: number;
   projectTitle: string;
+  projectCoverImage: string | null;
   phase_no: number;
   title: string;
   voting_open: boolean;
@@ -22,6 +23,7 @@ interface VoteMilestone {
 interface VoteProject {
   id: number;
   title: string;
+  coverImage: string | null;
   milestones: VoteMilestone[];
 }
 
@@ -45,7 +47,17 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
 
   return (
     <div className="bg-card border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border">
+          {vote.projectCoverImage ? (
+            <img src={vote.projectCoverImage} alt={vote.projectTitle} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ImageIcon size={20} className="text-muted-foreground" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-1 flex-wrap">
           <h3 className="font-bold text-foreground text-base leading-tight">{vote.projectTitle}</h3>
           {isOpen ? (
@@ -83,6 +95,7 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
           )}
           <span className="text-muted-foreground">ปล่อยเงิน {vote.percent_release}%</span>
         </div>
+        </div>
       </div>
 
       {isOpen ? (
@@ -113,7 +126,17 @@ function ProjectRow({ project }: { project: VoteProject }) {
       to={`/booster/votes?project=${project.id}`}
       className="bg-card border border-border rounded-xl p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:shadow-sm transition-all"
     >
-      <div className="min-w-0">
+      <div className="flex items-center gap-4 min-w-0">
+        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-muted border border-border">
+          {project.coverImage ? (
+            <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <ImageIcon size={22} className="text-muted-foreground" />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0">
         <h3 className="font-bold text-foreground text-base leading-tight mb-2">{project.title}</h3>
         <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
           <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
@@ -129,6 +152,7 @@ function ProjectRow({ project }: { project: VoteProject }) {
               ปิดแล้ว {closedCount}
             </span>
           )}
+        </div>
         </div>
       </div>
       <span className="shrink-0 px-6 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground">
@@ -202,13 +226,18 @@ const Votes = () => {
           projectIds.map(async (pid) => {
             try {
               const data = await fetchProjectMilestones(pid);
+              const investmentProject = investments.find(inv => inv.project_id === pid)?.project;
+              const coverImage = investmentProject?.cover_image
+                ?? [...(investmentProject?.media ?? [])].sort((a, b) => a.sort_order - b.sort_order)[0]?.url
+                ?? null;
               return data.map((m: ProjectMilestoneRaw) => ({
                 ...m,
                 voting_open: m.voting_open ?? false,
                 voting_opened_at: m.voting_opened_at ?? null,
                 voting_closed_at: m.voting_closed_at ?? null,
                 project_id: pid,
-                projectTitle: investments.find(inv => inv.project_id === pid)?.project?.title ?? `โปรเจกต์ #${pid}`,
+                projectTitle: investmentProject?.title ?? `โปรเจกต์ #${pid}`,
+                projectCoverImage: coverImage,
               })) as VoteMilestone[];
             } catch { return [] as VoteMilestone[]; }
           })
@@ -228,6 +257,7 @@ const Votes = () => {
       else grouped.set(milestone.project_id, {
         id: milestone.project_id,
         title: milestone.projectTitle,
+        coverImage: milestone.projectCoverImage,
         milestones: [milestone],
       });
     });
@@ -244,9 +274,18 @@ const Votes = () => {
   );
 
   const filteredProjects = useMemo(() => {
-    if (activeTab === 'open') return openProjects;
-    if (activeTab === 'closed') return closedProjects;
-    return projects;
+    const selected = activeTab === 'open'
+      ? openProjects
+      : activeTab === 'closed'
+        ? closedProjects
+        : projects;
+
+    return [...selected].sort((a, b) => {
+      const aHasOpenVote = a.milestones.some(m => m.voting_open);
+      const bHasOpenVote = b.milestones.some(m => m.voting_open);
+      if (aHasOpenVote !== bHasOpenVote) return aHasOpenVote ? -1 : 1;
+      return b.id - a.id;
+    });
   }, [activeTab, projects, openProjects, closedProjects]);
 
   const selectedProject = useMemo(
@@ -310,7 +349,10 @@ const Votes = () => {
             <div className="space-y-4">
               {selectedProject.milestones
                 .slice()
-                .sort((a, b) => a.phase_no - b.phase_no)
+                .sort((a, b) => {
+                  if (a.voting_open !== b.voting_open) return a.voting_open ? -1 : 1;
+                  return a.phase_no - b.phase_no;
+                })
                 .map(vote => (
                 <VoteRow key={vote.id} vote={vote} isOpen={vote.voting_open === true} />
               ))}

@@ -184,6 +184,10 @@ const Meetings = () => {
       if (filter === 'upcoming') return upcoming && !isCancelled;
       if (filter === 'past')     return isClosed || isCancelled || (!upcoming && !ongoing && isOpen);
       return true;
+    }).sort((a, b) => {
+      const aTime = getMeetingDatetime(a.date, a.time)?.getTime() ?? 0;
+      const bTime = getMeetingDatetime(b.date, b.time)?.getTime() ?? 0;
+      return bTime - aTime || b.id - a.id;
     }),
     [boosterMeetings, filter, now]
   );
