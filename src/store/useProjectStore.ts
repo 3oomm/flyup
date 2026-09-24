@@ -149,6 +149,8 @@ const initialProject: Project = {
     })),
 };
 
+const MAX_DRAFT_PROJECTS = 5;
+
 let _savingStory = false;
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -505,6 +507,17 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     createProject: async () => {
         set({ isCreating: true });
         try {
+            // Always check the latest server state because this action is also available
+            // outside MyProjects, where the local project list may not have been loaded yet.
+            const projectsRes = await api.get('/pioneer/projects');
+            const latestProjects: ProjectSummary[] = projectsRes.data?.data ?? [];
+            const draftCount = latestProjects.filter(project => project.state === 'draft').length;
+
+            if (draftCount >= MAX_DRAFT_PROJECTS) {
+                toast.error('คุณมีโปรเจกต์แบบร่างครบ 5 โปรเจกต์แล้ว กรุณาลบแบบร่างเก่าก่อนสร้างโปรเจกต์ใหม่');
+                return null;
+            }
+
             const res = await api.post('/pioneer/projects');
             const projectId = res.data?.data?.id ?? res.data?.id;
 
