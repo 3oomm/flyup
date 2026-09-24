@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
 import KycDeviceChooser from "../verification/KycDeviceChooser";
+import BoosterTermsModal from "./BoosterTermsModal";
 
 const THAI_BANKS = [
   "ธนาคารกรุงเทพ (BBL)",
@@ -77,6 +78,7 @@ const BoosterVerifyTab = () => {
   const [acceptAccuracy, setAcceptAccuracy] = useState(idCardLocked);
   const [isSavingVerify, setIsSavingVerify] = useState(false);
   const [deviceChosen, setDeviceChosen] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -330,20 +332,32 @@ const BoosterVerifyTab = () => {
 
         {/* checkboxes */}
         <div className="flex flex-col gap-[10px]">
-          {[
-            { state: acceptTerms, set: setAcceptTerms, label: <>ยอมรับข้อตกลงของ <span className="text-primary">FlyUp Booster</span></> },
-            { state: acceptAccuracy, set: setAcceptAccuracy, label: "ข้าพเจ้ายืนยันว่าข้อมูลทั้งหมดเป็นความจริง" },
-          ].map(({ state, set, label }, idx) => (
-            <label key={idx} className={`flex items-center gap-[10px] ${idCardLocked ? "cursor-default" : "cursor-pointer"}`}>
-              <div
-                onClick={() => !idCardLocked && set(!state)}
-                className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${state ? "bg-primary border-primary" : "border-border"} ${idCardLocked ? "cursor-default" : "cursor-pointer"}`}
-              >
-                {state && <span className="text-white text-[10px] font-bold">✓</span>}
-              </div>
-              <span className="text-[13px] text-foreground">{label}</span>
-            </label>
-          ))}
+          <div className="flex items-center gap-[10px]">
+            <button
+              type="button"
+              aria-label="ยอมรับข้อตกลงของ FlyUp Booster"
+              onClick={() => !idCardLocked && (acceptTerms ? setAcceptTerms(false) : setShowTermsModal(true))}
+              className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${acceptTerms ? "bg-primary border-primary" : "border-border"} ${idCardLocked ? "cursor-default" : "cursor-pointer"}`}
+            >
+              {acceptTerms && <span className="text-white text-[10px] font-bold">✓</span>}
+            </button>
+            <span className="text-[13px] text-foreground">
+              ยอมรับ
+              <button type="button" onClick={() => setShowTermsModal(true)} className="mx-1 font-medium text-primary underline underline-offset-2 hover:text-primary-hover cursor-pointer">
+                ข้อตกลงและนโยบาย PDPA
+              </button>
+              ของ FlyUp Booster
+            </span>
+          </div>
+          <label className={`flex items-center gap-[10px] ${idCardLocked ? "cursor-default" : "cursor-pointer"}`}>
+            <div
+              onClick={() => !idCardLocked && setAcceptAccuracy(!acceptAccuracy)}
+              className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${acceptAccuracy ? "bg-primary border-primary" : "border-border"} ${idCardLocked ? "cursor-default" : "cursor-pointer"}`}
+            >
+              {acceptAccuracy && <span className="text-white text-[10px] font-bold">✓</span>}
+            </div>
+            <span className="text-[13px] text-foreground">ข้าพเจ้ายืนยันว่าข้อมูลทั้งหมดเป็นความจริง</span>
+          </label>
         </div>
 
         {!idCardLocked && (
@@ -363,6 +377,17 @@ const BoosterVerifyTab = () => {
           </div>
         )}
       </div>
+
+      {showTermsModal && (
+        <BoosterTermsModal
+          locked={idCardLocked}
+          onClose={() => setShowTermsModal(false)}
+          onAccept={() => {
+            setAcceptTerms(true);
+            setShowTermsModal(false);
+          }}
+        />
+      )}
 
       {/* ยืนยันบัญชี */}
       <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[16px]">

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Pencil, Camera, Phone, Briefcase, Link, FileBraces, Mail, MapPin, GraduationCap, X, Loader2, Save } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 
@@ -19,11 +19,9 @@ const ProfileTab = () => {
   const [snapshot, setSnapshot] = useState({ ...form });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // sync ฟอร์มจาก authUser ครั้งแรกที่โหลดเสร็จ ไม่ reset ซ้ำเมื่อ tab อื่น trigger checkAuth
-  // ตั้งค่า state ระหว่าง render ตามแนวทางของ React แทนการใช้ useEffect + setState
-  const [hasSyncedForm, setHasSyncedForm] = useState(false);
-  if (!hasSyncedForm && authUser) {
-    setHasSyncedForm(true);
+  // sync ฟอร์มกับข้อมูลล่าสุดจาก /user/me แต่ไม่ทับค่าระหว่างที่ผู้ใช้กำลังแก้ไข
+  useEffect(() => {
+    if (!authUser || isEditing) return;
     setForm({
       first_name: (authUser.first_name as string) ?? "",
       last_name: (authUser.last_name as string) ?? "",
@@ -35,7 +33,7 @@ const ProfileTab = () => {
       faculty: authUser.student_profile?.faculty ?? "",
       major: authUser.student_profile?.major ?? "",
     });
-  }
+  }, [authUser, isEditing]);
 
   const initials = `${form.first_name[0] ?? ""}${form.last_name[0] ?? ""}`.toUpperCase() || "?";
 
@@ -71,11 +69,11 @@ const ProfileTab = () => {
       last_name: form.last_name,
       phone: form.phone,
       address: form.address || undefined,
-      bio: form.bio || undefined,
-      portfolio: form.portfolio || undefined,
-      skills: form.skills || undefined,
-      faculty: form.faculty || undefined,
-      major: form.major || undefined,
+      bio: form.bio,
+      portfolio: form.portfolio,
+      skills: form.skills,
+      faculty: form.faculty,
+      major: form.major,
     });
     if (ok) setIsEditing(false);
   };
