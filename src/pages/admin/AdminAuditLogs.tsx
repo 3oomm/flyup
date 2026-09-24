@@ -25,6 +25,8 @@ const ACTION_LABEL: Record<string, string> = {
     confirm_profit_payout:  'ยืนยันจ่ายกำไร',
     suspend_project:        'ระงับโปรเจกต์',
     unsuspend_project:      'ยกเลิกระงับโปรเจกต์',
+    approve_project_edit:   'อนุมัติคำขอแก้ไขโปรเจกต์',
+    reject_project_edit:    'ปฏิเสธคำขอแก้ไขโปรเจกต์',
 }
 
 const ACTION_BADGE: Record<string, string> = {
@@ -39,6 +41,8 @@ const ACTION_BADGE: Record<string, string> = {
     confirm_profit_payout:  'bg-green-50 text-green-700 border-green-200',
     rollback_user:          'bg-blue-50 text-blue-700 border-blue-200',
     unsuspend_project:      'bg-blue-50 text-blue-700 border-blue-200',
+    approve_project_edit:   'bg-green-50 text-green-700 border-green-200',
+    reject_project_edit:    'bg-red-50 text-red-700 border-red-200',
     reject_student_card:    'bg-red-50 text-red-700 border-red-200',
     reject_id_card:         'bg-red-50 text-red-700 border-red-200',
     reject_project:         'bg-red-50 text-red-700 border-red-200',
