@@ -432,7 +432,9 @@ const Step1Basics = () => {
               maxLength={40}
               disabled={isLocked}
               className={isLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
-            <p className="text-right text-[11px] text-muted-foreground">{localData.title.length}/40</p>
+            <p className={`text-right text-[11px] ${localData.title.length >= 40 ? 'text-error' : 'text-muted-foreground'}`}>
+              {localData.title.length}/40
+            </p>
             {isLocked && <p className="text-[11px] text-amber-600">🔒 แก้ไขไม่ได้ในสถานะปัจจุบันของโปรเจกต์</p>}
           </div>
           <p className="text-[12px] text-muted-foreground">*การตั้งชื่อโปรเจกต์ควรเน้นความสั้นและจดจำง่ายในทันที่ เพื่อให้ชื่อโปรเจกต์ของคุณดูโดดเด่นและค้นหาได้รวดเร็ว*</p>
@@ -597,6 +599,7 @@ const Step1Basics = () => {
               }}
               disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+            <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1 เดือน และสูงสุด 48 เดือน</span>
           </div>
           <div className="grid grid-cols-1 gap-[20px] md:grid-cols-3 md:gap-[20px]">
             <div className="flex flex-col gap-[4px]">
@@ -628,6 +631,9 @@ const Step1Basics = () => {
                 }}
                 disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+              <span className="text-[11px] text-muted-foreground">
+                ขั้นต่ำ 70% ของเป้าหมาย ({formatNum(Math.ceil(localData.fundingGoal * 0.7)) || '0'} บาท) และสูงสุด {formatNum(localData.fundingGoal) || '0'} บาท
+              </span>
             </div>
             <div className="flex flex-col gap-[4px]">
               <label className="text-foreground text-[14px]">ระยะเวลาระดมทุน (1-60 วัน) <span className="text-error">*</span></label>
@@ -652,6 +658,7 @@ const Step1Basics = () => {
                 }}
                 disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+              <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1 วัน และสูงสุด 60 วัน</span>
             </div>
             <div className="flex flex-col gap-[4px]">
               <label className="text-foreground text-[14px]">ส่วนแบ่งกำไร (%) <span className="text-error">*</span></label>
@@ -681,6 +688,7 @@ const Step1Basics = () => {
                 }}
                 disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+              <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1% และสูงสุด 50%</span>
             </div>
           </div>
           <div className="flex flex-col gap-[4px]">
@@ -691,6 +699,9 @@ const Step1Basics = () => {
               disabled
               className="border border-border bg-background h-[38px] px-[12px] rounded-[6px] text-muted-foreground cursor-not-allowed opacity-60"
             />
+            <span className="text-[11px] text-muted-foreground">
+              ระบบกำหนดอัตโนมัติที่ 1% ของเป้าหมายเงินทุน ({formatNum(localData.minInvestAmount) || '0'} บาท)
+            </span>
           </div>
           <p className="text-[12px] text-muted-foreground"><span className="text-error">*</span> ระบุเป้าหมายเงินทุนและระยะเวลา ให้ชัดเจน พร้อมกำหนดเงื่อนไขการรับเงินทั้งแบบ Soft Cap รวมถึงสัดส่วนผลตอบแทนที่แน่นอน เพื่อใช้เป็นข้อตกลงในการระดมทุน*</p>
         </form>

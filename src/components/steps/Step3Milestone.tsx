@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useParams, useSearchParams } from 'react-router'
 
 const MAX_VIDEOS_PER_MILESTONE = 5
+const MAX_FILES_PER_MILESTONE = 5
 const MAX_VIDEO_SIZE_MB = 10
 const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
@@ -211,13 +212,23 @@ const Step3Milestone = () => {
     const phase = activePhase
 
     // ต้อง convert ก่อน clear — FileList เป็น live reference ถูกล้างเมื่อ value = ""
-    const files = Array.from(fileList)
+    const selectedFiles = Array.from(fileList)
     e.target.value = ""
-    const oversized = files.find(file => file.size > 5 * 1024 * 1024)
+    const currentFiles = useProjectStore.getState().currentProject.milestones[phase]?.files ?? []
+    const remainingSlots = MAX_FILES_PER_MILESTONE - currentFiles.length
+    if (remainingSlots <= 0) {
+      toast.error(`ไฟล์ประกอบอัปโหลดได้สูงสุด ${MAX_FILES_PER_MILESTONE} ไฟล์ต่อ Milestone`)
+      return
+    }
+    const oversized = selectedFiles.find(file => file.size > 5 * 1024 * 1024)
     if (oversized) {
       toast.error('รูปภาพ, PDF หรือ Excel ต้องมีขนาดไม่เกิน 5MB')
       return
     }
+    if (selectedFiles.length > remainingSlots) {
+      toast.error(`ไฟล์ประกอบอัปโหลดได้สูงสุด ${MAX_FILES_PER_MILESTONE} ไฟล์ ขณะนี้เพิ่มได้อีก ${remainingSlots} ไฟล์`)
+    }
+    const files = selectedFiles.slice(0, remainingSlots)
     const previews = files.map(file => ({ name: file.name, url: URL.createObjectURL(file) }))
 
     // append blob previews ต่อรายการปัจจุบัน (อ่านจาก store ผ่าน setState เพื่อหลีกเลี่ยง stale closure)
@@ -627,13 +638,25 @@ const Step3Milestone = () => {
           <div className="flex flex-col gap-[24px]">
             {/* 5.1 ไฟล์ประกอบ — เพิ่มไฟล์จะล้าง video อัตโนมัติ (backend รองรับ type เดียวต่อ milestone) */}
             <div className="flex flex-col gap-[8px]">
-              <label className="text-[14px] font-semibold text-foreground">ไฟล์ประกอบ (ไม่บังคับ)</label>
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-[14px] font-semibold text-foreground">ไฟล์ประกอบ (ไม่บังคับ)</label>
+                <span className={`text-[12px] font-normal tabular-nums ${(currentData.files?.length ?? 0) >= MAX_FILES_PER_MILESTONE ? 'text-error' : 'text-muted-foreground'}`}>
+                  {currentData.files?.length ?? 0}/{MAX_FILES_PER_MILESTONE} ไฟล์
+                </span>
+              </div>
               {!isLocked && (
                 <>
                   <input type="file" multiple hidden ref={fileInputRef} onChange={handleFileChange} accept="image/*,.pdf,.xls,.xlsx" />
                   <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-[1.5px] border-dashed border-[#C084FC] rounded-[12px] p-[40px] flex flex-col items-center justify-center bg-[#F9F5FF] hover:bg-[#F3E8FF] transition-all cursor-pointer group"
+                    onClick={() => {
+                      if ((currentData.files?.length ?? 0) >= MAX_FILES_PER_MILESTONE) {
+                        toast.error(`ไฟล์ประกอบอัปโหลดได้สูงสุด ${MAX_FILES_PER_MILESTONE} ไฟล์ต่อ Milestone`)
+                        return
+                      }
+                      fileInputRef.current?.click()
+                    }}
+                    aria-disabled={(currentData.files?.length ?? 0) >= MAX_FILES_PER_MILESTONE}
+                    className={`border-[1.5px] border-dashed rounded-[12px] p-[40px] flex flex-col items-center justify-center transition-all group ${(currentData.files?.length ?? 0) >= MAX_FILES_PER_MILESTONE ? 'border-border bg-surface-disabled cursor-not-allowed opacity-70' : 'border-[#C084FC] bg-[#F9F5FF] hover:bg-[#F3E8FF] cursor-pointer'}`}
                   >
                     <Upload className="text-muted-foreground mb-2 group-hover:-translate-y-1 transition-transform" size={24} />
                     <span className="text-[13px] text-muted-foreground">.jpg, .png, .gif, .webp, .pdf, .xls, .xlsx (สูงสุด 5MB ต่อไฟล์)</span>
