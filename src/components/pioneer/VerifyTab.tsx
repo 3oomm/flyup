@@ -19,6 +19,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
 import KycDeviceChooser from "../verification/KycDeviceChooser";
+import PioneerTermsModal from "./PioneerTermsModal";
 
 const SELECT_STYLE = "border border-border rounded-[8px] px-[12px] py-[10px] pr-[32px] text-[14px] outline-none focus:border-primary transition-colors bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_10px_center]";
 const INPUT_STYLE = "border border-border rounded-[8px] px-[12px] py-[10px] text-[14px] outline-none focus:border-primary transition-colors";
@@ -105,6 +106,7 @@ const VerifyTab = () => {
   const [acceptAccuracy, setAcceptAccuracy] = useState(studentCardLocked);
   const [isSavingStudent, setIsSavingStudent] = useState(false);
   const [deviceChosen, setDeviceChosen] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -256,6 +258,10 @@ const VerifyTab = () => {
   const selfiePreview = selfieFile
     ? URL.createObjectURL(selfieFile)
     : storedSelfieUrl || null;
+
+  const bankAccounts = [...(authUser?.bank_accounts ?? [])].sort(
+    (a, b) => Number(Boolean(b.is_default)) - Number(Boolean(a.is_default)),
+  );
 
   const uploadBorderClass = (approved: boolean, pending: boolean, rejected: boolean, locked: boolean) =>
     `border-2 border-dashed rounded-xl overflow-hidden transition-colors block
@@ -456,20 +462,32 @@ const VerifyTab = () => {
 
         {/* checkboxes */}
         <div className="flex flex-col gap-[10px]">
-          {[
-            { state: acceptTerms, set: setAcceptTerms, label: <>ยอมรับข้อตกลงของ <span className="text-primary">FlyUp Pioneer</span></> },
-            { state: acceptAccuracy, set: setAcceptAccuracy, label: "ข้าพเจ้ายืนยันว่าข้อมูลทั้งหมดเป็นความจริง" },
-          ].map(({ state, set, label }, idx) => (
-            <label key={idx} className={`flex items-center gap-[10px] ${bothLocked ? "cursor-default" : "cursor-pointer"}`}>
-              <div
-                onClick={() => !bothLocked && set(!state)}
-                className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${state ? "bg-primary border-primary" : "border-border"} ${bothLocked ? "cursor-default" : "cursor-pointer"}`}
-              >
-                {state && <span className="text-white text-[10px] font-bold">✓</span>}
-              </div>
-              <span className="text-[13px] text-foreground">{label}</span>
-            </label>
-          ))}
+          <div className="flex items-center gap-[10px]">
+            <button
+              type="button"
+              aria-label="ยอมรับข้อตกลงของ FlyUp Pioneer"
+              onClick={() => !bothLocked && (acceptTerms ? setAcceptTerms(false) : setShowTermsModal(true))}
+              className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${acceptTerms ? "bg-primary border-primary" : "border-border"} ${bothLocked ? "cursor-default" : "cursor-pointer"}`}
+            >
+              {acceptTerms && <span className="text-white text-[10px] font-bold">✓</span>}
+            </button>
+            <span className="text-[13px] text-foreground">
+              ยอมรับ
+              <button type="button" onClick={() => setShowTermsModal(true)} className="mx-1 font-medium text-primary underline underline-offset-2 hover:text-primary-hover cursor-pointer">
+                ข้อตกลงและนโยบาย PDPA
+              </button>
+              ของ FlyUp Pioneer
+            </span>
+          </div>
+          <label className={`flex items-center gap-[10px] ${bothLocked ? "cursor-default" : "cursor-pointer"}`}>
+            <div
+              onClick={() => !bothLocked && setAcceptAccuracy(!acceptAccuracy)}
+              className={`w-[18px] h-[18px] rounded-[4px] border-2 flex items-center justify-center shrink-0 transition-colors ${acceptAccuracy ? "bg-primary border-primary" : "border-border"} ${bothLocked ? "cursor-default" : "cursor-pointer"}`}
+            >
+              {acceptAccuracy && <span className="text-white text-[10px] font-bold">✓</span>}
+            </div>
+            <span className="text-[13px] text-foreground">ข้าพเจ้ายืนยันว่าข้อมูลทั้งหมดเป็นความจริง</span>
+          </label>
         </div>
 
         {!bothLocked && (
@@ -490,6 +508,17 @@ const VerifyTab = () => {
         )}
       </div>
 
+      {showTermsModal && (
+        <PioneerTermsModal
+          locked={bothLocked}
+          onClose={() => setShowTermsModal(false)}
+          onAccept={() => {
+            setAcceptTerms(true);
+            setShowTermsModal(false);
+          }}
+        />
+      )}
+
       {/* ยืนยันบัญชี */}
       <div className="bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[16px]">
         <div className="flex items-center gap-[8px]">
@@ -505,11 +534,11 @@ const VerifyTab = () => {
         </div>
 
         {/* รายการบัญชี */}
-        {(authUser?.bank_accounts ?? []).length === 0 && !showAddForm && (
+        {bankAccounts.length === 0 && !showAddForm && (
           <p className="text-[13px] text-muted-foreground text-center py-[8px]">ยังไม่มีบัญชีธนาคาร</p>
         )}
 
-        {(authUser?.bank_accounts ?? []).map((acc) => (
+        {bankAccounts.map((acc) => (
           <div key={acc.id} className="border border-border rounded-[12px] p-[16px] flex flex-col gap-[12px]">
             {editingBankId === acc.id ? (
               <>
