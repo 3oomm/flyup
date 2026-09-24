@@ -48,6 +48,7 @@ function MeetingCard({ meeting, now }: { meeting: BoosterMeeting; now: Date }) {
   const isUpcoming = isOpen && (!meetingDatetime || meetingDatetime > now);
 
   const projectTitle = meeting.project?.title || 'โปรเจกต์';
+  const projectCoverImage = meeting.project?.cover_image ?? null;
   const phaseLabel   = meeting.milestone
     ? `Phase ${meeting.milestone.phase_no || ''}: ${meeting.milestone.title || ''}`
     : '';
@@ -59,12 +60,24 @@ function MeetingCard({ meeting, now }: { meeting: BoosterMeeting; now: Date }) {
     <div className={`bg-card border rounded-2xl overflow-hidden transition-all ${expanded ? 'border-primary/30' : 'border-border'} ${isCancelled ? 'opacity-60' : ''}`}>
       {/* Header */}
       <div className="flex items-center gap-4 p-5">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+        <div className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center shrink-0 border border-border ${
           isCancelled ? 'bg-muted text-muted-foreground' :
           isClosed    ? 'bg-muted text-muted-foreground' :
                         'bg-purple-100 text-primary'
         }`}>
-          {isCancelled ? <Ban size={20} /> : isClosed ? <CheckCircle size={20} /> : <Video size={20} />}
+          {projectCoverImage ? (
+            <img
+              src={projectCoverImage}
+              alt={projectTitle}
+              className={`w-full h-full object-cover ${isCancelled ? 'grayscale' : ''}`}
+            />
+          ) : isCancelled ? (
+            <Ban size={20} />
+          ) : isClosed ? (
+            <CheckCircle size={20} />
+          ) : (
+            <Video size={20} />
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
