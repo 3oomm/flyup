@@ -55,6 +55,7 @@ const Step3Milestone = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null) // input file ที่ซ่อนไว้ สำหรับไฟล์ประกอบ (รูป/pdf/excel)
   const videoInputRef = useRef<HTMLInputElement>(null) // input file ที่ซ่อนไว้ สำหรับวิดีโอ
+  const uploadControllers = useRef(new Map<string, AbortController>())
   const descriptionRef = useRef<HTMLTextAreaElement>(null) // ใช้ปรับความสูง textarea คำอธิบายอัตโนมัติ
   const criteriaRefs = useRef<(HTMLInputElement | null)[]>([]) // เก็บ ref ของ input เกณฑ์แต่ละข้อ เพื่อ focus ข้อใหม่หลังกด Enter
   // ✅ ดึง currentProject มาก่อน แล้วค่อยเข้าถึง milestones
@@ -72,10 +73,16 @@ const Step3Milestone = () => {
     const milestone = useProjectStore.getState().currentProject.milestones[phaseIndex]
     const current = JSON.stringify(milestone)
     if (savedSnapshot.current[phaseIndex] === current) return
-    savedSnapshot.current[phaseIndex] = current
     setSaveStatus('saving');
-    await saveMilestonePhase(Number(projectId), phaseIndex);
-    triggerSaved();
+    const saved = await saveMilestonePhase(Number(projectId), phaseIndex);
+    if (saved) {
+      savedSnapshot.current[phaseIndex] = JSON.stringify(
+        useProjectStore.getState().currentProject.milestones[phaseIndex]
+      )
+      triggerSaved();
+    } else {
+      setSaveStatus('idle');
+    }
   };
   const fundingGoal = currentProject.fundingGoal || 0
   const phasePercents = [0.15, 0.20, 0.30, 0.35] // สัดส่วนงบประมาณคงที่ของแต่ละ phase (รวมกันได้ 100%)
@@ -133,8 +140,8 @@ const Step3Milestone = () => {
   }
 
   // อัปโหลดไฟล์เดียวผ่าน /upload (key: file) — คืน server URL
-  const uploadOneFile = async (file: File): Promise<string | null> => {
-    const uploaded = await uploadFile(file)
+  const uploadOneFile = async (file: File, signal?: AbortSignal): Promise<string | null> => {
+    const uploaded = await uploadFile(file, signal)
     return uploaded?.url ?? null
   }
 
@@ -221,17 +228,30 @@ const Step3Milestone = () => {
 
     // upload ทีละไฟล์แล้วแทนที่ blob URL
     toast.loading('กำลังอัปโหลดไฟล์...', { id: 'upload-milestone-files' })
+    let uploadedCount = 0
     for (let i = 0; i < files.length; i++) {
-      const serverUrl = await uploadOneFile(files[i])
+      const isStillSelected = useProjectStore.getState().currentProject.milestones[phase]
+        ?.files.some(item => item.url === previews[i].url)
+      if (!isStillSelected) continue
+      const controller = new AbortController()
+      uploadControllers.current.set(previews[i].url, controller)
+      const serverUrl = await uploadOneFile(files[i], controller.signal)
+      uploadControllers.current.delete(previews[i].url)
+      if (controller.signal.aborted) continue
       if (serverUrl) {
         replaceFileBlobUrl(previews[i].url, serverUrl, files[i].name, phase)
+        uploadedCount++
       } else {
         removeFileBlobUrl(previews[i].url, phase)
         toast.error(`อัปโหลด ${files[i].name} ไม่สำเร็จ`, { id: 'upload-milestone-files' })
         return
       }
     }
-    toast.success('อัปโหลดไฟล์สำเร็จ', { id: 'upload-milestone-files', duration: 2000 })
+    if (uploadedCount > 0) {
+      toast.success('อัปโหลดไฟล์สำเร็จ', { id: 'upload-milestone-files', duration: 2000 })
+    } else {
+      toast.dismiss('upload-milestone-files')
+    }
     await savePhaseIfChanged(phase)
   }
 
@@ -240,9 +260,10 @@ const Step3Milestone = () => {
     const file = e.target.files?.[0]
     if (!file) return
     const phase = activePhase
-    const supportedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
-    if (!supportedVideoTypes.includes(file.type)) {
-      toast.error(`ไม่รองรับไฟล์นี้ (รองรับ MP4, WebM, OGG, MOV)`)
+    const supportedVideoExtensions = ['mp4', 'webm', 'mov', 'avi']
+    const extension = file.name.split('.').pop()?.toLowerCase() ?? ''
+    if (!supportedVideoExtensions.includes(extension)) {
+      toast.error(`ไม่รองรับไฟล์นี้ (รองรับ MP4, WebM, MOV, AVI)`)
       e.target.value = ""
       return
     }
@@ -254,6 +275,8 @@ const Step3Milestone = () => {
     e.target.value = ""
 
     const blobUrl = URL.createObjectURL(file)
+    const controller = new AbortController()
+    uploadControllers.current.set(blobUrl, controller)
     useProjectStore.setState(state => ({
       currentProject: {
         ...state.currentProject,
@@ -264,7 +287,12 @@ const Step3Milestone = () => {
     }))
 
     toast.loading('กำลังอัปโหลดวิดีโอ...', { id: 'upload-milestone-video' })
-    const serverUrl = await uploadOneFile(file)
+    const serverUrl = await uploadOneFile(file, controller.signal)
+    uploadControllers.current.delete(blobUrl)
+    if (controller.signal.aborted) {
+      toast.dismiss('upload-milestone-video')
+      return
+    }
     if (serverUrl) {
       replaceVideoBlobUrl(blobUrl, serverUrl, file.name, phase)
       toast.success('อัปโหลดวิดีโอสำเร็จ', { id: 'upload-milestone-video', duration: 2000 })
@@ -280,7 +308,11 @@ const Step3Milestone = () => {
     const files = currentData.files || []
     const f = files[index]
     if (!f) return
-    if (f.url?.startsWith('blob:')) URL.revokeObjectURL(f.url)
+    if (f.url?.startsWith('blob:')) {
+      uploadControllers.current.get(f.url)?.abort()
+      uploadControllers.current.delete(f.url)
+      URL.revokeObjectURL(f.url)
+    }
     updateMilestone(activePhase, { files: files.filter((_, i) => i !== index) })
     await savePhaseIfChanged(activePhase)
   }
@@ -290,7 +322,12 @@ const Step3Milestone = () => {
     const videos = currentData.videos || []
     const v = videos[index]
     if (!v) return
-    if (v.url?.startsWith('blob:')) URL.revokeObjectURL(v.url)
+    if (v.url?.startsWith('blob:')) {
+      uploadControllers.current.get(v.url)?.abort()
+      uploadControllers.current.delete(v.url)
+      URL.revokeObjectURL(v.url)
+      toast.dismiss('upload-milestone-video')
+    }
     updateMilestone(activePhase, { videos: videos.filter((_, i) => i !== index) })
     await savePhaseIfChanged(activePhase)
   }
@@ -358,6 +395,7 @@ const Step3Milestone = () => {
               <input
                 type="text"
                 value={currentData.title}
+                maxLength={50}
                 readOnly={isLocked}
                 onChange={(e) => !isLocked && handleChange('title', e.target.value)}
                 onBlur={() => { if (!isLocked) savePhaseIfChanged(activePhase) }}
@@ -375,6 +413,7 @@ const Step3Milestone = () => {
                 ref={descriptionRef}
                 rows={3}
                 value={currentData.description}
+                maxLength={5000}
                 readOnly={isLocked}
                 onChange={(e) => {
                   if (isLocked) return
@@ -410,11 +449,16 @@ const Step3Milestone = () => {
             <div className="flex flex-col gap-[8px]">
               <label className="text-[14px] font-semibold text-foreground">ระยะเวลา (วัน) <span className="text-error">*</span></label>
               <input
-                type="number"
-                min={1}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={3}
                 value={currentData.duration || ''}
                 disabled={isLocked}
-                onChange={(e) => handleChange('duration', Number(e.target.value))}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, '').slice(0, 3)
+                  handleChange('duration', digits ? Math.min(Number(digits), 365) : 0)
+                }}
                 onBlur={() => {
                   const maxDays = (currentProject.projectDuration || 0) * 30;
                   if (maxDays > 0) {
@@ -603,8 +647,8 @@ const Step3Milestone = () => {
                         )}
                       </div>
                       <span className={`max-w-[150px] truncate ${uploading ? 'text-muted-foreground' : ''}`}>{f.name}</span>
-                      {!uploading && !isLocked && (
-                        <button type="button" onClick={() => removeImage(i)} className="ml-2 hover:text-error cursor-pointer">
+                      {!isLocked && (
+                        <button type="button" aria-label={`ลบ ${f.name}`} onClick={() => removeImage(i)} className="ml-2 hover:text-error cursor-pointer">
                           <X size={14} />
                         </button>
                       )}
@@ -621,13 +665,13 @@ const Step3Milestone = () => {
               </label>
               {!isLocked && (
                 <>
-                  <input type="file" accept="video/*" hidden ref={videoInputRef} onChange={handleVideoChange} />
+                  <input type="file" accept=".mp4,.webm,.mov,.avi,video/mp4,video/webm,video/quicktime,video/x-msvideo" hidden ref={videoInputRef} onChange={handleVideoChange} />
                   <div
                     onClick={() => videoInputRef.current?.click()}
                     className="border-[1.5px] border-dashed border-[#C084FC] rounded-[12px] p-[40px] flex flex-col items-center justify-center bg-[#F9F5FF] hover:bg-[#F3E8FF] transition-all cursor-pointer group"
                   >
                     <Upload className="text-muted-foreground mb-2 group-hover:-translate-y-1 transition-transform" size={24} />
-                    <span className="text-[13px] text-muted-foreground">.mp4, .webm, .mov, .avi, .mkv (สูงสุด 50MB)</span>
+                    <span className="text-[13px] text-muted-foreground">.mp4, .webm, .mov, .avi (สูงสุด 50MB)</span>
                   </div>
                 </>
               )}
@@ -645,8 +689,8 @@ const Step3Milestone = () => {
                         )}
                       </div>
                       <span className={`max-w-[150px] truncate ${uploading ? 'text-muted-foreground' : ''}`}>{vid.name}</span>
-                      {!uploading && !isLocked && (
-                        <button type="button" onClick={() => removeVideo(i)} className="ml-2 hover:text-error cursor-pointer">
+                      {!isLocked && (
+                        <button type="button" aria-label={`ลบ ${vid.name}`} onClick={() => removeVideo(i)} className="ml-2 hover:text-error cursor-pointer">
                           <X size={14} />
                         </button>
                       )}

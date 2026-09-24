@@ -97,7 +97,7 @@ interface ProjectState {
     updateProject: (id: number, data: Partial<Project>) => Promise<boolean>;
     deleteProject: (id: number) => Promise<boolean>;
     saveStory: (projectId: number, html?: string) => Promise<void>;
-    saveMilestonePhase: (projectId: number, phaseIndex: number) => Promise<void>;
+    saveMilestonePhase: (projectId: number, phaseIndex: number) => Promise<boolean>;
     updateProjectInfo: (data: Partial<Project>) => void;
     updateMilestone: (index: number, data: Partial<Milestone>) => void;
     updateProjectStatus: (projectId: number) => Promise<void>;
@@ -115,7 +115,7 @@ interface ProjectState {
     deleteProjectUpdate: (id: number) => Promise<boolean>;
 
     fetchCategories: () => Promise<{ id: number; name: string }[]>;
-    uploadFile: (file: File) => Promise<{ url: string; type?: string } | null>;
+    uploadFile: (file: File, signal?: AbortSignal) => Promise<{ url: string; type?: string } | null>;
     attachProjectMedia: (projectId: number | string, url: string, type: string) => Promise<void>;
     fetchProjectMedia: (projectId: number | string) => Promise<{ id: number; url: string }[]>;
     deleteProjectMedia: (mediaId: number) => Promise<void>;
@@ -324,6 +324,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
     // auto-save partial update (patch) ขึ้น backend — ใช้ตอน blur ของ input ต่างๆ ใน Step1Basics/Step2Story
     updateProject: async (id, data) => {
+        if (data.fundingGoal !== undefined && data.fundingGoal < 1000) {
+            toast.error('เป้าหมายเงินทุนขั้นต่ำ 1,000 บาท');
+            return false;
+        }
         // map store field names → API field names
         const payload: Record<string, unknown> = {};
         if (data.title !== undefined) payload.title = data.title;
@@ -460,7 +464,24 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
         const hasMedia = videoUrls.length > 0 || fileUrls.length > 0;
         const hasAnyData = !!(m?.title || m?.description || m?.duration || acceptanceCriteria || hasMedia);
-        if (!hasAnyData) return;
+        if (!hasAnyData) return true;
+
+        if (m.title.length > 50) {
+            toast.error('ชื่อ Milestone ต้องไม่เกิน 50 ตัวอักษร');
+            return false;
+        }
+        if (m.description.length > 5000) {
+            toast.error('คำอธิบายต้องไม่เกิน 5,000 ตัวอักษร');
+            return false;
+        }
+        if (acceptanceCriteria && acceptanceCriteria.length > 5000) {
+            toast.error('เกณฑ์การยอมรับรวมกันต้องไม่เกิน 5,000 ตัวอักษร');
+            return false;
+        }
+        if (m.duration < 0 || m.duration > 365) {
+            toast.error('ระยะเวลาต้องเป็นตัวเลขตั้งแต่ 1–365 วัน');
+            return false;
+        }
 
         const allUrls = [...fileUrls, ...videoUrls];
         const mTypes: string[] = [];
@@ -496,9 +517,12 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
                     }));
                 }
             }
+            return true;
         } catch (error) {
             console.error('saveMilestonePhase:', error);
-            toast.error('บันทึก Milestone ไม่สำเร็จ');
+            const message = error instanceof AxiosError ? error.response?.data?.message : null;
+            toast.error(message || 'บันทึก Milestone ไม่สำเร็จ');
+            return false;
         }
     },
 
@@ -759,13 +783,14 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     },
 
     // อัปโหลดไฟล์ดิบ (รูป/วิดีโอ/เอกสาร) ขึ้น Cloudinary ผ่าน backend endpoint /upload — คืน url + type ที่ backend ตรวจจับให้
-    uploadFile: async (file) => {
+    uploadFile: async (file, signal) => {
         try {
             const formData = new FormData();
             formData.append('file', file);
             const res = await api.post('/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
                 timeout: 120000,
+                signal,
             });
             const { url, type } = res.data?.data ?? {};
             return url ? { url, type } : null;

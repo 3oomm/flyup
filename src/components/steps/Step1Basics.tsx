@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 // backend validator บังคับ description ไม่เกิน 40 ตัวอักษร (PATCH คืน 400 ถ้าเกิน)
 const DESCRIPTION_MAX_LENGTH = 40;
+const MIN_FUNDING_GOAL = 1_000;
 
 const Step1Basics = () => {
   const { projectId } = useParams();
@@ -491,27 +492,42 @@ const Step1Basics = () => {
               onBlur={async () => {
                 setActiveField(null);
                 if (isFundingLocked) return;
-                const goalChanged = localData.fundingGoal !== currentProject.fundingGoal;
-                const capChanged = localData.softCap !== currentProject.softCap;
-                const maxInvestChanged = localData.maxInvestAmount !== currentProject.maxInvestAmount;
+                const fundingGoal = Math.max(localData.fundingGoal, MIN_FUNDING_GOAL);
+                const softCap = Math.ceil(fundingGoal * 0.7);
+                const minInvestAmount = Math.ceil(fundingGoal * 0.01);
+                if (localData.fundingGoal < MIN_FUNDING_GOAL) {
+                  toast.error('เป้าหมายเงินทุนขั้นต่ำ 1,000 บาท');
+                  setLocalData({
+                    ...localData,
+                    fundingGoal,
+                    softCap,
+                    minInvestAmount,
+                    maxInvestAmount: fundingGoal,
+                  });
+                }
+                const goalChanged = fundingGoal !== currentProject.fundingGoal;
+                const capChanged = softCap !== currentProject.softCap;
+                const maxInvestChanged = fundingGoal !== currentProject.maxInvestAmount;
                 if (!goalChanged && !capChanged && !maxInvestChanged) return;
                 updateProjectInfo({
-                  fundingGoal: localData.fundingGoal,
-                  softCap: localData.softCap,
-                  maxInvestAmount: localData.maxInvestAmount,
+                  fundingGoal,
+                  softCap,
+                  minInvestAmount,
+                  maxInvestAmount: fundingGoal,
                 });
                 setSaveStatus('saving');
                 if (projectId) {
                   await updateProject(Number(projectId), {
-                    fundingGoal: localData.fundingGoal,
-                    softCap: localData.softCap,
-                    maxInvestAmount: localData.maxInvestAmount,
+                    fundingGoal,
+                    softCap,
+                    maxInvestAmount: fundingGoal,
                   });
                 }
                 triggerSaved();
               }}
               disabled={isFundingLocked}
               className={isFundingLocked ? lockedInputCls : "border border-border bg-background h-[38px] px-[12px] rounded-[6px] focus:outline-none focus:border-primary transition-all duration-200 hover:border-primary/50"} />
+            <span className="text-[11px] text-muted-foreground">ขั้นต่ำ 1,000 บาท</span>
           </div>
           <div className="flex flex-col gap-[4px]">
             <label className="text-foreground text-[14px]">ระยะเวลาโปรเจกต์ (เดือน) <span className="text-error">*</span></label>
