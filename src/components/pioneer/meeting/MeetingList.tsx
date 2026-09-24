@@ -21,14 +21,13 @@ const FILTER_TABS: { value: FilterMode; label: string }[] = [
 ];
 
 function getMeetingDatetime(m: Meeting): Date | null {
-  try {
-    const d = new Date(m.date)
-    const t = new Date(m.time)
-    return new Date(Date.UTC(
-      d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
-      t.getUTCHours(), t.getUTCMinutes()
-    ))
-  } catch { return null }
+  const d = new Date(m.date)
+  const t = new Date(m.time)
+  const datetime = new Date(
+    d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(),
+    t.getUTCHours(), t.getUTCMinutes()
+  )
+  return Number.isNaN(datetime.getTime()) ? null : datetime
 }
 
 function isOngoingMeeting(m: Meeting): boolean {
@@ -54,8 +53,12 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
     return m.phase_no ? `Phase ${m.phase_no}` : m.title;
   };
 
-  const projectTitleByMilestone = (mid: number): string => {
-    return findMilestone(mid)?.project_title ?? '';
+  const projectTitleForMeeting = (meeting: Meeting): string => {
+    return meeting.project_title ?? findMilestone(meeting.milestone_id)?.project_title ?? '';
+  };
+
+  const projectIdForMeeting = (meeting: Meeting): number | undefined => {
+    return meeting.project_id ?? findMilestone(meeting.milestone_id)?.project_id;
   };
 
   const filtered = meetings.filter(m => {
@@ -63,6 +66,10 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
     if (filter === 'upcoming') return isUpcomingMeeting(m)
     if (filter === 'past')     return !isUpcomingMeeting(m) && !isOngoingMeeting(m)
     return true
+  }).sort((a, b) => {
+    const aTime = getMeetingDatetime(a)?.getTime() ?? 0
+    const bTime = getMeetingDatetime(b)?.getTime() ?? 0
+    return bTime - aTime || b.id - a.id
   })
 
   return (
@@ -99,7 +106,8 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
             <MeetingCard
               key={m.id}
               meeting={m}
-              projectTitle={projectTitleByMilestone(m.milestone_id)}
+              projectId={projectIdForMeeting(m)}
+              projectTitle={projectTitleForMeeting(m)}
               phaseLabel={milestoneLabel(m.milestone_id)}
               onEdit={onEdit}
               onCancel={onCancel}

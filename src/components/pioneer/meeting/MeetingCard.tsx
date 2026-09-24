@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
-  Video, MapPin, ChevronDown, ExternalLink, CheckCircle, Pencil, Trash2, Ban,
+  Video, MapPin, ChevronDown, ExternalLink, CheckCircle, Pencil, Trash2, Ban, Vote,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { MEETING_TYPE_LABEL, MEETING_WINDOW_MS, type Meeting } from './types';
 
 function formatDateThai(iso: string) {
@@ -21,6 +22,7 @@ function formatTime(iso: string) {
 
 interface MeetingCardProps {
   meeting: Meeting;
+  projectId?: number;
   projectTitle: string;
   phaseLabel: string | null;
   onEdit?: (m: Meeting) => void;
@@ -28,8 +30,9 @@ interface MeetingCardProps {
 }
 
 export default function MeetingCard({
-  meeting, projectTitle, phaseLabel, onEdit, onCancel,
+  meeting, projectId, projectTitle, phaseLabel, onEdit, onCancel,
 }: MeetingCardProps) {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const typeLabel = MEETING_TYPE_LABEL[meeting.meeting_type] ?? meeting.meeting_type;
@@ -59,6 +62,19 @@ export default function MeetingCard({
   const isOngoing  = isOpen && !!meetingDatetime && meetingDatetime <= now && now < new Date(meetingDatetime.getTime() + MEETING_WINDOW_MS)
   const isUpcoming = isOpen && (!meetingDatetime || meetingDatetime > now)
   const canModify = isUpcoming;
+  const canManageMilestone = !!projectId && !isCanceled && !isUpcoming;
+
+  const manageMilestoneButton = canManageMilestone ? (
+    <button
+      type="button"
+      onClick={() => navigate(`/pioneer/dashboard/projects/${projectId}/milestones`)}
+      title="ไปหน้าจัดการ Milestone เพื่อเปิด Vote"
+      className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-primary/20 bg-primary/5 text-primary text-xs font-semibold hover:bg-primary/10 transition-colors cursor-pointer whitespace-nowrap"
+    >
+      <Vote size={14} />
+      <span className="hidden sm:inline">จัดการ Milestone</span>
+    </button>
+  ) : null;
 
   return (
     <div className={`bg-white border rounded-2xl overflow-hidden transition-all ${expanded ? 'border-primary/40 shadow-sm' : 'border-border'} ${isCanceled ? 'opacity-60' : ''}`}>
@@ -85,9 +101,12 @@ export default function MeetingCard({
               ยกเลิก
             </span>
           ) : isClosed || (isOpen && !isUpcoming && !isOngoing) ? (
-            <span className="text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-full">
-              เสร็จสิ้น
-            </span>
+            <>
+              <span className="text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-full">
+                เสร็จสิ้น
+              </span>
+              {manageMilestoneButton}
+            </>
           ) : isOngoing ? (
             <>
               <span className="text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full animate-pulse hidden sm:inline-block">
@@ -103,6 +122,7 @@ export default function MeetingCard({
                   <Video size={13} /> เข้าร่วม
                 </a>
               )}
+              {manageMilestoneButton}
               {hasDetail && (
                 <button
                   onClick={() => setExpanded(!expanded)}

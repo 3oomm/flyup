@@ -58,6 +58,15 @@ export function useMeetingForm(initial?: Meeting) {
     if (!values.milestoneId) { toast.error('กรุณาเลือก Milestone'); return null; }
     if (!values.date) { toast.error('กรุณาเลือกวันที่'); return null; }
     if (!values.time) { toast.error('กรุณาเลือกเวลา'); return null; }
+    const meetingStartsAt = new Date(`${values.date}T${values.time}:00`);
+    if (Number.isNaN(meetingStartsAt.getTime())) {
+      toast.error('วันที่หรือเวลานัดหมายไม่ถูกต้อง');
+      return null;
+    }
+    if (meetingStartsAt.getTime() <= Date.now()) {
+      toast.error('ไม่สามารถนัดหมายในเวลาที่ผ่านมาแล้ว กรุณาเลือกเวลาในอนาคต');
+      return null;
+    }
     if (!values.meetingType) { toast.error('กรุณาเลือกรูปแบบการประชุม'); return null; }
     if ((values.meetingType === 'online' || values.meetingType === 'hybrid') && !values.meetingUrl.trim()) {
       toast.error('กรุณาระบุลิงก์ประชุม');

@@ -77,11 +77,13 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
     onDateChange(newDate)
     // ถ้าเป็นวันนี้และ time ปัจจุบันผ่านไปแล้ว ให้ reset time
     if (newDate === todayStr) {
+      const currentNow = new Date()
       const currentH = parseInt(localH)
       const currentM = parseInt(localM)
-      if (currentH < now.getHours() || (currentH === now.getHours() && currentM <= now.getMinutes())) {
-        setLocalH(pad(now.getHours()))
-        setLocalM(pad(now.getMinutes() + 1 > 59 ? 0 : now.getMinutes() + 1))
+      if (currentH < currentNow.getHours() || (currentH === currentNow.getHours() && currentM <= currentNow.getMinutes())) {
+        const nextMinute = new Date(currentNow.getTime() + 60_000)
+        setLocalH(pad(nextMinute.getHours()))
+        setLocalM(pad(nextMinute.getMinutes()))
       }
     }
     setTimeError('')
@@ -90,10 +92,11 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
   const validateTime = (h: string, m: string): string => {
     if (!date) return ''
     if (date === todayStr) {
+      const currentNow = new Date()
       const selH = parseInt(h)
       const selM = parseInt(m)
-      if (selH < now.getHours() || (selH === now.getHours() && selM <= now.getMinutes())) {
-        return `เวลาผ่านไปแล้ว กรุณาเลือกหลัง ${pad(now.getHours())}:${pad(now.getMinutes())}`
+      if (selH < currentNow.getHours() || (selH === currentNow.getHours() && selM <= currentNow.getMinutes())) {
+        return `เวลาผ่านไปแล้ว กรุณาเลือกหลัง ${pad(currentNow.getHours())}:${pad(currentNow.getMinutes())}`
       }
     }
     return ''

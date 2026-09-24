@@ -7,6 +7,8 @@ export const MEETING_WINDOW_MS = 2 * 60 * 60 * 1000; // 2 hours
 export interface Meeting {
   id: number;
   milestone_id: number;
+  project_id?: number;
+  project_title?: string;
   date: string;
   time: string;
   meeting_type: MeetingType;

@@ -58,7 +58,11 @@ export const useMeetingStore = create<MeetingStoreState>((set) => ({
         projects.map(p =>
           api
             .get(`/me/projects/${p.id}/meetings`, { params: { filter: 'all' } })
-            .then(r => (r.data?.data ?? []) as Meeting[])
+            .then(r => ((r.data?.data ?? []) as Meeting[]).map(meeting => ({
+              ...meeting,
+              project_id: p.id,
+              project_title: p.title,
+            })))
             .catch(() => [] as Meeting[])
         )
       );
