@@ -217,7 +217,6 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
                 placeholder="ชื่อ (เช่น GitHub)"
                 value={link.name}
                 onChange={e => updateLink(i, 'name', e.target.value)}
-                maxLength={100}
                 className="w-[140px] shrink-0 px-[10px] py-[8px] rounded-[8px] border border-border text-[13px] outline-none focus:border-primary"
               />
               <div className={`flex-1 flex items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-danger-bright' : 'border-border'}`}>

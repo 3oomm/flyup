@@ -223,7 +223,6 @@ export const useMilestoneStore = create<MilestoneStore>((set) => ({
         criteria: checkedCriteria,
         attachments,
         links: links.map(l => l.url.trim()).filter(Boolean),
-        link_names: links.filter(l => l.url.trim()).map(l => l.name.trim()),
       }
 
       await api.patch(
