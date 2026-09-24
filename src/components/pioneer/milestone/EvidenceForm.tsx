@@ -35,7 +35,14 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    setFiles(prev => [...prev, ...Array.from(e.target.files!)])
+    const selected = Array.from(e.target.files)
+    e.target.value = ''
+    const oversized = selected.find(file => file.size > 5 * 1024 * 1024)
+    if (oversized) {
+      toast.error('รูปภาพหรือ PDF ต้องมีขนาดไม่เกิน 5MB')
+      return
+    }
+    setFiles(prev => [...prev, ...selected])
     setFilesError(false)
   }
   const removeFile = (i: number) => setFiles(prev => prev.filter((_, idx) => idx !== i))
@@ -154,7 +161,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
         <p className="text-[13px] font-semibold text-foreground mb-[4px]">
           ไฟล์แนบ <span className="text-danger-bright">*</span>
         </p>
-        <p className="text-[12px] text-muted-foreground mb-[10px]">รูปภาพ (≤10MB) หรือ PDF (≤50MB)</p>
+        <p className="text-[12px] text-muted-foreground mb-[10px]">รูปภาพหรือ PDF (≤5MB)</p>
         <button
           type="button"
           disabled={isSubmitting}

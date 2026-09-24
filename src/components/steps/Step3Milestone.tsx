@@ -202,6 +202,11 @@ const Step3Milestone = () => {
     // ต้อง convert ก่อน clear — FileList เป็น live reference ถูกล้างเมื่อ value = ""
     const files = Array.from(fileList)
     e.target.value = ""
+    const oversized = files.find(file => file.size > 5 * 1024 * 1024)
+    if (oversized) {
+      toast.error('รูปภาพ, PDF หรือ Excel ต้องมีขนาดไม่เกิน 5MB')
+      return
+    }
     const previews = files.map(file => ({ name: file.name, url: URL.createObjectURL(file) }))
 
     // append blob previews ต่อรายการปัจจุบัน (อ่านจาก store ผ่าน setState เพื่อหลีกเลี่ยง stale closure)

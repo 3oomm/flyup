@@ -242,10 +242,14 @@ const Step1Basics = () => {
 
     const currentImages = currentProject?.files || [];
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    const validFiles = Array.from(files).filter(file => allowedTypes.includes(file.type));
+    const typeValidFiles = Array.from(files).filter(file => allowedTypes.includes(file.type));
 
-    if (validFiles.length !== files.length) {
+    if (typeValidFiles.length !== files.length) {
       toast.error("อนุญาตเฉพาะไฟล์ PNG, JPEG และ WEBP เท่านั้น");
+    }
+    const validFiles = typeValidFiles.filter(file => file.size <= 5 * 1024 * 1024);
+    if (validFiles.length !== typeValidFiles.length) {
+      toast.error("รูปภาพต้องมีขนาดไม่เกิน 5MB");
     }
     if (validFiles.length === 0) return;
 
