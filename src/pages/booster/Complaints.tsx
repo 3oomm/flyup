@@ -40,6 +40,7 @@ const FILTER_TABS: { key: FilterKey; label: string }[] = [
 const Complaints = () => {
   const { complaints, isLoading, fetchMyComplaints } = useComplaintStore();
   const [filter, setFilter] = useState<FilterKey>('all');
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     fetchMyComplaints();
@@ -52,6 +53,8 @@ const Complaints = () => {
     () => filter === 'all' ? complaints : complaints.filter((c) => c.status === filter),
     [complaints, filter]
   );
+
+  useEffect(() => setVisibleCount(5), [filter]);
 
   return (
     <div className="relative">
@@ -106,7 +109,7 @@ const Complaints = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filtered.map((item) => {
+          {filtered.slice(0, visibleCount).map((item) => {
             const cfg = statusConfig[item.status] ?? statusConfig.open;
             const { Icon } = cfg;
             return (
@@ -140,6 +143,13 @@ const Complaints = () => {
               </Link>
             );
           })}
+          {visibleCount < filtered.length && (
+            <div className="flex justify-center pt-3">
+              <button onClick={() => setVisibleCount((count) => count + 5)} className="rounded-lg bg-[#171525] px-7 py-3 text-sm font-semibold text-white hover:opacity-90">
+                โหลดเพิ่มเติม
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

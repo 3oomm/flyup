@@ -189,6 +189,7 @@ const Payouts = () => {
   // /pioneer/payouts ไม่ส่ง thumbnail มาด้วย ต้องดึงจาก useProjectStore แล้ว match ด้วย project_id เอาเอง
   const { projects, fetchMyProjects } = useProjectStore()
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [visibleCount, setVisibleCount] = useState(5)
 
   useEffect(() => { fetchPayouts() }, [fetchPayouts])
   useEffect(() => { fetchMyProjects() }, [fetchMyProjects])
@@ -276,9 +277,16 @@ const Payouts = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {grouped.map(g => (
+          {grouped.slice(0, visibleCount).map(g => (
             <ProjectCard key={g.id} title={g.title} items={g.items} thumbnailUrl={g.thumbnailUrl} onClick={() => setSelectedId(g.id)} />
           ))}
+          {visibleCount < grouped.length && (
+            <div className="flex justify-center pt-3">
+              <button onClick={() => setVisibleCount(count => count + 5)} className="rounded-lg bg-[#171525] px-7 py-3 text-sm font-semibold text-white hover:opacity-90">
+                โหลดเพิ่มเติม
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

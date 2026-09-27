@@ -172,6 +172,7 @@ function MeetingCard({ meeting, now }: { meeting: BoosterMeeting; now: Date }) {
 
 const Meetings = () => {
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('all');
+  const [visibleCount, setVisibleCount] = useState(5);
   const [now, setNow] = useState(() => new Date());
   const { boosterMeetings, fetchBoosterMeetings } = useBoosterStore();
 
@@ -205,6 +206,10 @@ const Meetings = () => {
     [boosterMeetings, filter, now]
   );
 
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [filter]);
+
   return (
     <div>
       <div className="mb-6">
@@ -229,7 +234,18 @@ const Meetings = () => {
 
         {filtered.length > 0 ? (
           <div className="space-y-3">
-            {filtered.map((m: BoosterMeeting) => <MeetingCard key={m.id} meeting={m} now={now} />)}
+            {filtered.slice(0, visibleCount).map((m: BoosterMeeting) => <MeetingCard key={m.id} meeting={m} now={now} />)}
+            {visibleCount < filtered.length && (
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount(count => count + 5)}
+                  className="rounded-lg bg-[#171421] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#292438]"
+                >
+                  โหลดเพิ่มเติม
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 bg-card border border-border rounded-2xl text-muted-foreground">

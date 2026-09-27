@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { CheckCircle2, Clock, Loader2, RotateCcw } from 'lucide-react'
 import { useBoosterStore } from '../../store/useBoosterStore'
@@ -15,6 +15,7 @@ function fmtBaht(v?: number) {
 const Refunds = () => {
   const navigate = useNavigate()
   const { investments, isLoading, fetchMyInvestments } = useBoosterStore()
+  const [visibleCount, setVisibleCount] = useState(5)
 
   useEffect(() => { fetchMyInvestments() }, [fetchMyInvestments])
 
@@ -46,7 +47,7 @@ const Refunds = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {refunds.map(inv => {
+          {refunds.slice(0, visibleCount).map(inv => {
             const isRefunded = inv.status === 'refunded'
             const projectTitle = inv.project?.title ?? `Project ${inv.project_id}`
             const amount = inv.refund_amount ?? inv.amount ?? 0
@@ -96,6 +97,13 @@ const Refunds = () => {
               </div>
             )
           })}
+          {visibleCount < refunds.length && (
+            <div className="flex justify-center pt-3">
+              <button onClick={() => setVisibleCount(count => count + 5)} className="rounded-lg bg-[#171525] px-7 py-3 text-sm font-semibold text-white hover:opacity-90">
+                โหลดเพิ่มเติม
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

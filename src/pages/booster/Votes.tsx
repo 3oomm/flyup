@@ -61,14 +61,14 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
         <div className="flex items-center gap-3 mb-1 flex-wrap">
           <h3 className="font-bold text-foreground text-base leading-tight">{vote.projectTitle}</h3>
           {isOpen ? (
-            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-primary/5 text-primary border-primary/20">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-green-50 text-green-700 border-green-200 animate-pulse">
               เปิดโหวต
             </span>
           ) : (
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
               isPassed ? 'bg-green-50 text-green-700 border-green-200' :
               isFailed ? 'bg-red-50 text-red-600 border-red-200' :
-              'bg-muted text-muted-foreground border-border'
+              'bg-white text-muted-foreground border-border'
             }`}>
               {isPassed ? 'โหวตผ่าน' : isFailed ? 'โหวตไม่ผ่าน' : 'ปิดแล้ว'}
             </span>
@@ -143,12 +143,12 @@ function ProjectRow({ project }: { project: VoteProject }) {
             {project.milestones.length} Phase
           </span>
           {openCount > 0 && (
-            <span className="px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20">
+            <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 animate-pulse">
               เปิดโหวต {openCount}
             </span>
           )}
           {closedCount > 0 && (
-            <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+            <span className="px-2.5 py-1 rounded-full bg-white text-muted-foreground border border-border">
               ปิดแล้ว {closedCount}
             </span>
           )}

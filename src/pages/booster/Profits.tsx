@@ -11,6 +11,7 @@ const fmtDate = (d?: string | null) =>
 const Profits = () => {
     const { profitPayouts: items, isLoadingProfitPayouts: isLoading, fetchProfitPayouts } = useBoosterStore()
     const [expanded, setExpanded] = useState<Record<number, boolean>>({})
+    const [visibleCount, setVisibleCount] = useState(5)
 
     useEffect(() => { fetchProfitPayouts() }, [fetchProfitPayouts])
 
@@ -74,7 +75,7 @@ const Profits = () => {
                 </div>
             ) : (
                 <div className="flex flex-col gap-3">
-                    {Object.entries(grouped).map(([projectId, { title, items: groupItems }]) => {
+                    {Object.entries(grouped).slice(0, visibleCount).map(([projectId, { title, items: groupItems }]) => {
                         const pid = Number(projectId)
                         const isOpen = !!expanded[pid]
                         const totalConfirmed = groupItems.filter(i => i.status === 'confirmed').reduce((s, i) => s + i.amount, 0)
@@ -150,6 +151,13 @@ const Profits = () => {
                             </div>
                         )
                     })}
+                    {visibleCount < Object.keys(grouped).length && (
+                        <div className="flex justify-center pt-3">
+                            <button onClick={() => setVisibleCount(count => count + 5)} className="rounded-lg bg-[#171525] px-7 py-3 text-sm font-semibold text-white hover:opacity-90">
+                                โหลดเพิ่มเติม
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

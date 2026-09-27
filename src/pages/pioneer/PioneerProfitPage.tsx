@@ -360,6 +360,7 @@ const PioneerProfitPage = () => {
     const [showModal, setShowModal]   = useState(false)
     const [myProjects, setMyProjects] = useState<MyProject[]>([])
     const [selectedId, setSelectedId] = useState<number | null>(null)
+    const [visibleCount, setVisibleCount] = useState(5)
 
     useEffect(() => {
         fetchPools()
@@ -480,7 +481,7 @@ const PioneerProfitPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {grouped.map((g, idx) => {
+                                {grouped.slice(0, visibleCount).map((g, idx) => {
                                     const totalAmt  = g.items.reduce((s, p) => s + p.total_amount, 0)
                                     const doneCount = g.items.filter(p => p.status === 'completed').length
                                     const allDone   = doneCount === g.items.length && g.items.length > 0
@@ -523,6 +524,13 @@ const PioneerProfitPage = () => {
                             </tbody>
                         </table>
                     </div>
+                    {visibleCount < grouped.length && (
+                        <div className="flex justify-center border-t border-border p-4">
+                            <button onClick={() => setVisibleCount(count => count + 5)} className="rounded-lg bg-[#171525] px-7 py-3 text-sm font-semibold text-white hover:opacity-90">
+                                โหลดเพิ่มเติม
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import MeetingCard from './MeetingCard';
 import type { FilterMode, Meeting, MilestoneOption } from './types';
@@ -45,6 +46,7 @@ function isUpcomingMeeting(m: Meeting): boolean {
 }
 
 export default function MeetingList({ meetings, loading, filter, onFilterChange, milestones, onEdit, onCancel }: MeetingListProps) {
+  const [visibleCount, setVisibleCount] = useState(5);
   const findMilestone = (mid: number) => milestones.find(x => x.id === mid);
 
   const milestoneLabel = (mid: number): string | null => {
@@ -71,6 +73,10 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
     const bTime = getMeetingDatetime(b)?.getTime() ?? 0
     return bTime - aTime || b.id - a.id
   })
+
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [filter]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -102,7 +108,7 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
         <p className="text-sm text-muted-foreground text-center py-10">ยังไม่มีการประชุม</p>
       ) : (
         <div className="flex flex-col gap-3">
-          {filtered.map(m => (
+          {filtered.slice(0, visibleCount).map(m => (
             <MeetingCard
               key={m.id}
               meeting={m}
@@ -113,6 +119,17 @@ export default function MeetingList({ meetings, loading, filter, onFilterChange,
               onCancel={onCancel}
             />
           ))}
+          {visibleCount < filtered.length && (
+            <div className="flex justify-center pt-2">
+              <button
+                type="button"
+                onClick={() => setVisibleCount(count => count + 5)}
+                className="rounded-lg bg-[#171421] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#292438]"
+              >
+                โหลดเพิ่มเติม
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
