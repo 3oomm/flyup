@@ -67,7 +67,7 @@ const SidebarBooster = () => {
 
     useEffect(() => {
         fetchBadges()
-        const interval = setInterval(fetchBadges, 10_000)
+        const interval = setInterval(fetchBadges, 60_000)
         const refreshOnVisible = () => {
             if (document.visibilityState === 'visible') fetchBadges()
         }

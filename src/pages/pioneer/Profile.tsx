@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSearchParams } from "react-router";
 import ProfileTab from "../../components/pioneer/ProfileTab";
 import NotificationTab from "../../components/pioneer/NotificationTab";
@@ -17,11 +16,13 @@ const tabs: { key: Tab; label: string }[] = [
 const validTabs: Tab[] = ["profile", "notification", "password", "verify"];
 
 const Profile = () => {
-  const [searchParams] = useSearchParams();
-  const initialTab = (searchParams.get("tab") ?? "profile") as Tab;
-  const [activeTab, setActiveTab] = useState<Tab>(
-    validTabs.includes(initialTab) ? initialTab : "profile"
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = (searchParams.get("tab") ?? "profile") as Tab;
+  const activeTab = validTabs.includes(requestedTab) ? requestedTab : "profile";
+
+  const handleTabChange = (tab: Tab) => {
+    setSearchParams({ tab }, { replace: true });
+  };
 
   return (
     <div className="max-w-[670px] mx-auto">
@@ -32,7 +33,7 @@ const Profile = () => {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabChange(tab.key)}
             className={`px-[16px] py-[8px] rounded-[8px] text-[14px] font-medium transition-colors cursor-pointer ${
               activeTab === tab.key
                 ? "bg-primary text-white"

@@ -42,6 +42,7 @@ const AboutUs = lazy(() => import('../pages/public/AboutUs'));
 const Terms = lazy(() => import('../pages/public/Terms'));
 const HelpCenter = lazy(() => import('../pages/public/HelpCenter'));
 const MobileKyc = lazy(() => import('../pages/public/MobileKyc'));
+const NotFound = lazy(() => import('../pages/public/NotFound'));
 
 // Pioneer Pages
 const ProjectOverview = lazy(() => import('../pages/pioneer/ProjectOverview'));
@@ -186,6 +187,7 @@ const Router = () => {
                         <Route path='/about/we' element={<AboutUs />} />
                         <Route path='/legal/terms' element={<Terms />} />
                         <Route path='/help' element={<HelpCenter />} />
+                        <Route path='*' element={<NotFound />} />
                     </Route>
 
                     <Route element={<PioneerGuard />}>

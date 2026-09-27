@@ -1,4 +1,5 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -23,8 +24,48 @@ const instance = axios.create({
 
 // Request interceptor: ส่ง Authorization header จาก localStorage ถ้ามี
 // (รองรับ incognito ที่ cookie ถูกบล็อก)
-instance.interceptors.request.use((config) => {
-  const token = getStoredToken();
+let proactiveRefresh: Promise<string | undefined> | null = null;
+
+const tokenExpiresSoon = (token: string) => {
+  try {
+    const { exp } = jwtDecode<{ exp?: number }>(token);
+    return typeof exp === "number" && exp * 1000 <= Date.now() + 30_000;
+  } catch {
+    return false;
+  }
+};
+
+const refreshBeforeExpiry = () => {
+  if (proactiveRefresh) return proactiveRefresh;
+
+  const refreshToken = getStoredRefresh();
+  proactiveRefresh = axios
+    .post(`${baseURL}/auth/refresh`, null, {
+      withCredentials: true,
+      timeout: 8000,
+      headers: refreshToken ? { "X-Refresh-Token": refreshToken } : {},
+    })
+    .then((res) => {
+      const newToken: string | undefined = res.data?.token;
+      if (newToken) setStoredToken(newToken);
+      return newToken;
+    })
+    .finally(() => {
+      proactiveRefresh = null;
+    });
+
+  return proactiveRefresh;
+};
+
+instance.interceptors.request.use(async (config) => {
+  let token = getStoredToken();
+  if (token && tokenExpiresSoon(token) && !config.url?.includes("/auth/refresh")) {
+    try {
+      token = (await refreshBeforeExpiry()) ?? token;
+    } catch {
+      // The response interceptor handles an expired/invalid session consistently.
+    }
+  }
   if (token) config.headers["Authorization"] = `Bearer ${token}`;
   return config;
 });

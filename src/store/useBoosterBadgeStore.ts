@@ -20,20 +20,30 @@ const empty: BoosterBadgeCounts = {
     open_complaints: 0,
 }
 
+let fetchInFlight: Promise<void> | null = null
+
 export const useBoosterBadgeStore = create<BoosterBadgeStore>((set) => ({
     counts: empty,
     fetchBadges: async () => {
-        try {
-            const [badgeRes, meetingsRes] = await Promise.all([
-                api.get('/booster/badges'),
-                api.get('/me/investor-meetings'),
-            ])
-            const meetings: { status: string }[] = meetingsRes.data?.data ?? []
-            const upcomingMeetings = meetings.filter((meeting) => meeting.status === 'open').length
-            const counts = badgeRes.data?.data ?? empty
-            set({ counts: { ...counts, upcoming_meetings: upcomingMeetings } })
-        } catch {
-            // ignore
-        }
+        if (fetchInFlight) return fetchInFlight
+
+        fetchInFlight = (async () => {
+            try {
+                const [badgeRes, meetingsRes] = await Promise.all([
+                    api.get('/booster/badges'),
+                    api.get('/me/investor-meetings'),
+                ])
+                const meetings: { status: string }[] = meetingsRes.data?.data ?? []
+                const upcomingMeetings = meetings.filter((meeting) => meeting.status === 'open').length
+                const counts = badgeRes.data?.data ?? empty
+                set({ counts: { ...counts, upcoming_meetings: upcomingMeetings } })
+            } catch {
+                // The auth interceptor retries expired sessions automatically.
+            } finally {
+                fetchInFlight = null
+            }
+        })()
+
+        return fetchInFlight
     },
 }))
