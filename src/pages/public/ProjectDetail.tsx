@@ -139,6 +139,7 @@ function ProjectDetail() {
 
   const isAdmin = authUser?.role === 'admin';
   const isPioneer = authUser?.role === 'pioneer';
+  const hasPhone = typeof authUser?.phone === 'string' && authUser.phone.trim().length > 0;
   const isIdVerified = authUser?.id_card_verification?.status === 'approved';
   const hasBank = (authUser?.bank_accounts?.length ?? 0) > 0;
   const cannotInvestReason = isAdmin
@@ -168,6 +169,21 @@ function ProjectDetail() {
     }
     if (isAdmin || isOwner || isPioneer) {
       toast.error(cannotInvestReason, { id: "cannot-invest", position: "top-right", duration: 3000 });
+      return;
+    }
+    if (!hasPhone) {
+      const result = await Swal.fire({
+        icon: 'warning',
+        title: 'กรุณากรอกข้อมูลส่วนตัวให้ครบ',
+        html: '<p style="font-size:14px;color:#374151">กรุณากรอกเบอร์โทรศัพท์ในหน้าโปรไฟล์ก่อนลงทุน</p>',
+        confirmButtonText: 'ไปหน้าโปรไฟล์',
+        confirmButtonColor: '#16A34A',
+        showCancelButton: true,
+        cancelButtonText: 'ยกเลิก',
+        cancelButtonColor: '#6B7280',
+        reverseButtons: true,
+      });
+      if (result.isConfirmed) navigate('/booster/profile?tab=profile');
       return;
     }
     if (!isIdVerified || !hasBank) {

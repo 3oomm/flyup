@@ -120,6 +120,7 @@ const Investment = () => {
     const isAdmin = authUser.role === 'admin';
     const isPioneer = authUser.role === 'pioneer';
     const isOwner = !!project?.owner_user_id && authUser.id === project.owner_user_id;
+    const hasPhone = typeof authUser.phone === 'string' && authUser.phone.trim().length > 0;
     const kycApproved = authUser.id_card_verification?.status === 'approved';
 
     if (isAdmin || isPioneer) {
@@ -128,6 +129,9 @@ const Investment = () => {
     } else if (isOwner) {
       toast.error('เจ้าของโปรเจกต์ไม่สามารถลงทุนในโปรเจกต์ของตัวเองได้');
       navigate(`/projects/${slug}`, { replace: true });
+    } else if (!hasPhone) {
+      toast.error('กรุณากรอกข้อมูลส่วนตัวให้ครบ โดยเพิ่มเบอร์โทรศัพท์ก่อนลงทุน', { duration: 4000 });
+      navigate('/booster/profile?tab=profile', { replace: true });
     } else if (!kycApproved) {
       toast.error('กรุณายืนยันตัวตนด้วยบัตรประชาชนก่อนลงทุน', { duration: 4000 });
       navigate('/booster/profile?tab=verify', { replace: true });
