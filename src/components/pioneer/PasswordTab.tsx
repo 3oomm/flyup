@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Lock, Eye, EyeOff, CheckCircle, Circle } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 import { useAuthStore } from "../../store/useAuthStore";
 import { unicodeLength, utf8ByteLength } from "../../lib/validation";
 
 const PasswordTab = () => {
+  const navigate = useNavigate();
   const { authUser, addPassword, changePassword, isSavingPassword } = useAuthStore();
   // Fallback when backend doesn't send has_password: assume Google-only users
   // (google_sub set, no has_password field) still need to set a password.
@@ -42,7 +44,10 @@ const PasswordTab = () => {
     const ok = isSettingPassword
       ? await addPassword(form.newPass)
       : await changePassword(form.current, form.newPass);
-    if (ok) setForm({ current: "", newPass: "", confirm: "" });
+    if (ok) {
+      setForm({ current: "", newPass: "", confirm: "" });
+      navigate("/", { replace: true });
+    }
   };
 
   const fields: { key: keyof typeof form; label: string }[] = isSettingPassword
