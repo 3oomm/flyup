@@ -15,6 +15,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   verified: { label: 'กำลังดำเนินการ', color: 'bg-purple-100 text-purple-700' },
   funding: { label: 'กำลังดำเนินการ', color: 'bg-purple-100 text-purple-700' },
   completed: { label: 'เสร็จสิ้น', color: 'bg-green-100 text-green-700' },
+  refund_pending: { label: 'รอคืนเงิน', color: 'bg-orange-100 text-orange-700' },
   refunded: { label: 'คืนเงิน', color: 'bg-orange-100 text-orange-700' },
   cancelled: { label: 'ยกเลิก', color: 'bg-red-100 text-red-700' },
   rejected: { label: 'ชำระเงินไม่สำเร็จ', color: 'bg-red-100 text-red-700' },

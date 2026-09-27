@@ -118,6 +118,17 @@ function ProjectDetail() {
 
   const milestones = project?.milestones ?? [];
   const hasMilestones = milestones.length > 0;
+  const orderedMilestones = [...milestones].sort((a, b) =>
+    (a.sort_order - b.sort_order) || (a.phase_no - b.phase_no)
+  );
+  const currentMilestone = orderedMilestones.find((milestone) =>
+    ['active', 'submitted', 'rejected', 'failed'].includes(milestone.status)
+  ) ?? orderedMilestones.find((milestone) =>
+    !['paid', 'approved', 'cancelled'].includes(milestone.status)
+  );
+  const currentPhase = currentMilestone
+    ? currentMilestone.phase_no || orderedMilestones.indexOf(currentMilestone) + 1
+    : null;
 
   const storyHtml = project?.stories
     ? project.stories.sort((a, b) => a.sort_order - b.sort_order).map(s => s.body).join('')
@@ -570,7 +581,7 @@ function ProjectDetail() {
               {(() => {
                 const stateLabel: Record<string, { text: string; color: string }> = {
                   funding:        { text: 'กำลังระดมทุน',       color: 'text-primary' },
-                  executing:      { text: 'กำลังดำเนินการ',      color: 'text-purple-600' },
+                  executing:      { text: `กำลังดำเนินการ${currentPhase ? ` · Phase ${currentPhase}` : ''}`, color: 'text-purple-600' },
                   closed:         { text: 'ปิดโครงการแล้ว',       color: 'text-green-600' },
                   cancelled:      { text: 'ยกเลิกแล้ว',           color: 'text-red-500' },
                   pending_cancel: { text: 'รอยืนยันการยกเลิก',   color: 'text-orange-500' },

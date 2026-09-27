@@ -462,9 +462,12 @@ const Home = () => {
       </div>
 
       {howItWorksModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setHowItWorksModal(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4" onClick={() => setHowItWorksModal(null)}>
           <div
-            className="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-label={howItWorksModal.role}
+            className="bg-white rounded-3xl w-full max-w-lg max-h-[calc(100dvh-24px)] sm:max-h-[85dvh] overflow-y-auto overscroll-contain shadow-2xl animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             <div className="p-6 md:p-8 space-y-5">
@@ -509,7 +512,7 @@ const Home = () => {
 
               <button
                 onClick={() => setHowItWorksModal(null)}
-                className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium transition-colors cursor-pointer"
+                className="sticky bottom-0 z-10 w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium transition-colors cursor-pointer shadow-[0_-12px_24px_12px_white]"
               >
                 เข้าใจแล้ว
               </button>
