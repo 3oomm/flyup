@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { Loader2, ChevronRight, ChevronLeft, Flag } from 'lucide-react'
 import { useProjectStore, type ProjectSummary } from '../../store/useProjectStore'
+import { getCurrentProjectPhase } from '../../lib/projectPhase'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -49,6 +50,10 @@ const ProjectRow = ({ project }: { project: ProjectSummary }) => {
   const navigable = MILESTONE_NAVIGABLE.includes(project.state)
   const badge = STATE_BADGE[project.state] ?? 'bg-surface-hover text-[#6C757D]'
   const label = STATE_LABEL[project.state] ?? project.state
+  const currentPhase = getCurrentProjectPhase(project.milestones)
+  const badgeLabel = project.state === 'executing' && currentPhase
+    ? `${label} · Phase ${currentPhase}`
+    : label
   const progress = project.funding_goal > 0
     ? Math.min(100, Math.round((project.current_funding / project.funding_goal) * 100))
     : 0
@@ -70,7 +75,7 @@ const ProjectRow = ({ project }: { project: ProjectSummary }) => {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className="font-semibold text-[14px] text-foreground truncate">{project.title}</span>
-          <span className={`shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full ${badge}`}>{label}</span>
+          <span className={`shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full ${badge}`}>{badgeLabel}</span>
           {project.category && (
             <span className="shrink-0 text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{project.category.name}</span>
           )}

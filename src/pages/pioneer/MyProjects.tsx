@@ -4,6 +4,7 @@ import { Search, Plus, SlidersHorizontal, ChevronDown, Eye, Edit3, Trash2, Loade
 import { useProjectStore } from "../../store/useProjectStore";
 import useCreateProjectGuard from "../../hooks/useCreateProjectGuard";
 import Swal from "../../lib/swal";
+import { getCurrentProjectPhase } from "../../lib/projectPhase";
 
 type StateType = "funding" | "pending_review" | "draft" | "closed" | "cancelled" | "executing" | "pending_cancel" | "suspended" | "pending_edit_review";
 
@@ -267,17 +268,7 @@ const MyProjects = () => {
             const progress = project.funding_goal > 0
               ? Math.min(Math.round((project.current_funding / project.funding_goal) * 100), 100)
               : 0;
-            const orderedMilestones = [...(project.milestones ?? [])].sort((a, b) =>
-              (a.sort_order - b.sort_order) || (a.phase_no - b.phase_no)
-            );
-            const currentMilestone = orderedMilestones.find((milestone) =>
-              ['active', 'submitted', 'rejected', 'failed'].includes(milestone.status)
-            ) ?? orderedMilestones.find((milestone) =>
-              !['paid', 'approved', 'cancelled'].includes(milestone.status)
-            );
-            const currentPhase = currentMilestone
-              ? currentMilestone.phase_no || orderedMilestones.indexOf(currentMilestone) + 1
-              : null;
+            const currentPhase = getCurrentProjectPhase(project.milestones);
 
             return (
               <div
