@@ -37,6 +37,9 @@ function ProjectDetail() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("story");
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isMediaVisible, setIsMediaVisible] = useState(true);
+  const [isGalleryPaused, setIsGalleryPaused] = useState(false);
+  const [galleryCycle, setGalleryCycle] = useState(0);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
   const [showInvestorsModal, setShowInvestorsModal] = useState(false);
 
@@ -48,6 +51,7 @@ function ProjectDetail() {
   const [commentBody, setCommentBody] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mediaFadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isLoggedIn = !!authUser;
   const project = currentPublicProject;
@@ -105,7 +109,7 @@ function ProjectDetail() {
   type MediaItem = { type: 'video' | 'image'; url: string; };
 
   const mediaList: MediaItem[] = project?.media
-    ? project.media
+    ? [...project.media]
         .sort((a, b) => a.sort_order - b.sort_order)
         .map(m => {
           const typeStr = Array.isArray(m.type) ? m.type[0] : m.type;
@@ -115,6 +119,39 @@ function ProjectDetail() {
 
   const displayMedia = mediaList.length > 0 ? mediaList : [{ type: 'image' as const, url: PLACEHOLDER_IMG }];
   const selectedMedia = displayMedia[selectedImage] || displayMedia[0];
+
+  const selectMedia = (index: number) => {
+    if (index === selectedImage) return;
+    if (mediaFadeTimeoutRef.current) clearTimeout(mediaFadeTimeoutRef.current);
+    setIsMediaVisible(false);
+    mediaFadeTimeoutRef.current = setTimeout(() => {
+      setSelectedImage(index);
+      setIsMediaVisible(true);
+      mediaFadeTimeoutRef.current = null;
+    }, 350);
+    setGalleryCycle(cycle => cycle + 1);
+  };
+
+  useEffect(() => {
+    if (displayMedia.length <= 1 || isGalleryPaused) return;
+
+    const interval = setInterval(() => {
+      setIsMediaVisible(false);
+      mediaFadeTimeoutRef.current = setTimeout(() => {
+        setSelectedImage(current => (current + 1) % displayMedia.length);
+        setIsMediaVisible(true);
+        mediaFadeTimeoutRef.current = null;
+      }, 350);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      if (mediaFadeTimeoutRef.current) {
+        clearTimeout(mediaFadeTimeoutRef.current);
+        mediaFadeTimeoutRef.current = null;
+      }
+    };
+  }, [displayMedia.length, isGalleryPaused, galleryCycle, projectId]);
 
   const milestones = project?.milestones ?? [];
   const hasMilestones = milestones.length > 0;
@@ -283,18 +320,25 @@ function ProjectDetail() {
           {/* ── LEFT COLUMN ── */}
           <div className="flex-1 min-w-0 w-full lg:w-auto flex flex-col gap-[20px]">
             {/* Main image */}
-            <div className="w-full aspect-[16/10] bg-white rounded-[16px] border border-border overflow-hidden">
+            <div
+              className="w-full aspect-[16/10] bg-white rounded-[16px] border border-border overflow-hidden"
+              onMouseEnter={() => setIsGalleryPaused(true)}
+              onMouseLeave={() => setIsGalleryPaused(false)}
+            >
               {selectedMedia.type === 'video' ? (
                 <video
                   src={selectedMedia.url}
                   controls
-                  className="w-full h-full object-cover"
+                  onPlay={() => setIsGalleryPaused(true)}
+                  onPause={() => setIsGalleryPaused(false)}
+                  onEnded={() => setIsGalleryPaused(false)}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isMediaVisible ? 'opacity-100' : 'opacity-0'}`}
                 />
               ) : (
                 <img
                   src={selectedMedia.url}
                   alt="project media"
-                  className="w-full h-full object-cover transition-all duration-300 ease-in-out"
+                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isMediaVisible ? 'opacity-100' : 'opacity-0'}`}
                 />
               )}
             </div>
@@ -305,7 +349,7 @@ function ProjectDetail() {
                 {displayMedia.map((img, i) => (
                   <button
                     key={i}
-                    onClick={() => setSelectedImage(i)}
+                    onClick={() => selectMedia(i)}
                     className={`w-[80px] h-[60px] flex-shrink-0 border-2 rounded-[8px] overflow-hidden cursor-pointer transition-colors ${selectedImage === i ? 'border-primary' : 'border-border hover:border-primary/50'}`}
                   >
                     {img.type === 'video' ? (
