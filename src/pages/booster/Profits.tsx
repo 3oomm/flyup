@@ -88,7 +88,7 @@ const Profits = () => {
                                 <button
                                     data-testid={`profit-group-toggle-${pid}`}
                                     onClick={() => setExpanded(prev => ({ ...prev, [pid]: !prev[pid] }))}
-                                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/60 transition-colors cursor-pointer text-left"
+                                    className="w-full flex flex-col min-[420px]:flex-row min-[420px]:items-center justify-between gap-3 px-4 sm:px-5 py-4 hover:bg-gray-50/60 transition-colors cursor-pointer text-left"
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
                                         <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0">
@@ -105,7 +105,7 @@ const Profits = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 shrink-0">
+                                    <div className="flex items-center justify-between min-[420px]:justify-end gap-3 w-full min-[420px]:w-auto shrink-0 pl-12 min-[420px]:pl-0">
                                         <span className="font-bold text-[15px] text-primary">{fmtBaht(totalConfirmed)}</span>
                                         <ChevronDown
                                             size={16}
@@ -118,7 +118,7 @@ const Profits = () => {
                                 {isOpen && (
                                     <div className="border-t border-border divide-y divide-border">
                                         {[...groupItems].sort((a, b) => a.quarter_no - b.quarter_no).map(item => (
-                                            <div key={item.id} className="flex items-center justify-between px-5 py-3.5 bg-gray-50/30">
+                                            <div key={item.id} className="flex flex-col min-[420px]:flex-row min-[420px]:items-center justify-between gap-2 px-4 sm:px-5 py-3.5 bg-gray-50/30">
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         {item.quarter_no > 0 && (
@@ -135,7 +135,7 @@ const Profits = () => {
                                                         }
                                                     </p>
                                                 </div>
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-2 self-end min-[420px]:self-auto">
                                                     <span className={`font-bold text-[15px] ${item.status === 'confirmed' ? 'text-primary' : 'text-amber-500'}`}>
                                                         +{fmtBaht(item.amount)}
                                                     </span>

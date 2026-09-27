@@ -17,7 +17,7 @@ function fmtDate(dateStr: string) {
 function PayoutRow({ item }: { item: PioneerPayoutItem }) {
   const isConfirmed = item.status === 'confirmed'
   return (
-    <div className="flex items-center gap-4 p-4 rounded-xl border border-border hover:bg-gray-50 transition-colors">
+    <div className="flex flex-wrap min-[480px]:flex-nowrap items-center gap-3 sm:gap-4 p-4 rounded-xl border border-border hover:bg-gray-50 transition-colors">
       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm
         ${isConfirmed ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
         {item.phase_no}
@@ -39,7 +39,7 @@ function PayoutRow({ item }: { item: PioneerPayoutItem }) {
           <p className="text-xs text-muted-foreground mt-1 italic">{item.admin_note}</p>
         )}
       </div>
-      <div className="flex flex-col items-end gap-1 shrink-0">
+      <div className="flex flex-row min-[480px]:flex-col items-center min-[480px]:items-end justify-between gap-2 shrink-0 w-full min-[480px]:w-auto pl-14 min-[480px]:pl-0">
         <span className="text-sm font-bold text-foreground">{fmtBaht(item.amount)}</span>
         {isConfirmed ? (
           <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600">
@@ -67,7 +67,7 @@ function ProjectCard({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-border rounded-2xl p-5 flex items-center gap-4 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer"
+      className="w-full text-left bg-white border border-border rounded-2xl p-4 sm:p-5 flex flex-wrap min-[480px]:flex-nowrap items-center gap-3 sm:gap-4 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
         {thumbnailUrl
@@ -77,7 +77,7 @@ function ProjectCard({
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-[15px] text-foreground leading-tight truncate">{title}</p>
+        <p className="font-bold text-[15px] text-foreground leading-tight break-words min-[480px]:truncate">{title}</p>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
           <span className="text-xs text-muted-foreground">{items.length} Milestone</span>
           {confirmed > 0 && (
@@ -89,7 +89,7 @@ function ProjectCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center justify-end gap-3 shrink-0 w-full min-[480px]:w-auto pl-14 min-[480px]:pl-0">
         {allComplete ? (
           <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
             <CheckCircle2 size={11} /> ครบ 4 Phase
@@ -150,7 +150,7 @@ function ProjectDetail({
       </div>
 
       {/* Summary row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-3">
         <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
           <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
             <CheckCircle2 size={16} className="text-emerald-600" />
@@ -174,7 +174,7 @@ function ProjectDetail({
       </div>
 
       {/* Phase rows */}
-      <div className="bg-white border border-border rounded-2xl p-5 flex flex-col gap-3">
+      <div className="bg-white border border-border rounded-2xl p-3 sm:p-5 flex flex-col gap-3">
         {items.map(item => <PayoutRow key={item.id} item={item} />)}
       </div>
 

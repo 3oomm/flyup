@@ -43,9 +43,7 @@ export const useRefundStore = create<RefundStore>((set) => ({
         await api.patch(`/admin/investments/${id}/approve-refund`)
         toast.success('อนุมัติการคืนเงินสำเร็จ')
         set((state) => ({
-            refunds: state.refunds.map((r) =>
-                r.investment_id === id ? { ...r, status: 'refunded' } : r
-            ),
+            refunds: state.refunds.filter((r) => r.investment_id !== id),
         }))
     },
 }))

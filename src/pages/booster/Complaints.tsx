@@ -116,13 +116,13 @@ const Complaints = () => {
               <Link
                 key={item.id}
                 to={`/booster/complaints/${item.id}`}
-                className="bg-white border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/50 transition-colors group/card block"
+                className="bg-white border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/50 transition-colors group/card"
               >
                 <div className="flex items-start gap-4">
                   <div className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${cfg.iconClass}`}>
                     <Icon size={16} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-foreground text-sm group-hover/card:text-primary transition-colors">
                       {item.subject}
                     </h3>
@@ -132,7 +132,7 @@ const Complaints = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto shrink-0">
                   <div className={`text-[11px] font-semibold px-3 py-1 rounded-full ${cfg.badgeClass}`}>
                     {cfg.label}
                   </div>

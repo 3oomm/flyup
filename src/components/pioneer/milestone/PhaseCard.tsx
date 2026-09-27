@@ -39,8 +39,34 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
   useEffect(() => {
     if (!milestone.voting_open || !milestone.id) return
     const id = milestone.id
-    setTimeout(() => setVoters(null), 0)
-    fetchMilestoneVoters(id).then(setVoters)
+    let active = true
+    let fetching = false
+
+    const refreshVoters = async () => {
+      if (fetching || document.visibilityState === 'hidden') return
+      fetching = true
+      try {
+        const latestVoters = await fetchMilestoneVoters(id)
+        if (active) setVoters(latestVoters)
+      } finally {
+        fetching = false
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void refreshVoters()
+    }
+
+    setVoters(null)
+    void refreshVoters()
+    const interval = window.setInterval(refreshVoters, 3_000)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      active = false
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [milestone.voting_open, milestone.id, milestone.voting_opened_at, fetchMilestoneVoters])
 
   const now = new Date()
@@ -293,7 +319,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
                       {v.choice === 'approve' ? '✓ ยอมรับ' : '✕ ไม่ยอมรับ'}
                     </span>
                   ) : (
-                    <span className="shrink-0 text-[11px] font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+                    <span className="shrink-0 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full animate-pulse">
                       ยังไม่โหวต
                     </span>
                   )}

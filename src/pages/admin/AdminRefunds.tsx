@@ -44,7 +44,7 @@ const AdminRefunds = () => {
         setApprovingId(r.investment_id)
         try {
             await approveRefund(r.investment_id)
-            fetchBadges()
+            await fetchBadges()
         } catch (error) {
             const msg = error instanceof AxiosError ? error.response?.data?.message : null
             toast.error(msg || 'เกิดข้อผิดพลาด')

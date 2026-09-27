@@ -46,7 +46,7 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
   const isFailed = vote.status === 'rejected' || vote.status === 'failed';
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border">
           {vote.projectCoverImage ? (
@@ -59,7 +59,7 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
         </div>
         <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-1 flex-wrap">
-          <h3 className="font-bold text-foreground text-base leading-tight">{vote.projectTitle}</h3>
+          <h3 className="font-bold text-foreground text-sm sm:text-base leading-tight break-words">{vote.projectTitle}</h3>
           {isOpen ? (
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-green-50 text-green-700 border-green-200 animate-pulse">
               เปิดโหวต
@@ -101,14 +101,14 @@ function VoteRow({ vote, isOpen }: { vote: VoteMilestone; isOpen: boolean }) {
       {isOpen ? (
         <Link
           to={`/booster/votes/${vote.id}`}
-          className="shrink-0 px-6 py-2.5 rounded-xl text-sm font-semibold bg-primary text-white hover:opacity-90 transition-opacity"
+          className="w-full sm:w-auto text-center shrink-0 px-6 py-2.5 rounded-xl text-sm font-semibold bg-primary text-white hover:opacity-90 transition-opacity"
         >
           โหวตเลย
         </Link>
       ) : (
         <Link
           to={`/booster/votes/${vote.id}`}
-          className="shrink-0 px-6 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground hover:bg-muted transition-colors"
+          className="w-full sm:w-auto text-center shrink-0 px-6 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground hover:bg-muted transition-colors"
         >
           ดูรายละเอียด
         </Link>
@@ -124,10 +124,10 @@ function ProjectRow({ project }: { project: VoteProject }) {
   return (
     <Link
       to={`/booster/votes?project=${project.id}`}
-      className="bg-card border border-border rounded-xl p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:shadow-sm transition-all"
+      className="group bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/40 hover:shadow-sm transition-all"
     >
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-muted border border-border">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0 w-full">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 bg-muted border border-border">
           {project.coverImage ? (
             <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover" />
           ) : (
@@ -137,7 +137,7 @@ function ProjectRow({ project }: { project: VoteProject }) {
           )}
         </div>
         <div className="min-w-0">
-        <h3 className="font-bold text-foreground text-base leading-tight mb-2">{project.title}</h3>
+        <h3 className="font-bold text-foreground text-sm sm:text-base leading-tight mb-2 break-words">{project.title}</h3>
         <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
           <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
             {project.milestones.length} Phase
@@ -155,8 +155,8 @@ function ProjectRow({ project }: { project: VoteProject }) {
         </div>
         </div>
       </div>
-      <span className="shrink-0 px-6 py-2 rounded-xl text-sm font-semibold border border-border text-muted-foreground">
-        ดูแต่ละ Phase
+      <span className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-center shrink-0 px-6 py-2.5 rounded-xl text-sm font-semibold bg-primary text-white shadow-sm transition-all group-hover:shadow-md group-hover:-translate-y-0.5">
+        ดูแต่ละ Phase <ChevronRight size={15} />
       </span>
     </Link>
   );

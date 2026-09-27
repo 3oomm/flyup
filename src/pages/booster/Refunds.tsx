@@ -55,7 +55,7 @@ const Refunds = () => {
             return (
               <div
                 key={inv.id}
-                className="bg-white border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="bg-white border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 <div className="flex items-start gap-4">
                   <div className={`mt-0.5 shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${
@@ -64,7 +64,7 @@ const Refunds = () => {
                     {isRefunded ? <CheckCircle2 size={18} /> : <Clock size={18} />}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-foreground text-[14px] truncate">{projectTitle}</h3>
+                    <h3 className="font-bold text-foreground text-[14px] break-words sm:truncate">{projectTitle}</h3>
                     <p className="text-[12px] text-muted-foreground mt-0.5">
                       {isRefunded
                         ? `คืนเงินเมื่อ ${fmtDate(inv.refunded_at)}`
@@ -76,7 +76,7 @@ const Refunds = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-5 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 w-full sm:w-auto shrink-0">
                   <div className="text-right">
                     <p className="text-[15px] font-bold text-primary">{fmtBaht(amount)}</p>
                     <span className={`mt-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full inline-flex ${
