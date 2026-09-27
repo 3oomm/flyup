@@ -22,6 +22,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
   const [links, setLinks] = useState<EvidenceLink[]>([{ name: '', url: '' }])
   const [checkedCriteria, setCheckedCriteria] = useState<boolean[]>(criteria.map(() => false))
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const summaryRef = useRef<HTMLTextAreaElement>(null)
 
   const [summaryError, setSummaryError] = useState(false)
   const [criteriaError, setCriteriaError] = useState(false)
@@ -114,11 +115,17 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
         </p>
         <p className="text-[12px] text-muted-foreground mb-[10px]">อธิบายสิ่งที่ทำสำเร็จใน Phase นี้โดยย่อ</p>
         <textarea
+          ref={summaryRef}
           value={summary}
-          onChange={e => { setSummary(e.target.value); setSummaryError(false) }}
+          onChange={e => {
+            setSummary(e.target.value)
+            setSummaryError(false)
+            e.currentTarget.style.height = 'auto'
+            e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`
+          }}
           rows={3}
           placeholder="เช่น พัฒนาระบบคลังข้อมูลเสร็จสมบูรณ์ พร้อมคู่มือแนะนำการใช้งาน..."
-          className={`w-full px-[12px] py-[10px] rounded-[10px] border text-[13px] outline-none resize-none transition-colors ${summaryError ? 'border-danger-bright' : 'border-border focus:border-primary'}`}
+          className={`w-full overflow-hidden px-[12px] py-[10px] rounded-[10px] border text-[13px] outline-none resize-none transition-colors ${summaryError ? 'border-danger-bright' : 'border-border focus:border-primary'}`}
         />
         <p className={`text-[11px] mt-[4px] text-right ${Array.from(summary.trim()).length < MIN_SUMMARY_LENGTH ? 'text-muted-foreground' : 'text-primary'}`}>
           {Array.from(summary.trim()).length}/{MIN_SUMMARY_LENGTH} ตัวอักษรขั้นต่ำ

@@ -73,6 +73,12 @@ export interface ProjectSummary {
     funding_goal: number;
     cover_image?: string | null;
     thumbnail_url?: string;
+    milestones?: {
+        id: number;
+        phase_no: number;
+        sort_order: number;
+        status: string;
+    }[];
 }
 
 interface ProjectState {

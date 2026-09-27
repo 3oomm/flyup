@@ -267,6 +267,17 @@ const MyProjects = () => {
             const progress = project.funding_goal > 0
               ? Math.min(Math.round((project.current_funding / project.funding_goal) * 100), 100)
               : 0;
+            const orderedMilestones = [...(project.milestones ?? [])].sort((a, b) =>
+              (a.sort_order - b.sort_order) || (a.phase_no - b.phase_no)
+            );
+            const currentMilestone = orderedMilestones.find((milestone) =>
+              ['active', 'submitted', 'rejected', 'failed'].includes(milestone.status)
+            ) ?? orderedMilestones.find((milestone) =>
+              !['paid', 'approved', 'cancelled'].includes(milestone.status)
+            );
+            const currentPhase = currentMilestone
+              ? currentMilestone.phase_no || orderedMilestones.indexOf(currentMilestone) + 1
+              : null;
 
             return (
               <div
@@ -291,6 +302,7 @@ const MyProjects = () => {
                         <h3 className="text-[16px] font-bold text-foreground">{project.title}</h3>
                         <span className={`px-[10px] py-[2px] rounded-full text-[11px] font-medium ${stateBadgeClass[project.state]}`}>
                           {stateTextMap[project.state]}
+                          {project.state === 'executing' && currentPhase ? ` · Phase ${currentPhase}` : ''}
                         </span>
                         {project.category?.name && (
                           <span className="px-[10px] py-[2px] rounded-full text-[11px] font-medium bg-white border border-border text-[#495057]">

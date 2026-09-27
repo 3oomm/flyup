@@ -467,10 +467,10 @@ const Home = () => {
             role="dialog"
             aria-modal="true"
             aria-label={howItWorksModal.role}
-            className="bg-white rounded-3xl w-full max-w-lg max-h-[calc(100dvh-24px)] sm:max-h-[85dvh] overflow-y-auto overscroll-contain shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+            className="flex w-full max-w-lg max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
-            <div className="p-6 md:p-8 space-y-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 md:p-8 space-y-5">
               {/* Role */}
               <div>
                 <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full mb-3">
@@ -510,9 +510,12 @@ const Home = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed">{howItWorksModal.why}</p>
               </div>
 
+            </div>
+
+            <div className="shrink-0 border-t border-border bg-white p-4 sm:px-6">
               <button
                 onClick={() => setHowItWorksModal(null)}
-                className="sticky bottom-0 z-10 w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium transition-colors cursor-pointer shadow-[0_-12px_24px_12px_white]"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium transition-colors cursor-pointer"
               >
                 เข้าใจแล้ว
               </button>
