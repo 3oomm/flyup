@@ -51,6 +51,10 @@ const verificationErrorMessage = (err: unknown) => {
         'verification is already pending': 'ข้อมูลยืนยันตัวตนถูกส่งแล้วและกำลังรอตรวจสอบ',
         'already verified': 'บัญชีนี้ยืนยันตัวตนแล้ว',
         'invalid ID card URL': 'ระบบไม่สามารถอ่านรูปบัตรประชาชนที่อัปโหลดได้',
+        'invalid selfie URL': 'ระบบไม่สามารถอ่านรูปเซลฟี่ที่อัปโหลดได้',
+        'ID card or face not detected; retake the photos and try again': 'ไม่พบบัตรประชาชนหรือใบหน้าในภาพ กรุณาถ่ายรูปใหม่ให้ชัดเจนแล้วลองอีกครั้ง',
+        'ID card not detected; retake the full front of the card closer to the camera': 'ไม่พบบัตรประชาชนในภาพ กรุณาถ่ายด้านหน้าบัตรให้เห็นครบทั้งใบและใกล้กล้องมากขึ้น',
+        'Selfie or card in selfie not detected; hold the entire card in frame with your face visible and try again': 'ไม่พบใบหน้าหรือบัตรประชาชนในภาพเซลฟี่ กรุณาถือบัตรให้เห็นครบทั้งใบ พร้อมให้ใบหน้าอยู่ในกรอบอย่างชัดเจน',
     }
     return message ? (messages[message] ?? message) : 'ส่งข้อมูลยืนยันตัวตนไม่สำเร็จ กรุณาลองใหม่'
 }
