@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera, Loader2, RefreshCw } from "lucide-react";
 
-export default function LiveCamera({ facingMode, label, onCapture }: { facingMode: "user" | "environment"; label: string; onCapture: (file: File) => void }) {
+type LiveCameraProps = {
+  facingMode: "user" | "environment";
+  label: string;
+  onCapture: (file: File) => void;
+  mode?: "card" | "selfie";
+};
+
+const CARD_ASPECT_RATIO = 1.586;
+
+export default function LiveCamera({ facingMode, label, onCapture, mode = "selfie" }: LiveCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [starting, setStarting] = useState(true);
@@ -13,7 +22,9 @@ export default function LiveCamera({ facingMode, label, onCapture }: { facingMod
     setError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode }, width: { ideal: 1080 }, height: { ideal: 1920 }, aspectRatio: { ideal: 0.75 } },
+        video: mode === "card"
+          ? { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 }, aspectRatio: { ideal: CARD_ASPECT_RATIO } }
+          : { facingMode: { ideal: facingMode }, width: { ideal: 1080 }, height: { ideal: 1920 }, aspectRatio: { ideal: 0.75 } },
         audio: false,
       });
       streamRef.current = stream;
@@ -30,15 +41,33 @@ export default function LiveCamera({ facingMode, label, onCapture }: { facingMod
     startCamera();
     return () => streamRef.current?.getTracks().forEach(track => track.stop());
     // เริ่ม stream ใหม่เมื่อเปลี่ยนจากกล้องหลังเป็นกล้องหน้า
-  }, [facingMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [facingMode, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const capture = () => {
     const video = videoRef.current;
     if (!video?.videoWidth) return;
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0);
+    if (mode === "card") {
+      const sourceAspectRatio = video.videoWidth / video.videoHeight;
+      let sourceWidth = video.videoWidth;
+      let sourceHeight = video.videoHeight;
+
+      if (sourceAspectRatio > CARD_ASPECT_RATIO) {
+        sourceWidth = video.videoHeight * CARD_ASPECT_RATIO;
+      } else {
+        sourceHeight = video.videoWidth / CARD_ASPECT_RATIO;
+      }
+
+      const sourceX = (video.videoWidth - sourceWidth) / 2;
+      const sourceY = (video.videoHeight - sourceHeight) / 2;
+      canvas.width = Math.round(sourceWidth);
+      canvas.height = Math.round(sourceHeight);
+      canvas.getContext("2d")?.drawImage(video, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
+    } else {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+    }
     canvas.toBlob(blob => {
       if (!blob) return;
       onCapture(new File([blob], `kyc-${Date.now()}.jpg`, { type: "image/jpeg" }));
@@ -48,10 +77,10 @@ export default function LiveCamera({ facingMode, label, onCapture }: { facingMod
 
   return (
     <div>
-      <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-2xl bg-slate-950">
+      <div className={`relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-slate-950 ${mode === "card" ? "aspect-[1.586/1]" : "aspect-[3/4]"}`}>
         <video ref={videoRef} playsInline muted className={`h-full w-full object-cover ${facingMode === "user" ? "-scale-x-100" : ""}`} />
-        {facingMode === "environment" ? (
-          <div className="pointer-events-none absolute left-4 right-4 top-1/2 aspect-[1.586/1] -translate-y-1/2 rounded-xl border-2 border-dashed border-white/90" />
+        {mode === "card" ? (
+          <div className="pointer-events-none absolute inset-4 rounded-xl border-2 border-dashed border-white/90" />
         ) : (
           <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border-2 border-dashed border-white/90" />
         )}

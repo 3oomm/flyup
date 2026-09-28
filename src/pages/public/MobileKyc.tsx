@@ -57,7 +57,7 @@ export default function MobileKyc() {
         <p className="mt-1 text-sm text-muted-foreground">ใช้กล้องถ่ายบัตรประชาชนและเซลฟี่แบบสด ไม่รองรับการเลือกรูปจากคลังภาพ</p>
         {!token && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">ลิงก์นี้ไม่ถูกต้อง กรุณาสแกน QR Code ใหม่</p>}
         <div className="mt-6">
-          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก 2 — ถ่ายบัตรประชาชน</p><LiveCamera facingMode="environment" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
+          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก 2 — ถ่ายบัตรประชาชน</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
           {step === "selfie" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 2 จาก 2 — ถ่ายเซลฟี่พร้อมถือบัตร</p><LiveCamera facingMode="user" label="ถ่ายรูปเซลฟี่" onCapture={file => { setSelfie(file); setStep("review"); }} /></>}
           {step === "review" && idCard && selfie && <div>
             <div className="grid grid-cols-2 gap-3">
