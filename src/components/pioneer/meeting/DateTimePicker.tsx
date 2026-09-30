@@ -40,7 +40,6 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
   const [showTime, setShowTime]   = useState(false)
   const [localH, setLocalH]       = useState(time ? time.slice(0,2) : pad(now.getHours()))
   const [localM, setLocalM]       = useState(time ? time.slice(3,5) : pad(now.getMinutes()))
-  const [timeError, setTimeError] = useState('')
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -88,12 +87,11 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
         setLocalM(pad(nextMinute.getMinutes()))
       }
     }
-    setTimeError('')
   }
 
-  const validateTime = (h: string, m: string): string => {
-    if (!date) return ''
-    if (date === todayStr) {
+  const validateTime = (selectedDate: string, h: string, m: string): string => {
+    if (!selectedDate) return ''
+    if (selectedDate === todayStr) {
       const currentNow = new Date()
       const selH = parseInt(h)
       const selM = parseInt(m)
@@ -106,16 +104,15 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
 
   const changeH = (newH: string) => {
     setLocalH(newH)
-    setTimeError(validateTime(newH, localM))
   }
   const changeM = (newM: string) => {
     setLocalM(newM)
-    setTimeError(validateTime(localH, newM))
   }
 
+  const timeError = validateTime(date, localH, localM)
+
   const handleDone = () => {
-    const err = validateTime(localH, localM)
-    if (err) { setTimeError(err); return }
+    if (timeError) { setShowTime(true); return }
     onTimeChange(`${localH}:${localM}`)
     setOpen(false)
   }
@@ -143,13 +140,13 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
       {/* Trigger */}
       <button
         type="button"
-        aria-invalid={!!error}
+        aria-invalid={!!error || !!timeError}
         aria-describedby={error ? errorId : undefined}
         onClick={() => {
           if (!open && time) { setLocalH(time.slice(0,2)); setLocalM(time.slice(3,5)) }
           setOpen(o => !o)
         }}
-        className={`w-full flex items-center gap-2 border rounded-[8px] px-3 py-2.5 text-[14px] text-left transition-colors cursor-pointer ${error ? 'border-error' : open ? 'border-primary' : 'border-border hover:border-primary/50'} ${!date ? 'text-muted-foreground' : 'text-foreground'}`}
+        className={`w-full flex items-center gap-2 border rounded-[8px] px-3 py-2.5 text-[14px] text-left transition-colors cursor-pointer ${error || timeError ? 'border-error' : open ? 'border-primary' : 'border-border hover:border-primary/50'} ${!date ? 'text-muted-foreground' : 'text-foreground'}`}
       >
         <Calendar size={15} className="text-muted-foreground shrink-0" />
         <span>{fmtDisplay(date, time)}</span>
@@ -220,7 +217,7 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
                   className={`
                     aspect-square w-full flex items-center justify-center rounded-full text-[13px] transition-colors
                     ${disabled
-                      ? 'text-muted-foreground/30 cursor-not-allowed'
+                      ? past ? 'bg-red-50 text-red-400 cursor-not-allowed' : 'text-muted-foreground/30 cursor-not-allowed'
                       : isSelected(d)
                       ? 'bg-gray-900 text-white font-semibold cursor-pointer'
                       : isToday(d)
@@ -241,10 +238,10 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
               onClick={() => setShowTime(t => !t)}
               className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-2 text-[13px] text-foreground">
+              <div className={`flex min-w-0 flex-wrap items-center gap-2 text-[13px] ${timeError ? 'text-error' : 'text-foreground'}`}>
                 <Clock size={14} className="text-muted-foreground" />
                 <span>{localH}:{localM}</span>
-                {timeError && <span className="text-[11px] text-red-500 ml-1">{timeError}</span>}
+                {timeError && <span role="alert" className="text-[11px] text-error">{timeError}</span>}
               </div>
               <ChevronDown size={14} className={`text-muted-foreground transition-transform ${showTime ? 'rotate-180' : ''}`} />
             </button>
@@ -259,7 +256,7 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
                       type="number" min={0} max={23}
                       value={parseInt(localH)}
                       onChange={e => changeH(pad(Math.min(23, Math.max(0, Number(e.target.value)))))}
-                      className="w-12 text-center text-[18px] font-semibold border border-border rounded-[6px] py-1 outline-none focus:border-primary"
+                      className={`w-12 text-center text-[18px] font-semibold border rounded-[6px] py-1 outline-none focus:border-primary ${timeError ? 'border-error text-error' : 'border-border'}`}
                     />
                     <button type="button" onClick={() => changeH(pad((parseInt(localH)-1+24)%24))} className="p-1 hover:bg-muted rounded cursor-pointer"><ChevronLeft size={14} className="-rotate-90" /></button>
                   </div>
@@ -271,14 +268,11 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
                       type="number" min={0} max={59}
                       value={parseInt(localM)}
                       onChange={e => changeM(pad(Math.min(59, Math.max(0, Number(e.target.value)))))}
-                      className="w-12 text-center text-[18px] font-semibold border border-border rounded-[6px] py-1 outline-none focus:border-primary"
+                      className={`w-12 text-center text-[18px] font-semibold border rounded-[6px] py-1 outline-none focus:border-primary ${timeError ? 'border-error text-error' : 'border-border'}`}
                     />
                     <button type="button" onClick={() => changeM(pad((parseInt(localM)-1+60)%60))} className="p-1 hover:bg-muted rounded cursor-pointer"><ChevronLeft size={14} className="-rotate-90" /></button>
                   </div>
                 </div>
-                {timeError && (
-                  <p className="text-[11px] text-red-500 text-center">{timeError}</p>
-                )}
               </div>
             )}
           </div>
