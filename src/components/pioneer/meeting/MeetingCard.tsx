@@ -78,24 +78,26 @@ export default function MeetingCard({
 
   return (
     <div className={`bg-white border rounded-2xl overflow-hidden transition-all ${expanded ? 'border-primary/40 shadow-sm' : 'border-border'} ${isCanceled ? 'opacity-60' : ''}`}>
-      <div className="flex items-center gap-4 p-5">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCanceled || isClosed ? 'bg-muted text-muted-foreground' : 'bg-purple-100 text-primary'}`}>
-          {isCanceled ? <Ban size={20} /> : isClosed ? <CheckCircle size={20} /> : <Video size={20} />}
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5">
+        <div className="flex w-full min-w-0 items-start gap-3 sm:flex-1 sm:items-center sm:gap-4">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCanceled || isClosed ? 'bg-muted text-muted-foreground' : 'bg-purple-100 text-primary'}`}>
+            {isCanceled ? <Ban size={20} /> : isClosed ? <CheckCircle size={20} /> : <Video size={20} />}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-foreground text-sm break-words">
+              {projectTitle}
+              {phaseLabel && (
+                <span className="text-muted-foreground font-normal"> — {phaseLabel}</span>
+              )}
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {formatDateThai(meeting.date)} เวลา {formatTime(meeting.time)} · {typeLabel}
+            </p>
+          </div>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-foreground text-sm">
-            {projectTitle}
-            {phaseLabel && (
-              <span className="text-muted-foreground font-normal"> — {phaseLabel}</span>
-            )}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {formatDateThai(meeting.date)} เวลา {formatTime(meeting.time)} · {typeLabel}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:shrink-0">
           {isCanceled ? (
             <span className="text-xs font-medium text-error border border-error/30 bg-error/5 px-3 py-1.5 rounded-full">
               ยกเลิก

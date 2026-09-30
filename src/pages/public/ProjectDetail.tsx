@@ -37,7 +37,6 @@ function ProjectDetail() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("story");
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isMediaVisible, setIsMediaVisible] = useState(true);
   const [isGalleryPaused, setIsGalleryPaused] = useState(false);
   const [galleryCycle, setGalleryCycle] = useState(0);
   const [showComplaintModal, setShowComplaintModal] = useState(false);
@@ -51,7 +50,6 @@ function ProjectDetail() {
   const [commentBody, setCommentBody] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const mediaFadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isLoggedIn = !!authUser;
   const project = currentPublicProject;
@@ -122,13 +120,7 @@ function ProjectDetail() {
 
   const selectMedia = (index: number) => {
     if (index === selectedImage) return;
-    if (mediaFadeTimeoutRef.current) clearTimeout(mediaFadeTimeoutRef.current);
-    setIsMediaVisible(false);
-    mediaFadeTimeoutRef.current = setTimeout(() => {
-      setSelectedImage(index);
-      setIsMediaVisible(true);
-      mediaFadeTimeoutRef.current = null;
-    }, 350);
+    setSelectedImage(index);
     setGalleryCycle(cycle => cycle + 1);
   };
 
@@ -136,21 +128,10 @@ function ProjectDetail() {
     if (displayMedia.length <= 1 || isGalleryPaused) return;
 
     const interval = setInterval(() => {
-      setIsMediaVisible(false);
-      mediaFadeTimeoutRef.current = setTimeout(() => {
-        setSelectedImage(current => (current + 1) % displayMedia.length);
-        setIsMediaVisible(true);
-        mediaFadeTimeoutRef.current = null;
-      }, 350);
+      setSelectedImage(current => (current + 1) % displayMedia.length);
     }, 5000);
 
-    return () => {
-      clearInterval(interval);
-      if (mediaFadeTimeoutRef.current) {
-        clearTimeout(mediaFadeTimeoutRef.current);
-        mediaFadeTimeoutRef.current = null;
-      }
-    };
+    return () => clearInterval(interval);
   }, [displayMedia.length, isGalleryPaused, galleryCycle, projectId]);
 
   const milestones = project?.milestones ?? [];
@@ -332,13 +313,13 @@ function ProjectDetail() {
                   onPlay={() => setIsGalleryPaused(true)}
                   onPause={() => setIsGalleryPaused(false)}
                   onEnded={() => setIsGalleryPaused(false)}
-                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isMediaVisible ? 'opacity-100' : 'opacity-0'}`}
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <img
                   src={selectedMedia.url}
                   alt="project media"
-                  className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${isMediaVisible ? 'opacity-100' : 'opacity-0'}`}
+                  className="w-full h-full object-cover"
                 />
               )}
             </div>

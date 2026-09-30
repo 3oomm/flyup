@@ -89,13 +89,13 @@ const ProjectOverview = () => {
         >
           <ArrowLeft size={16} /> กลับไปยังโปรเจกต์ของฉัน
         </button>
-        <div className='flex items-center justify-between p-2.5'>
-          <h1 className='text-[24px] font-semibold text-foreground'>ภาพรวมของโปรเจกต์</h1>
+        <div className='flex flex-col items-start gap-3 p-2.5 sm:flex-row sm:items-center sm:justify-between'>
+          <h1 className='text-[24px] font-semibold text-foreground leading-tight'>ภาพรวมของโปรเจกต์</h1>
           <Link
             to='/project/guide'
-            className='flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 transition-colors text-[13px] font-medium'
+            className='inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 transition-colors text-[13px] font-medium'
           >
-            <BookOpen size={15} />
+            <BookOpen size={15} className='shrink-0' />
             อ่านคู่มือการสร้างโปรเจกต์
           </Link>
         </div>
@@ -105,11 +105,11 @@ const ProjectOverview = () => {
             const Icon = s.icon;
             const done = s.isComplete(currentProject, projectId);
             return (
-              <Link to={`/project/overview/${projectId}/step/${idx + 1}`} key={idx} className='flex border border-border bg-white-foreground px-[15px] py-[10px] gap-[5px] h-[90px] items-center rounded-[10px] cursor-pointer hover:bg-white-foreground/50 transition-all duration-200'>
-                <Icon size={40} className={done ? 'text-green-500 shrink-0' : 'text-primary-light shrink-0'} strokeWidth={2} />
-                <div className='flex flex-col p-[10px] gap-[4px]'>
-                  <h2 className='text-foreground text-[18px] font-semibold'>{s.title}</h2>
-                  <p className='text-muted-foreground text-[14px]'>{s.des}</p>
+              <Link to={`/project/overview/${projectId}/step/${idx + 1}`} key={idx} className='flex min-h-[90px] items-center gap-3 rounded-[10px] border border-border bg-white-foreground px-4 py-4 cursor-pointer hover:bg-white-foreground/50 transition-all duration-200'>
+                <Icon size={36} className={done ? 'text-green-500 shrink-0' : 'text-primary-light shrink-0'} strokeWidth={2} />
+                <div className='flex min-w-0 flex-col gap-1'>
+                  <h2 className='text-foreground text-[18px] font-semibold leading-snug'>{s.title}</h2>
+                  <p className='text-muted-foreground text-[14px] leading-relaxed'>{s.des}</p>
                 </div>
               </Link>
             )

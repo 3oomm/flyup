@@ -273,7 +273,7 @@ const MyProjects = () => {
             return (
               <div
                 key={project.id}
-                className="bg-white border border-border rounded-[16px] p-[20px] flex gap-[20px] shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white border border-border rounded-[16px] p-[16px] sm:p-[20px] flex gap-[12px] sm:gap-[20px] shadow-sm hover:shadow-md transition-shadow cursor-pointer min-w-0"
                 onClick={() => handleView(project.id, project.state, project.slug)}
               >
                 {/* Thumbnail */}
@@ -284,13 +284,13 @@ const MyProjects = () => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 flex flex-col">
-                  <div className="flex flex-col lg:flex-row justify-between items-start gap-[16px]">
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <div className="flex flex-col lg:flex-row justify-between items-start gap-[16px] min-w-0">
 
                     {/* Left Info */}
-                    <div className="flex flex-col gap-[8px] flex-1">
-                      <div className="flex items-center gap-[8px] flex-wrap">
-                        <h3 className="text-[16px] font-bold text-foreground">{project.title}</h3>
+                    <div className="flex flex-col gap-[8px] flex-1 min-w-0">
+                      <div className="flex items-center gap-[8px] flex-wrap min-w-0">
+                        <h3 className="text-[16px] font-bold text-foreground min-w-0 break-words">{project.title}</h3>
                         <span className={`px-[10px] py-[2px] rounded-full text-[11px] font-medium ${stateBadgeClass[project.state]}`}>
                           {stateTextMap[project.state]}
                           {project.state === 'executing' && currentPhase ? ` · Phase ${currentPhase}` : ''}
@@ -311,7 +311,7 @@ const MyProjects = () => {
                       {/* Funding Progress */}
                       {project.state === 'funding' && project.funding_goal > 0 && (
                         <div className="flex flex-col gap-[6px] mt-[4px] max-w-[400px]">
-                          <div className="flex items-center gap-[16px] text-[12px] font-medium text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-x-[16px] gap-y-1 text-[12px] font-medium text-muted-foreground">
                             <span>฿{project?.current_funding.toLocaleString()} / ฿{project?.funding_goal.toLocaleString()}</span>
                             <span>{progress}%</span>
                           </div>
@@ -349,7 +349,7 @@ const MyProjects = () => {
                     </div>
 
                     {/* Right Actions */}
-                    <div className="flex items-center gap-[8px] shrink-0 mt-[10px] lg:mt-0">
+                    <div className="flex w-full flex-wrap items-center gap-[8px] mt-[10px] lg:mt-0 lg:w-auto lg:shrink-0">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleView(project.id, project.state); }}
                         className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-surface-hover hover:bg-surface-raised transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"

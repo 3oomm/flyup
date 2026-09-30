@@ -106,7 +106,7 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
   }
 
   return (
-    <div className="border-t border-border px-[20px] py-[20px] flex flex-col gap-[20px]">
+    <div className="border-t border-border px-[20px] py-[20px] flex min-w-0 flex-col gap-[20px]">
 
       {/* Summary */}
       <div>
@@ -218,22 +218,22 @@ const EvidenceForm = ({ criteria, isSubmitting, onCancel, onSubmit }: EvidenceFo
         <p className="text-[12px] text-muted-foreground mb-[10px]">GitHub, Figma, วิดีโอ หรือลิงก์อื่นๆ</p>
         <div className="flex flex-col gap-[8px]">
           {links.map((link, i) => (
-            <div key={i} className="flex items-center gap-[8px]">
+            <div key={i} className="flex min-w-0 flex-wrap items-center gap-[8px] sm:flex-nowrap">
               <input
                 type="text"
                 placeholder="ชื่อ (เช่น GitHub)"
                 value={link.name}
                 onChange={e => updateLink(i, 'name', e.target.value)}
-                className="w-[140px] shrink-0 px-[10px] py-[8px] rounded-[8px] border border-border text-[13px] outline-none focus:border-primary"
+                className="w-full min-w-0 px-[10px] py-[8px] rounded-[8px] border border-border text-[13px] outline-none focus:border-primary sm:w-[140px] sm:shrink-0"
               />
-              <div className={`flex-1 flex items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-danger-bright' : 'border-border'}`}>
+              <div className={`flex min-w-0 flex-1 items-center gap-[6px] px-[10px] py-[8px] rounded-[8px] border focus-within:border-primary ${linksError && !link.url.trim() ? 'border-danger-bright' : 'border-border'}`}>
                 <ExternalLink size={14} className="text-muted-foreground shrink-0" />
                 <input
                   type="url"
                   placeholder="https://..."
                   value={link.url}
                   onChange={e => updateLink(i, 'url', e.target.value)}
-                  className="flex-1 text-[13px] outline-none bg-transparent"
+                  className="w-full min-w-0 flex-1 text-[13px] outline-none bg-transparent"
                 />
               </div>
               {links.length > 1 && (

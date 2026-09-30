@@ -40,13 +40,13 @@ const Breadcrumb = () => {
     const activeStepItems = stepItems.filter((_, i) => i <= currentStepNum);
 
     return (
-        <div className="flex justify-between p-[10px]">
-            <ul className="flex">
+        <div className="flex min-w-0 flex-col gap-3 p-[10px] lg:flex-row lg:items-center lg:justify-between">
+            <ul className="flex w-full min-w-0 overflow-x-auto whitespace-nowrap lg:w-auto">
                 {
                     activeStepItems.map((item, idx) => {
                         const isLastItem = idx === activeStepItems.length - 1;
                         return (
-                            <li key={idx} className="flex text-[14px] text-muted-foreground items-center">
+                            <li key={idx} className="flex shrink-0 text-[14px] text-muted-foreground items-center">
                                 {
                                     !isLastItem ? (
                                         <Link to={idx === 0 ? `/project/overview/${projectId}` : `/project/overview/${projectId}/step/${idx}`} className="hover:text-foreground transition-all duration-200">
@@ -64,7 +64,7 @@ const Breadcrumb = () => {
                     })
                 }
             </ul>
-            <div className="flex items-center gap-[12px]">
+            <div className="flex w-full items-center justify-end gap-[12px] lg:w-auto lg:shrink-0">
                 {saveStatus === 'saving' && (
                     <div className="flex items-center gap-[6px] text-muted-foreground text-[13px]">
                         <Loader2 size={14} className="animate-spin" />
@@ -78,7 +78,7 @@ const Breadcrumb = () => {
                     </div>
                 )}
                 {saveStatus === 'idle' && <CloudCheck size={16} className="text-muted-foreground" />}
-                <Link to={`/preview/${projectId}`} state={{ from: location.pathname }} className="border border-border bg-white-foreground text-foreground rounded-[4px] flex gap-[10px] p-[8px] w-[165px] h-[38px] items-center justify-center hover:bg-white-foreground/50 transition-all duration-200">
+                <Link to={`/preview/${projectId}`} state={{ from: location.pathname }} className="border border-border bg-white-foreground text-foreground rounded-[4px] flex shrink-0 gap-[10px] p-[8px] w-[165px] h-[38px] items-center justify-center hover:bg-white-foreground/50 transition-all duration-200">
                     <Eye size={16} />
                     <span className="text-[14px] font-medium">ดูตัวอย่าง</span>
                 </Link>

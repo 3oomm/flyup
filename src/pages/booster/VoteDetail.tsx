@@ -192,22 +192,22 @@ const VoteDetail = () => {
 
       {/* Header */}
       <div className="mb-8">
-        <p className="text-sm text-muted-foreground">{projectTitle}</p>
-        <h1 className="text-2xl font-bold text-foreground">Phase {milestone.phase_no}: {milestone.title}</h1>
+        <p className="text-sm text-muted-foreground [overflow-wrap:anywhere]">{projectTitle}</p>
+        <h1 className="text-2xl font-bold text-foreground [overflow-wrap:anywhere]">Phase {milestone.phase_no}: {milestone.title}</h1>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT COLUMN: Info */}
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 min-w-0 space-y-6">
 
           {/* Details */}
           <div className="bg-card border border-border rounded-2xl p-6">
             <h3 className="font-bold text-foreground text-sm mb-4">รายละเอียดงาน</h3>
-            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed [overflow-wrap:anywhere]">
               {milestone.description || 'ไม่มีรายละเอียด'}
             </p>
             {milestone.submission_summary && (
-              <p className="text-sm text-foreground leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed [overflow-wrap:anywhere]">
                 <span className="font-bold">สรุปผล:</span> {milestone.submission_summary}
               </p>
             )}
@@ -221,7 +221,7 @@ const VoteDetail = () => {
                 {criteria.map((c, i) => (
                   <li key={i} className="flex items-center gap-[10px] p-[12px] rounded-[10px] border border-green-200 bg-green-50">
                     <CheckCircle2 size={18} className="text-green-600 shrink-0" />
-                    <span className="text-[13px] font-medium text-green-800">{c}</span>
+                    <span className="min-w-0 text-[13px] font-medium text-green-800 [overflow-wrap:anywhere]">{c}</span>
                   </li>
                 ))}
               </ul>

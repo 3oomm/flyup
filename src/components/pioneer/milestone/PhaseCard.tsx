@@ -127,7 +127,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-[8px]">
+          <div className="flex flex-col items-start gap-[8px] sm:flex-row sm:items-center sm:justify-between">
             <span className="font-bold text-[15px] text-foreground">
               Phase {milestone.phase_no}: {milestone.title}
             </span>
@@ -153,7 +153,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-[20px] py-[12px] flex items-center justify-between">
+      <div className="px-[20px] py-[12px] flex flex-col items-start gap-[10px] sm:flex-row sm:items-center sm:justify-between">
         <span className={`text-[13px] font-medium ${isCompleted ? 'text-[#2BA88E]' : milestone.voting_open ? 'text-amber-600' : 'text-muted-foreground'}`}>
           {milestone.voting_open && totalVoters > 0
             ? `${votedCount}/${totalVoters} โหวตแล้ว (${votePct}%)`
@@ -161,7 +161,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
           }
         </span>
 
-        <div className="flex items-center gap-[8px]">
+        <div className="flex w-full flex-wrap items-center gap-[8px] sm:w-auto sm:justify-end">
           {isCompleted && (
             <div className="flex items-center gap-[5px] text-[#2BA88E] text-[13px] font-medium">
               <CheckCircle2 size={16} />
@@ -179,7 +179,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
                 <button
                   onClick={() => !hasMeeting && navigate('/pioneer/dashboard/meetings')}
                   disabled={hasMeeting}
-                  className={`flex items-center gap-[6px] px-[14px] py-[7px] rounded-[10px] border text-[13px] font-medium transition-colors ${
+                  className={`flex shrink-0 items-center gap-[6px] whitespace-nowrap px-[14px] py-[7px] rounded-[10px] border text-[13px] font-medium transition-colors ${
                     hasMeeting
                       ? 'border-border text-muted-foreground bg-surface-soft cursor-not-allowed opacity-60'
                       : 'border-border text-foreground hover:bg-surface-soft cursor-pointer'
@@ -197,7 +197,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
               {milestone.voting_open ? (
                 <button
                   onClick={() => setVotersOpen(v => !v)}
-                  className="flex items-center gap-[6px] px-[14px] py-[7px] rounded-[10px] bg-amber-50 border border-amber-200 text-[13px] font-medium text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer"
+                  className="flex shrink-0 items-center gap-[6px] whitespace-nowrap px-[14px] py-[7px] rounded-[10px] bg-amber-50 border border-amber-200 text-[13px] font-medium text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer"
                 >
                   <Vote size={14} />
                   กำลัง Vote อยู่...
