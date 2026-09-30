@@ -194,6 +194,7 @@ function ProjectDetail() {
         },
         iconTheme: { primary: "var(--color-error)", secondary: "var(--color-white-foreground)" },
       });
+      navigate('/login');
       return;
     }
     if (isAdmin || isOwner || isPioneer) {
