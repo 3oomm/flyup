@@ -31,12 +31,12 @@ function PayoutRow({ item }: { item: PioneerPayoutItem }) {
           {item.transfer_ref && (
             <>
               <span className="text-muted-foreground">·</span>
-              <span className="text-xs text-muted-foreground font-mono">{item.transfer_ref}</span>
+              <span className="min-w-0 text-xs text-muted-foreground font-mono [overflow-wrap:anywhere]">{item.transfer_ref}</span>
             </>
           )}
         </div>
         {item.admin_note && (
-          <p className="text-xs text-muted-foreground mt-1 italic">{item.admin_note}</p>
+          <p className="mt-1 min-w-0 text-xs italic text-muted-foreground [overflow-wrap:anywhere]">{item.admin_note}</p>
         )}
       </div>
       <div className="flex flex-row min-[480px]:flex-col items-center min-[480px]:items-end justify-between gap-2 shrink-0 w-full min-[480px]:w-auto pl-14 min-[480px]:pl-0">

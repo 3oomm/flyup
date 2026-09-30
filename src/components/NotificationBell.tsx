@@ -34,7 +34,7 @@ function timeAgo(dateStr: string): string {
     return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-function getNotifPath(notif: Notification, role: string): string {
+export function getNotifPath(notif: Notification, role: string): string {
     const { type, related_id, related_type } = notif
 
     if (role === 'pioneer') {
@@ -77,6 +77,11 @@ function getNotifPath(notif: Notification, role: string): string {
 
     if (role === 'admin') {
         switch (type) {
+            case 'milestone':
+                if (notif.title.includes('รอโอนเงิน')) return '/admin/disbursements'
+                return related_type === 'milestone' && related_id
+                    ? `/admin/milestones/${related_id}`
+                    : '/admin/milestones'
             case 'milestone_submitted':
                 return related_type === 'milestone' && related_id
                     ? `/admin/milestones/${related_id}`

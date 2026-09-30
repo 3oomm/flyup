@@ -3,9 +3,32 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNotificationStore } from '../store/useNotificationStore'
-import NotificationBell from './NotificationBell'
+import NotificationBell, { getNotifPath } from './NotificationBell'
 
 vi.mock('../hooks/useNotificationSSE', () => ({ default: () => {} }))
+
+describe('admin notification destinations', () => {
+    const notification = {
+        id: 1,
+        user_id: 1,
+        type: 'milestone',
+        title: 'Phase ผ่านการโหวต – รอโอนเงิน',
+        body: '',
+        is_read: false,
+        related_id: 42,
+        related_type: 'milestone',
+        CreatedAt: '',
+        UpdatedAt: '',
+    }
+
+    it('opens disbursements for a phase awaiting transfer', () => {
+        expect(getNotifPath(notification, 'admin')).toBe('/admin/disbursements')
+    })
+
+    it('opens the milestone detail for other milestone notifications', () => {
+        expect(getNotifPath({ ...notification, title: 'Milestone ผ่านการโหวต' }, 'admin')).toBe('/admin/milestones/42')
+    })
+})
 
 describe('mobile notifications', () => {
     afterEach(() => vi.unstubAllGlobals())
