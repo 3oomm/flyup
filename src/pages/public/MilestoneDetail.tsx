@@ -164,7 +164,7 @@ function MilestoneCard({
       </div>
 
       {/* Card */}
-      <div className={`flex-1 mb-6 rounded-2xl border transition-all duration-300 overflow-hidden ${
+      <div className={`flex-1 min-w-0 mb-6 rounded-2xl border transition-all duration-300 overflow-hidden ${
         active ? "border-primary/30 shadow-md shadow-primary/5 bg-white" :
         completed ? "border-emerald-200 bg-white" :
         "border-gray-200 bg-white hover:shadow-sm"
@@ -177,7 +177,7 @@ function MilestoneCard({
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h3 className={`text-base sm:text-lg font-bold ${completed ? "text-gray-900" : active ? "text-gray-900" : "text-gray-600"}`}>
+                <h3 className={`min-w-0 break-words text-base sm:text-lg font-bold ${completed ? "text-gray-900" : active ? "text-gray-900" : "text-gray-600"}`}>
                   Phase {milestone.phase_no}: {milestone.title}
                 </h3>
                 <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.border}`}>
@@ -201,9 +201,9 @@ function MilestoneCard({
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="text-right">
-                <span className="text-xl sm:text-2xl font-extrabold text-primary tracking-tight">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="min-w-0 text-right">
+                <span className="text-xl sm:text-2xl font-extrabold text-primary tracking-tight break-all">
                   {amount > 0 ? `฿${amount.toLocaleString("th-TH")}` : `${milestone.percent_release}%`}
                 </span>
                 {amount > 0 && (
@@ -470,7 +470,7 @@ export default function MilestoneDetail() {
             <MilestoneIcon size={20} className="text-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wider">แผนงาน Milestone</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2 break-words">
             {project.title}
           </h1>
           {project.description && (
@@ -479,9 +479,9 @@ export default function MilestoneDetail() {
         </div>
 
         {/* Progress Summary Card */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 mb-8 shadow-sm">
+        <div className="min-w-0 bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 mb-8 shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-3">
                 <h2 className="text-sm font-bold text-gray-800">ความคืบหน้าโดยรวม</h2>
                 <span className="text-xs font-semibold text-primary bg-primary/5 px-2 py-0.5 rounded-full">
@@ -496,7 +496,7 @@ export default function MilestoneDetail() {
               </div>
               <p className="text-xs text-gray-400 mt-2">{progressPct}% เสร็จสมบูรณ์</p>
             </div>
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 text-center min-w-0">
               <div>
                 <p className="text-2xl font-black text-primary">{totalPhases}</p>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Phase ทั้งหมด</p>
@@ -505,8 +505,8 @@ export default function MilestoneDetail() {
                 <p className="text-2xl font-black text-emerald-600">{completedCount}</p>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">เสร็จแล้ว</p>
               </div>
-              <div>
-                <p className="text-2xl font-black text-gray-800">
+              <div className="col-span-2 sm:col-span-1 min-w-0">
+                <p className="text-xl sm:text-2xl font-black text-gray-800 break-all">
                   ฿{project.funding_goal > 0 ? project.funding_goal.toLocaleString("th-TH") : "—"}
                 </p>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">เงินทุนรวม</p>
