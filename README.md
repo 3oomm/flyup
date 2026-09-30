@@ -204,15 +204,15 @@ flyup/
 <!-- contributors:start -->
 | Contributor | GitHub | Commits | สัดส่วน |
 |---|---|---:|---:|
-| Phongsakorn Tangpok | [@3oomm](https://github.com/3oomm) | **571** | **84.3%** |
+| Phongsakorn Tangpok | [@3oomm](https://github.com/3oomm) | **572** | **84.4%** |
 | Alongkon Natphunwat | [@nine9031](https://github.com/nine9031) | **94** | **13.9%** |
 | Krit | [@SundayYogurt](https://github.com/SundayYogurt) | **12** | **1.8%** |
-| **รวม** |  | **677** | **100%** |
+| **รวม** |  | **678** | **100%** |
 
 ```mermaid
 pie showData
     title สัดส่วน commits ของ FlyUp Frontend
-    "Phongsakorn Tangpok — 84.3%" : 571
+    "Phongsakorn Tangpok — 84.4%" : 572
     "Alongkon Natphunwat — 13.9%" : 94
     "Krit — 1.8%" : 12
 ```
