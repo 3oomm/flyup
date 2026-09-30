@@ -11,6 +11,7 @@ import StepNavigation from "../StepNavigation"
 import { useProjectStore } from '../../store/useProjectStore'
 import { useParams } from 'react-router'
 import toast from 'react-hot-toast'
+import { getSafeStoryImageHref } from '../../lib/storyImageLink'
 
 // ✅ Custom Image Extension ที่รองรับการแนบลิงก์ (href) และจับรูปภาพจัด Align
 const CustomImage = Image.extend({
@@ -208,6 +209,16 @@ const Step2Story = () => {
       },
     },
   })
+
+  const saveImageLink = () => {
+    const href = getSafeStoryImageHref(imageLinkUrl)
+    if (!href) {
+      toast.error('กรุณาใส่ลิงก์ http:// หรือ https:// ที่ถูกต้อง')
+      return
+    }
+    editor?.chain().focus().updateAttributes('image', { href }).run()
+    setImageLinkInputOpen(false)
+  }
 
   // sync editable state ทีหลังด้วย เพราะตอน editor ถูกสร้างครั้งแรก currentProject.state อาจยังโหลดไม่เสร็จ
   useEffect(() => {
@@ -591,16 +602,14 @@ const Step2Story = () => {
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault()
-                            editor.chain().focus().updateAttributes('image', { href: imageLinkUrl }).run()
-                            setImageLinkInputOpen(false)
+                            saveImageLink()
                           }
                         }}
                       />
                       <button
                         onMouseDown={(e) => {
                           e.preventDefault()
-                          editor.chain().focus().updateAttributes('image', { href: imageLinkUrl }).run()
-                          setImageLinkInputOpen(false)
+                          saveImageLink()
                         }}
                         className="p-1 px-2 text-green-600 hover:bg-green-50 rounded"
                       >

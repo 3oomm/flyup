@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify'
+import { getSafeStoryImageHref } from './storyImageLink'
 
 // เรื่องราวโปรเจกต์ (story) แก้ด้วย Tiptap editor ที่รองรับฝังวิดีโอ YouTube
 // (@tiptap/extension-youtube) ซึ่ง render ออกมาเป็น <div data-youtube-video><iframe src="...">
@@ -11,6 +12,12 @@ DOMPurify.addHook('uponSanitizeElement', (node, data) => {
     const el = node as HTMLIFrameElement
     const src = el.getAttribute('src') || ''
     if (!YOUTUBE_EMBED_SRC.test(src)) el.remove()
+  }
+})
+
+DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
+  if (data.attrName === 'data-href' && !getSafeStoryImageHref(data.attrValue)) {
+    data.keepAttr = false
   }
 })
 

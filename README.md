@@ -130,6 +130,21 @@ docker compose up --build
 
 > ฟีเจอร์ที่ต้องใช้ข้อมูลจริงจำเป็นต้องกำหนด `VITE_BASE_URL` ให้ชี้ไปยัง API ที่พร้อมใช้งาน
 
+### การตั้งค่า Nginx สำหรับ production
+
+Docker image ใช้ [`nginx.conf`](nginx.conf) เพื่อเสิร์ฟไฟล์ใน `dist/` หลังแก้ frontend หรือไฟล์นี้ต้อง build และ deploy image ใหม่ก่อนเว็บจริงจะเปลี่ยน
+
+- อนุญาตกล้องเฉพาะเว็บเดียวกัน (`camera=(self)`) สำหรับขั้นตอน KYC; ไม่เปิดไมโครโฟน
+- อนุญาต YouTube iframe เฉพาะ `www.youtube.com` และ `www.youtube-nocookie.com` สำหรับวิดีโอในเรื่องราว
+- `script-src` ใช้ SHA-256 hash สำหรับ JSON-LD ที่อยู่ใน `index.html` หากแก้เนื้อหา JSON-LD ต้องคำนวณ hash ใหม่ใน `nginx.conf` ก่อน deploy
+- หน้า SPA ใช้ `Cache-Control: no-cache` เพื่อให้เบราว์เซอร์ตรวจไฟล์ HTML ใหม่ ส่วน static assets แคช 1 ปี
+
+### ลิงก์ที่ผูกกับรูปในเรื่องราว
+
+ตัวแก้ไขเรื่องราวรับเฉพาะ URL แบบ `http://` หรือ `https://` สำหรับลิงก์ที่ผูกกับรูป ไม่รับ relative URL, `mailto:`, `data:` หรือ `javascript:` ลิงก์ที่ไม่ผ่านเงื่อนไขจะไม่ถูกบันทึก และลิงก์เก่าที่ไม่ผ่านเงื่อนไขจะถูกตัดออกตอนแสดงเรื่องราวโดยยังคงแสดงรูป
+
+การตรวจ URL อยู่ใน `src/lib/storyImageLink.ts` และใช้ทั้งตอนบันทึก ตอน sanitize HTML และตอนกดเปิดลิงก์ เมื่อแก้พฤติกรรมนี้ให้รัน `npm run test:run` และ `npm run build` ก่อน deploy
+
 ## คำสั่งที่ใช้บ่อย
 
 | คำสั่ง | รายละเอียด |
@@ -139,6 +154,8 @@ docker compose up --build
 | `npm run preview` | ดู production build ในเครื่อง |
 | `npm run lint` | ตรวจรูปแบบและข้อผิดพลาดของโค้ด |
 | `npm run test:run` | รันชุดทดสอบด้วย Vitest |
+
+ทดสอบเฉพาะลิงก์รูปในเรื่องราวได้ด้วย `npm run test:run -- src/components/preview/PreviewStory.test.tsx`
 
 ## โครงสร้างโปรเจกต์
 

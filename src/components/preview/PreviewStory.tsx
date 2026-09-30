@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import DOMPurify from 'dompurify';
 import { sanitizeStoryHtml } from '../../lib/sanitizeStoryHtml';
+import { getSafeStoryImageHref } from '../../lib/storyImageLink';
 
 interface PreviewStoryProps {
   story?: string;
@@ -66,8 +67,9 @@ const PreviewStory = ({ story, risks }: PreviewStoryProps) => {
           onClick={(e) => {
             const target = e.target as HTMLElement;
             const span = target.closest('[data-href]') as HTMLElement | null;
-            if (span?.dataset.href) {
-              window.open(span.dataset.href, '_blank', 'noopener,noreferrer');
+            const href = getSafeStoryImageHref(span?.dataset.href);
+            if (href) {
+              window.open(href, '_blank', 'noopener,noreferrer');
             }
           }}
         />
