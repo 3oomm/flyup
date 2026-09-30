@@ -393,11 +393,11 @@ function MilestoneCard({
 
             {/* Submission info (if submitted) */}
             {milestone.submission_summary && (
-              <div className="mt-5 p-4 border border-amber-200 bg-amber-50/50 rounded-xl">
+              <div className="mt-5 min-w-0 p-4 border border-amber-200 bg-amber-50/50 rounded-xl">
                 <h4 className="text-sm font-semibold text-amber-800 mb-2 flex items-center gap-2">
-                  <AlertCircle size={15} /> สิ่งที่ Pioneer ส่งมอบ
+                  <AlertCircle size={15} className="shrink-0" /> สรุปที่คนสร้างโปรเจกต์ส่งมา
                 </h4>
-                <p className="text-sm text-amber-700 leading-relaxed">{milestone.submission_summary}</p>
+                <p className="min-w-0 text-sm text-amber-700 leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">{milestone.submission_summary}</p>
                 {milestone.submitted_at && (
                   <p className="text-xs text-amber-500 mt-2">
                     ส่งเมื่อ {formatThDate(new Date(milestone.submitted_at))}

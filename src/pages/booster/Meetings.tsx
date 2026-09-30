@@ -44,12 +44,12 @@ function ProjectCard({ project, now }: { project: MeetingProject; now: Date }) {
   const upcoming = project.meetings.filter(item => stateOf(item, now).upcoming).length
   const past = project.meetings.length - ongoing - upcoming
   return (
-    <Link to={`/booster/meetings?project=${project.id}`} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
+    <Link to={`/booster/meetings?project=${project.id}`} className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:h-16 sm:w-16">{project.cover ? <img src={project.cover} alt={project.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Video size={22} /></div>}</div>
         <div className="min-w-0"><h3 className="mb-2 break-words text-sm font-bold sm:text-base">{project.title}</h3><div className="flex flex-wrap gap-2 text-xs font-medium"><span className="rounded-full bg-muted px-2.5 py-1 text-muted-foreground">{project.meetings.length} การประชุม</span>{ongoing > 0 && <span className="animate-pulse rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-green-700">กำลังประชุม {ongoing}</span>}{upcoming > 0 && <span className="rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-primary">กำลังจะถึง {upcoming}</span>}{past > 0 && <span className="rounded-full border border-border bg-white px-2.5 py-1 text-muted-foreground">ปิดแล้ว {past}</span>}</div></div>
       </div>
-      <span className="w-full shrink-0 rounded-xl border border-border px-6 py-2 text-center text-sm font-semibold text-muted-foreground sm:w-auto">ดูการประชุม <ChevronRight size={15} className="inline" /></span>
+      <span className="w-full shrink-0 rounded-xl bg-primary px-6 py-2 text-center text-sm font-semibold text-white transition-colors group-hover:bg-primary/90 sm:w-auto">ดูการประชุม <ChevronRight size={15} className="inline" /></span>
     </Link>
   )
 }

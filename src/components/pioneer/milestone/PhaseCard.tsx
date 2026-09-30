@@ -83,6 +83,7 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
   // นัดเก่าที่ปิด/ยกเลิกแล้วห้ามนำมาใช้เปิดโหวตรอบใหม่
   const activeMeetings = (milestone.meetings ?? []).filter(m => m.status === 'open')
   const hasMeeting = activeMeetings.length > 0
+  const needsMeeting = isApproved && !hasMeeting && !milestone.voting_open
   const meetingPassed = activeMeetings.some(m => {
     const dt = getMeetingDatetime(m)
     return dt !== null && dt <= now
@@ -177,15 +178,19 @@ const PhaseCard = ({ milestone, isActive, projectSuspended, payoutStatus, blocke
             <>
               <div className="relative group">
                 <button
-                  onClick={() => !hasMeeting && navigate('/pioneer/dashboard/meetings')}
+                  onClick={() => !hasMeeting && navigate(milestone.id
+                    ? `/pioneer/dashboard/meetings?milestoneId=${milestone.id}`
+                    : '/pioneer/dashboard/meetings')}
                   disabled={hasMeeting}
                   className={`flex shrink-0 items-center gap-[6px] whitespace-nowrap px-[14px] py-[7px] rounded-[10px] border text-[13px] font-medium transition-colors ${
                     hasMeeting
                       ? 'border-border text-muted-foreground bg-surface-soft cursor-not-allowed opacity-60'
+                      : needsMeeting
+                      ? 'border-primary bg-primary text-white shadow-md shadow-primary/30 hover:bg-primary/90 cursor-pointer motion-safe:animate-pulse'
                       : 'border-border text-foreground hover:bg-surface-soft cursor-pointer'
                   }`}
                 >
-                  <Calendar size={14} className="text-muted-foreground" />
+                  <Calendar size={14} className={needsMeeting ? 'text-white' : 'text-muted-foreground'} />
                   {hasMeeting ? 'นัดแล้ว' : 'นัดประชุม'}
                 </button>
                 {hasMeeting && (

@@ -7,6 +7,8 @@ interface DateTimePickerProps {
   onDateChange: (v: string) => void
   onTimeChange: (v: string) => void
   maxDate?: string  // YYYY-MM-DD — ห้ามเกิน milestone due_date
+  error?: string
+  errorId?: string
 }
 
 const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -25,7 +27,7 @@ function fmtDisplay(date: string, time: string) {
   return `${day} ${month} ${year}  ${t}`
 }
 
-export default function DateTimePicker({ date, time, onDateChange, onTimeChange, maxDate }: DateTimePickerProps) {
+export default function DateTimePicker({ date, time, onDateChange, onTimeChange, maxDate, error, errorId }: DateTimePickerProps) {
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`
 
@@ -141,11 +143,13 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
       {/* Trigger */}
       <button
         type="button"
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
         onClick={() => {
           if (!open && time) { setLocalH(time.slice(0,2)); setLocalM(time.slice(3,5)) }
           setOpen(o => !o)
         }}
-        className={`w-full flex items-center gap-2 border rounded-[8px] px-3 py-2.5 text-[14px] text-left transition-colors cursor-pointer ${open ? 'border-primary' : 'border-border hover:border-primary/50'} ${!date ? 'text-muted-foreground' : 'text-foreground'}`}
+        className={`w-full flex items-center gap-2 border rounded-[8px] px-3 py-2.5 text-[14px] text-left transition-colors cursor-pointer ${error ? 'border-error' : open ? 'border-primary' : 'border-border hover:border-primary/50'} ${!date ? 'text-muted-foreground' : 'text-foreground'}`}
       >
         <Calendar size={15} className="text-muted-foreground shrink-0" />
         <span>{fmtDisplay(date, time)}</span>
@@ -153,7 +157,7 @@ export default function DateTimePicker({ date, time, onDateChange, onTimeChange,
 
       {/* Popover */}
       {open && (
-        <div className="absolute z-50 mt-1 bg-white rounded-[14px] border border-border shadow-xl w-[320px]">
+        <div className="absolute z-50 mt-1 bg-white rounded-[14px] border border-border shadow-xl w-full max-w-[320px]">
 
           {/* Calendar header */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2 gap-2">

@@ -61,6 +61,7 @@ export default function EditMeetingModal({
 
         <MeetingFormFields
           values={form.values}
+          errors={form.errors}
           setField={form.setField}
           milestones={milestones}
           milestonesLoading={milestonesLoading}

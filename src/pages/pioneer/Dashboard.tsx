@@ -131,21 +131,21 @@ const Dashboard = () => {
     <div className="flex flex-col gap-[24px]">
 
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
+        <div className="min-w-0">
           <h1 className="text-[24px] text-foreground font-semibold">แดชบอร์ด Pioneer</h1>
           <p className="text-[13px] text-muted-foreground mt-[2px]">ภาพรวมโปรเจกต์และการระดมทุนของคุณ</p>
         </div>
         <button
           onClick={handleCreateProject}
           disabled={isCreating}
-          className="bg-primary h-[38px] flex justify-center items-center gap-[10px] px-[16px] rounded-[10px] text-white-foreground hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer text-[14px] font-medium"
+          className="bg-primary min-h-[42px] w-full lg:w-auto shrink-0 inline-flex justify-center items-center gap-[10px] px-[16px] py-2 rounded-[10px] text-white-foreground hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer text-[14px] font-medium whitespace-nowrap"
         >
           {isCreating ? (
             <Loader2 size={20} className="animate-spin" />
           ) : (
             <>
-              <Plus size={20} />
+              <Plus size={20} className="shrink-0" />
               <span>สร้างโปรเจกต์ใหม่</span>
             </>
           )}

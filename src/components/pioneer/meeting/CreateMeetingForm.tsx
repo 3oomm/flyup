@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { Send, Loader2 } from 'lucide-react';
+import { useSearchParams } from 'react-router';
 import { useMeetingStore } from '../../../store/useMeetingStore';
 import MeetingFormFields from './MeetingFormFields';
 import { useMeetingForm } from './useMeetingForm';
@@ -13,6 +15,18 @@ interface CreateMeetingFormProps {
 export default function CreateMeetingForm({ milestones, milestonesLoading, onCreated }: CreateMeetingFormProps) {
   const { createMeeting, isSubmitting } = useMeetingStore();
   const form = useMeetingForm();
+  const [searchParams] = useSearchParams();
+  const requestedMilestoneId = searchParams.get('milestoneId');
+
+  useEffect(() => {
+    if (milestonesLoading) return;
+    const currentId = form.values.milestoneId;
+    if (milestones.some(milestone => String(milestone.id) === currentId)) return;
+
+    const preferred = milestones.find(milestone => String(milestone.id) === requestedMilestoneId);
+    const nextId = String((preferred ?? milestones[0])?.id ?? '');
+    if (currentId !== nextId) form.setField('milestoneId', nextId);
+  }, [milestones, milestonesLoading, requestedMilestoneId, form.values.milestoneId, form.setField]);
 
   const handleSubmit = async () => {
     const payload = form.buildPayload();
@@ -30,6 +44,7 @@ export default function CreateMeetingForm({ milestones, milestonesLoading, onCre
 
       <MeetingFormFields
         values={form.values}
+        errors={form.errors}
         setField={form.setField}
         milestones={milestones}
         milestonesLoading={milestonesLoading}

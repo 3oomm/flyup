@@ -61,6 +61,7 @@ export default function MeetingCard({
   })()
   const isOngoing  = isOpen && !!meetingDatetime && meetingDatetime <= now && now < new Date(meetingDatetime.getTime() + MEETING_WINDOW_MS)
   const isUpcoming = isOpen && (!meetingDatetime || meetingDatetime > now)
+  const isFinished = isClosed || (isOpen && !isUpcoming && !isOngoing)
   const canModify = isUpcoming;
   const canManageMilestone = !!projectId && !isCanceled && !isUpcoming;
 
@@ -68,11 +69,11 @@ export default function MeetingCard({
     <button
       type="button"
       onClick={() => navigate(`/pioneer/dashboard/projects/${projectId}/milestones`)}
-      title="ไปหน้าจัดการ Milestone เพื่อเปิด Vote"
+      title="ไปหน้าจัดการ Vote"
       className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-primary/20 bg-primary/5 text-primary text-xs font-semibold hover:bg-primary/10 transition-colors cursor-pointer whitespace-nowrap"
     >
       <Vote size={14} />
-      <span className="hidden sm:inline">จัดการ Milestone</span>
+      <span className="hidden sm:inline">จัดการ Vote</span>
     </button>
   ) : null;
 
@@ -80,8 +81,8 @@ export default function MeetingCard({
     <div className={`bg-white border rounded-2xl overflow-hidden transition-all ${expanded ? 'border-primary/40 shadow-sm' : 'border-border'} ${isCanceled ? 'opacity-60' : ''}`}>
       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-5">
         <div className="flex w-full min-w-0 items-start gap-3 sm:flex-1 sm:items-center sm:gap-4">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCanceled || isClosed ? 'bg-muted text-muted-foreground' : 'bg-purple-100 text-primary'}`}>
-            {isCanceled ? <Ban size={20} /> : isClosed ? <CheckCircle size={20} /> : <Video size={20} />}
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCanceled ? 'bg-muted text-muted-foreground' : isFinished ? 'bg-green-50 text-green-600' : 'bg-purple-100 text-primary'}`}>
+            {isCanceled ? <Ban size={20} /> : isFinished ? <CheckCircle size={20} /> : <Video size={20} />}
           </div>
 
           <div className="flex-1 min-w-0">
@@ -102,9 +103,9 @@ export default function MeetingCard({
             <span className="text-xs font-medium text-error border border-error/30 bg-error/5 px-3 py-1.5 rounded-full">
               ยกเลิก
             </span>
-          ) : isClosed || (isOpen && !isUpcoming && !isOngoing) ? (
+          ) : isFinished ? (
             <>
-              <span className="text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-full">
+              <span className="text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
                 เสร็จสิ้น
               </span>
               {manageMilestoneButton}
@@ -181,34 +182,36 @@ export default function MeetingCard({
       </div>
 
       {expanded && hasDetail && (
-        <div className="border-t border-border px-5 py-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="flex flex-col sm:flex-row gap-6">
+        <div className="min-w-0 border-t border-border px-5 py-4 bg-muted/30 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex min-w-0 flex-col gap-6 sm:flex-row">
             {agenda && (
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">วาระการประชุม</h4>
-                <p className="text-sm text-foreground whitespace-pre-line">{agenda}</p>
+                <p className="text-sm text-foreground whitespace-pre-wrap [overflow-wrap:anywhere]">{agenda}</p>
               </div>
             )}
 
             {meeting.link && (
-              <div>
+              <div className="min-w-0">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">ลิงก์ประชุม</h4>
                 <a
                   href={meeting.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline flex items-center gap-1 break-all"
+                  className="flex min-w-0 items-start gap-1 text-sm text-primary hover:underline"
                 >
-                  <ExternalLink size={13} /> {meeting.link}
+                  <ExternalLink size={13} className="shrink-0" />
+                  <span className="min-w-0 break-all">{meeting.link}</span>
                 </a>
               </div>
             )}
 
             {meeting.place && (
-              <div>
+              <div className="min-w-0">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">สถานที่</h4>
-                <p className="text-sm text-foreground flex items-center gap-1">
-                  <MapPin size={13} className="text-muted-foreground" /> {meeting.place}
+                <p className="flex min-w-0 items-start gap-1 text-sm text-foreground">
+                  <MapPin size={13} className="shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{meeting.place}</span>
                 </p>
               </div>
             )}

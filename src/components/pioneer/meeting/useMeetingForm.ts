@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { isValidHttpUrl } from '../../../lib/validation';
 import type { CreateMeetingPayload, Meeting, MeetingType } from './types';
 
@@ -12,6 +11,8 @@ export interface MeetingFormValues {
   location: string;
   agenda: string;
 }
+
+export type MeetingFormErrors = Partial<Record<'milestoneId' | 'dateTime' | 'meetingType' | 'meetingUrl' | 'location', string>>;
 
 const EMPTY: MeetingFormValues = {
   milestoneId: '',
@@ -47,45 +48,51 @@ export function useMeetingForm(initial?: Meeting) {
   const [values, setValues] = useState<MeetingFormValues>(
     initial ? fromMeeting(initial) : EMPTY,
   );
+  const [errors, setErrors] = useState<MeetingFormErrors>({});
 
-  const setField = <K extends keyof MeetingFormValues>(key: K, val: MeetingFormValues[K]) =>
+  const setField = <K extends keyof MeetingFormValues>(key: K, val: MeetingFormValues[K]) => {
     setValues(prev => ({ ...prev, [key]: val }));
+    setErrors(prev => {
+      const next = { ...prev };
+      if (key === 'date' || key === 'time') delete next.dateTime;
+      else delete next[key as keyof MeetingFormErrors];
+      if (key === 'meetingType') {
+        delete next.meetingUrl;
+        delete next.location;
+      }
+      return next;
+    });
+  };
 
-  const reset = () => setValues(EMPTY);
-  const setFromMeeting = (m: Meeting) => setValues(fromMeeting(m));
+  const reset = () => { setValues(EMPTY); setErrors({}); };
+  const setFromMeeting = (m: Meeting) => { setValues(fromMeeting(m)); setErrors({}); };
 
   const buildPayload = (): CreateMeetingPayload | null => {
-    if (!values.milestoneId) { toast.error('กรุณาเลือก Milestone'); return null; }
-    if (!values.date) { toast.error('กรุณาเลือกวันที่'); return null; }
-    if (!values.time) { toast.error('กรุณาเลือกเวลา'); return null; }
-    const meetingStartsAt = new Date(`${values.date}T${values.time}:00`);
-    if (Number.isNaN(meetingStartsAt.getTime())) {
-      toast.error('วันที่หรือเวลานัดหมายไม่ถูกต้อง');
-      return null;
+    const nextErrors: MeetingFormErrors = {};
+    if (!values.milestoneId) nextErrors.milestoneId = 'กรุณาเลือก Milestone';
+    if (!values.date || !values.time) {
+      nextErrors.dateTime = 'กรุณาเลือกวันที่และเวลา';
+    } else {
+      const meetingStartsAt = new Date(`${values.date}T${values.time}:00`);
+      if (Number.isNaN(meetingStartsAt.getTime())) nextErrors.dateTime = 'วันที่หรือเวลานัดหมายไม่ถูกต้อง';
+      else if (meetingStartsAt.getTime() <= Date.now()) nextErrors.dateTime = 'เวลานี้ผ่านไปแล้ว กรุณาเลือกเวลาในอนาคต';
     }
-    if (meetingStartsAt.getTime() <= Date.now()) {
-      toast.error('ไม่สามารถนัดหมายในเวลาที่ผ่านมาแล้ว กรุณาเลือกเวลาในอนาคต');
-      return null;
-    }
-    if (!values.meetingType) { toast.error('กรุณาเลือกรูปแบบการประชุม'); return null; }
-    if ((values.meetingType === 'online' || values.meetingType === 'hybrid') && !values.meetingUrl.trim()) {
-      toast.error('กรุณาระบุลิงก์ประชุม');
-      return null;
-    }
-    if ((values.meetingType === 'online' || values.meetingType === 'hybrid') && !isValidHttpUrl(values.meetingUrl)) {
-      toast.error('ลิงก์ประชุมไม่ถูกต้อง กรุณาใช้ URL ที่ขึ้นต้นด้วย http:// หรือ https://');
-      return null;
+    if (!values.meetingType) nextErrors.meetingType = 'กรุณาเลือกรูปแบบการประชุม';
+    if (values.meetingType === 'online' || values.meetingType === 'hybrid') {
+      if (!values.meetingUrl.trim()) nextErrors.meetingUrl = 'กรุณาระบุลิงก์ประชุม';
+      else if (!isValidHttpUrl(values.meetingUrl)) nextErrors.meetingUrl = 'กรุณาใช้ลิงก์ที่ขึ้นต้นด้วย http:// หรือ https://';
     }
     if ((values.meetingType === 'onsite' || values.meetingType === 'hybrid') && !values.location.trim()) {
-      toast.error('กรุณาระบุสถานที่');
-      return null;
+      nextErrors.location = 'กรุณาระบุสถานที่';
     }
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return null;
 
     return {
       milestone_id: Number(values.milestoneId),
       date: values.date,
       time: values.time,
-      meeting_type: values.meetingType,
+      meeting_type: values.meetingType as MeetingType,
       link: values.meetingType === 'online' || values.meetingType === 'hybrid' ? values.meetingUrl.trim() : undefined,
       place: values.meetingType === 'onsite' || values.meetingType === 'hybrid' ? values.location.trim() : undefined,
       description: values.agenda.trim(),
@@ -93,5 +100,5 @@ export function useMeetingForm(initial?: Meeting) {
     };
   };
 
-  return { values, setField, reset, setFromMeeting, buildPayload };
+  return { values, errors, setField, reset, setFromMeeting, buildPayload };
 }
