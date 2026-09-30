@@ -15,6 +15,10 @@
   [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 </div>
 
+<p align="center">
+  <img src="docs/images/mobile-home.png" alt="หน้าแรก FlyUp บนมือถือ" width="260" />
+</p>
+
 ---
 
 ## ภาพตัวอย่างโปรเจกต์
@@ -102,7 +106,7 @@ flowchart LR
 ### รัน Frontend
 
 ```bash
-git clone https://github.com/011-Boom-Phongsakorn/flyup.git
+git clone https://github.com/3oomm/flyup.git
 cd flyup
 npm install
 cp .env.example .env
@@ -181,44 +185,42 @@ flyup/
 
 ## Contributors
 
-<div align="center">
-  <a href="https://github.com/011-Boom-Phongsakorn">
-    <img src="https://github.com/011-Boom-Phongsakorn.png?size=100" width="90" alt="Phongsakorn Tangpok" />
-  </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/SundayYogurt">
-    <img src="https://github.com/SundayYogurt.png?size=100" width="90" alt="Krit" />
-  </a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/nine9031">
-    <img src="https://github.com/nine9031.png?size=100" width="90" alt="Alongkon Natphunwat" />
-  </a>
-  <br />
-  <strong>Phongsakorn Tangpok</strong>
-  &nbsp;&nbsp;•&nbsp;&nbsp;
-  <strong>Krit</strong>
-  &nbsp;&nbsp;•&nbsp;&nbsp;
-  <strong>Alongkon Natphunwat</strong>
-</div>
+<table align="center">
+  <tr>
+    <td align="center" width="180">
+      <a href="https://github.com/3oomm"><img src="docs/images/contributor-phongsakorn.svg" width="72" alt="Phongsakorn Tangpok" /><br /><strong>Phongsakorn Tangpok</strong><br /><sub>@3oomm</sub></a>
+    </td>
+    <td align="center" width="180">
+      <a href="https://github.com/nine9031"><img src="docs/images/contributor-alongkon.svg" width="72" alt="Alongkon Natphunwat" /><br /><strong>Alongkon Natphunwat</strong><br /><sub>@nine9031</sub></a>
+    </td>
+    <td align="center" width="180">
+      <a href="https://github.com/SundayYogurt"><img src="docs/images/contributor-krit.svg" width="72" alt="Krit" /><br /><strong>Krit</strong><br /><sub>@SundayYogurt</sub></a>
+    </td>
+  </tr>
+</table>
 
 ### Commit Distribution
 
+<!-- contributors:start -->
 | Contributor | GitHub | Commits | สัดส่วน |
 |---|---|---:|---:|
-| Phongsakorn Tangpok | [@011-Boom-Phongsakorn](https://github.com/011-Boom-Phongsakorn) | **490** | **82.21%** |
-| Alongkon Natphunwat | [@nine9031](https://github.com/nine9031) | **94** | **15.77%** |
-| Krit | [@SundayYogurt](https://github.com/SundayYogurt) | **12** | **2.01%** |
-| **รวม** |  | **596** | **100%** |
+| Phongsakorn Tangpok | [@3oomm](https://github.com/3oomm) | **569** | **84.3%** |
+| Alongkon Natphunwat | [@nine9031](https://github.com/nine9031) | **94** | **13.9%** |
+| Krit | [@SundayYogurt](https://github.com/SundayYogurt) | **12** | **1.8%** |
+| **รวม** |  | **675** | **100%** |
 
 ```mermaid
 pie showData
     title สัดส่วน commits ของ FlyUp Frontend
-    "Phongsakorn Tangpok — 82.21%" : 490
-    "Alongkon Natphunwat — 15.77%" : 94
-    "Krit — 2.01%" : 12
+    "Phongsakorn Tangpok — 84.3%" : 569
+    "Alongkon Natphunwat — 13.9%" : 94
+    "Krit — 1.8%" : 12
 ```
 
-> สถิติคำนวณจาก `git log --all` ของ repository `flyup` ณ วันที่ **17 กันยายน 2026** โดยรวมชื่อและอีเมล commit หลายรูปแบบของบุคคลเดียวกันแล้ว ตัวเลข commits ใช้แสดงกิจกรรมใน Git เท่านั้น ไม่ใช่ตัววัดปริมาณหรือคุณค่าของงานทั้งหมด
+> สถิติคำนวณจาก `git log --all` ของ repository `flyup` ณ วันที่ **1 ตุลาคม 2026** โดยรวมชื่อและอีเมล commit หลายรูปแบบของบุคคลเดียวกันแล้ว ตัวเลข commits ใช้แสดงกิจกรรมใน Git เท่านั้น ไม่ใช่ตัววัดปริมาณหรือคุณค่าของงานทั้งหมด
+<!-- contributors:end -->
+
+ตัวเลขในตารางและกราฟอัปเดตอัตโนมัติเมื่อมี commit บน `develop` และตรวจซ้ำทุกสัปดาห์ รันเองได้ด้วย `node scripts/update-contributors.mjs` (`--check` สำหรับตรวจว่าข้อมูลล่าสุดหรือไม่)
 
 ## Contributing
 
