@@ -124,6 +124,11 @@ function MilestoneCard({
   const active = isActive(milestone.status);
   const amount = fundingGoal > 0 ? (fundingGoal * milestone.percent_release) / 100 : 0;
   const criteria = (milestone.acceptance_criteria ?? "").split("\n").filter((c) => c.trim());
+  const attachmentUrls = [...new Set([
+    ...(milestone.urls ?? []),
+    ...(milestone.submission_attachments ?? []),
+    ...(milestone.submission_links ?? []),
+  ])].filter((url) => url.trim());
 
   // Compute estimated dates
   const estimatedDates = (() => {
@@ -286,13 +291,13 @@ function MilestoneCard({
             )}
 
             {/* Attached files / URLs */}
-            {milestone.urls && milestone.urls.length > 0 && (
+            {attachmentUrls.length > 0 && (
               <div className="mt-5">
                 <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
                   <Link2 size={15} className="text-primary" /> ไฟล์แนบและสื่อ
                 </h4>
                 <div className="space-y-3">
-                  {milestone.urls.map((url, i) => {
+                  {attachmentUrls.map((url, i) => {
                     const file = detectFileKind(url);
 
                     if (file.kind === "image") {

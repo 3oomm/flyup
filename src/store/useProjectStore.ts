@@ -654,6 +654,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             const msg = error instanceof AxiosError ? error.response?.data?.message : null;
             if (msg === 'cancel request is already pending') {
                 toast.error('คุณได้ส่งคำขอยกเลิกไปแล้ว กรุณารอ Admin พิจารณา');
+            } else if (msg === 'cannot cancel a completed project') {
+                toast.error('โครงการดำเนินการเสร็จสิ้นแล้ว ไม่สามารถขอยกเลิกได้ กรุณาดำเนินการจ่ายเงินปันผล');
             } else if (msg === 'project is already cancelled or state is draft') {
                 toast.error('ไม่สามารถส่งคำขอได้ เนื่องจากโปรเจกต์ถูกยกเลิกแล้ว หรืออยู่ในสถานะแบบร่าง');
             } else if (msg === 'description is required') {

@@ -288,16 +288,18 @@ const MyProjects = () => {
             const hasMilestone = project.state === 'funding' || project.state === 'executing' || project.state === 'pending_edit_review';
             const hasDelete = project.state === 'draft';
             const hasCancel = project.state === 'pending_review';
-            const hasCancelRequest = project.state === 'funding' || project.state === 'closed' || project.state === 'executing' || project.state === 'pending_edit_review';
             const progress = project.funding_goal > 0
               ? Math.min(Math.round((project.current_funding / project.funding_goal) * 100), 100)
               : 0;
             const currentPhase = getCurrentProjectPhase(project.milestones);
+            const allPhasesPaid = (project.milestones?.length ?? 0) >= 4
+              && project.milestones?.every(milestone => milestone.status === 'paid') === true;
             // Closed projects have completed their phases; summaries may omit milestone details.
             const canPayDividends = project.state === 'closed'
-              || (project.state === 'executing'
-                && (project.milestones?.length ?? 0) >= 4
-                && project.milestones?.every(milestone => milestone.status === 'paid') === true);
+              || (project.state === 'executing' && allPhasesPaid);
+            const hasCancelRequest = !canPayDividends && !allPhasesPaid && (
+              project.state === 'funding' || project.state === 'executing' || project.state === 'pending_edit_review'
+            );
 
             return (
               <div
