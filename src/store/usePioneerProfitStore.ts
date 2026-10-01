@@ -78,16 +78,12 @@ export const usePioneerProfitStore = create<PioneerProfitStore>((set) => ({
     },
 
     uploadFile: async (file) => {
-        try {
-            const formData = new FormData()
-            formData.append('file', file)
-            const res = await api.post('/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            })
-            const { url, type } = res.data?.data ?? {}
-            return url ? { url, type } : null
-        } catch {
-            return null
-        }
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await api.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        const { url, type } = res.data?.data ?? {}
+        return url ? { url, type } : null
     },
 }))

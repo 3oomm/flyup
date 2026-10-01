@@ -107,8 +107,13 @@ function SubmitProfitModal({
             const uploaded = await uploadFile(file)
             if (!uploaded?.url) throw new Error('upload failed')
             setSlipImage(uploaded.url)
-        } catch {
-            toast.error('อัปโหลดสลิปไม่สำเร็จ')
+        } catch (err: unknown) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            const unsupportedFile = message === 'unsupported file type or extension does not match content'
+                || message === 'unsupported file type'
+            toast.error(unsupportedFile
+                ? 'ไฟล์สลิปไม่รองรับ หรือนามสกุลไฟล์ไม่ตรงกับเนื้อหา กรุณาเลือกไฟล์รูปภาพ JPG, PNG, GIF หรือ WebP ใหม่'
+                : 'อัปโหลดสลิปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง', { duration: 6000 })
             setSlipPreview('')
             if (fileInputRef.current) fileInputRef.current.value = ''
         } finally {
