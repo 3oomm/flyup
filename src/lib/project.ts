@@ -25,11 +25,15 @@ export function getProgress(p: ProgressLike): number {
 
 /**
  * Days remaining until `end_date`. Falls back to `duration_days` when there's no
- * end date. Never negative. `now` is injectable so tests are deterministic.
+ * end date, including Go's zero-time value. Never negative. `now` is injectable
+ * so tests are deterministic.
  */
 export function getDaysLeft(p: DaysLeftLike, now: number = Date.now()): number {
-  if (!p.end_date) return p.duration_days || 0
-  const diff = new Date(p.end_date).getTime() - now
+  const fallback = Math.max(0, p.duration_days ?? 0)
+  if (!p.end_date || p.end_date.startsWith('0001-01-01')) return fallback
+  const deadline = new Date(p.end_date).getTime()
+  if (!Number.isFinite(deadline)) return fallback
+  const diff = deadline - now
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 

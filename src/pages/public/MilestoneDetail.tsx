@@ -16,7 +16,6 @@ import {
   DollarSign,
   Target,
   Milestone as MilestoneIcon,
-  Download,
   Image,
   Film,
   File,
@@ -363,9 +362,6 @@ function MilestoneCard({
                             <p className="text-sm font-medium text-gray-800 truncate">{file.filename}</p>
                             <p className="text-xs text-gray-400">ไฟล์ {file.docType || file.ext}</p>
                           </div>
-                          <div className="shrink-0 text-gray-400 group-hover:text-primary transition-colors">
-                            <Download size={18} />
-                          </div>
                         </a>
                       );
                     }
@@ -385,9 +381,6 @@ function MilestoneCard({
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 truncate">{file.filename}</p>
                           <p className="text-xs text-gray-400 truncate">{url}</p>
-                        </div>
-                        <div className="shrink-0 text-gray-400 group-hover:text-primary transition-colors">
-                          <Download size={18} />
                         </div>
                       </a>
                     );
