@@ -148,9 +148,9 @@ const Home = () => {
         ></div>
 
         <div className="container mx-auto px-4 md:px-8 max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
 
-            <div className="max-w-xl">
+            <div className="order-2 md:order-1 max-w-xl">
               <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium text-purple-600 mb-6 border border-white/50 shadow-sm">
                 <Sparkles size={16} /> ผลงานพัฒนาระบบซอฟต์แวร์ของนักศึกษา
               </div>
@@ -196,7 +196,7 @@ const Home = () => {
                 </Link>
               </div>
             </div>
-            <div className="relative hidden md:block">
+            <div className="relative order-1 md:order-2">
               <div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-50 z-0"
                 style={{ background: "radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)" }}
@@ -205,7 +205,7 @@ const Home = () => {
               <img
                 src="/flyup-animation.webp"
                 alt="FlyUp Mascot"
-                className="relative z-10 w-full max-w-[500px] mx-auto drop-shadow-2xl animate-pulse-slow"
+                className="relative z-10 w-44 sm:w-56 md:w-full max-w-[500px] mx-auto drop-shadow-2xl animate-pulse-slow"
               />
             </div>
 
@@ -221,7 +221,7 @@ const Home = () => {
                 <h2 className="text-2xl font-bold mb-1">โปรเจกต์ที่สำเร็จแล้ว</h2>
                 <p className="text-sm text-gray-500">ผลงานที่พัฒนาสำเร็จจากการสนับสนุนของนักลงทุน</p>
               </div>
-              <Link to="/projects?section=completed" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0">
+              <Link to="/projects?section=completed" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0 whitespace-nowrap">
                 ดูทั้งหมด <ChevronRight size={16} />
               </Link>
             </div>
@@ -235,12 +235,12 @@ const Home = () => {
       {/* ── Recommended Section ── */}
       <section data-home-snap-section data-snap-key="recommended" className="min-h-[100dvh] snap-start flex items-center py-16 bg-white">
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex justify-between items-end gap-4 mb-8">
             <div>
               <h2 className="text-2xl font-bold mb-1">โปรเจกต์แนะนำ</h2>
               <p className="text-sm text-gray-500">ค้นพบโปรเจกต์ที่กำลังระดมทุน</p>
             </div>
-            <Link to="/projects?sort=popular&section=recommended" className="text-purple-600 text-sm font-medium hover:underline flex items-center">
+            <Link to="/projects?sort=popular&section=recommended" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0 whitespace-nowrap">
               ดูทั้งหมด <ChevronRight size={16} />
             </Link>
           </div>
@@ -310,12 +310,12 @@ const Home = () => {
       {hotProjects.length > 0 && (
         <section data-home-snap-section data-snap-key="hot" className="min-h-[100dvh] snap-start flex items-center py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-            <div className="flex justify-between items-end mb-8">
+            <div className="flex justify-between items-end gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">ใกล้สำเร็จแล้ว! <Flame className="text-orange-500" /></h2>
                 <p className="text-sm text-gray-500">โปรเจกต์เหล่านี้เกือบถึงเป้าหมายระดมทุนแล้ว อย่าพลาด!</p>
               </div>
-              <Link to="/projects?sort=ending_soon&section=hot" className="text-purple-600 text-sm font-medium hover:underline flex items-center">
+              <Link to="/projects?sort=ending_soon&section=hot" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0 whitespace-nowrap">
                 ดูทั้งหมด <ChevronRight size={16} />
               </Link>
             </div>
@@ -329,9 +329,9 @@ const Home = () => {
       {/* ── New Projects ── */}
       <section data-home-snap-section data-snap-key="new" className="min-h-[100dvh] snap-start flex items-center py-16 bg-white">
         <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex justify-between items-end gap-4 mb-8">
             <h2 className="text-2xl font-bold mb-1">โปรเจกต์มาใหม่</h2>
-            <Link to="/projects?sort=latest&section=new" className="text-purple-600 text-sm font-medium hover:underline flex items-center">
+            <Link to="/projects?sort=latest&section=new" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0 whitespace-nowrap">
               ดูทั้งหมด <ChevronRight size={16} />
             </Link>
           </div>
@@ -349,12 +349,12 @@ const Home = () => {
       {executingProjects.length > 0 && (
         <section data-home-snap-section data-snap-key="executing" className="min-h-[100dvh] snap-start flex items-center py-16">
           <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-            <div className="flex justify-between items-end mb-8">
+            <div className="flex justify-between items-end gap-4 mb-8">
               <div>
                 <h2 className="text-2xl font-bold mb-1">โปรเจกต์กำลังดำเนินการ</h2>
                 <p className="text-sm text-muted-foreground">โปรเจกต์ที่ระดมทุนสำเร็จและอยู่ในระหว่างพัฒนา</p>
               </div>
-              <Link to="/projects?sort=popular&section=executing" className="text-purple-600 text-sm font-medium hover:underline flex items-center">
+              <Link to="/projects?sort=popular&section=executing" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0 whitespace-nowrap">
                 ดูทั้งหมด <ChevronRight size={16} />
               </Link>
             </div>
