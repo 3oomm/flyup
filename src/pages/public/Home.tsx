@@ -203,7 +203,7 @@ const Home = () => {
               ></div>
 
               <img
-                src="/flyup-mascot.png"
+                src="/flyup-animation.webp"
                 alt="FlyUp Mascot"
                 className="relative z-10 w-full max-w-[500px] mx-auto drop-shadow-2xl animate-pulse-slow"
               />

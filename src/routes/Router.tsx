@@ -9,13 +9,7 @@ function ScrollToTop() {
     return null
 }
 
-function PageLoader() {
-    return (
-        <div className="flex items-center justify-center h-screen">
-            <Loader2 className="size-10 animate-spin" />
-        </div>
-    )
-}
+import PageLoader from '../components/PageLoader';
 import GoogleRoleModal from '../components/GoogleRoleModal';
 
 // Layouts (eager — shared shells rendered for every nested route)
@@ -25,7 +19,6 @@ import ProjectStageLayout from '../layouts/ProjectStageLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import BoosterLayout from '../layouts/BoosterLayout';
 
-import { Loader2 } from 'lucide-react';
 
 // Public Pages — lazy-loaded so each route only ships the JS it needs
 const Home = lazy(() => import('../pages/public/Home'));
@@ -159,11 +152,7 @@ const Router = () => {
     const showRoleModal = authUser?.role === 'pending' && hasUniversityDomain;
 
     if (isCheckingAuth && !authUser) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <Loader2 className="size-10 animate-spin" />
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (
