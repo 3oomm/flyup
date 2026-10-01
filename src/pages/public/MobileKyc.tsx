@@ -68,9 +68,9 @@ export default function MobileKyc() {
         <p className="mt-1 text-sm text-muted-foreground">{studentRequired ? "ใช้กล้องถ่ายบัตรประชาชน เซลฟี่พร้อมถือบัตร และบัตรนักศึกษาแบบสด" : "ใช้กล้องถ่ายบัตรประชาชนและเซลฟี่แบบสด"}</p>
         {!token && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">ลิงก์นี้ไม่ถูกต้อง กรุณาสแกน QR Code ใหม่</p>}
         <div className="mt-6">
-          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก {totalSteps} — ถ่ายบัตรประชาชน</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
-          {step === "selfie" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 2 จาก {totalSteps} — ถ่ายเซลฟี่พร้อมถือบัตร</p><LiveCamera facingMode="user" label="ถ่ายรูปเซลฟี่" onCapture={file => { setSelfie(file); setStep(studentRequired ? "student" : "review"); }} /></>}
-          {step === "student" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 3 จาก 3 — ถ่ายบัตรนักศึกษา</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรนักศึกษา" onCapture={file => { setStudentCard(file); setStep("review"); }} /></>}
+          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก {totalSteps} — ถ่ายบัตรประชาชน</p><LiveCamera key="id" facingMode="environment" mode="card" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
+          {step === "selfie" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 2 จาก {totalSteps} — ถ่ายเซลฟี่พร้อมถือบัตร</p><LiveCamera key="selfie" facingMode="user" label="ถ่ายรูปเซลฟี่" onCapture={file => { setSelfie(file); setStep(studentRequired ? "student" : "review"); }} /></>}
+          {step === "student" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 3 จาก 3 — ถ่ายบัตรนักศึกษา</p><LiveCamera key="student" facingMode="environment" mode="card" label="ถ่ายรูปบัตรนักศึกษา" onCapture={file => { setStudentCard(file); setStep("review"); }} /></>}
           {step === "review" && idCard && selfie && <div>
             <div className="grid grid-cols-2 gap-3">
               <div><p className="mb-2 text-xs font-medium">บัตรประชาชน</p><img src={URL.createObjectURL(idCard)} className="aspect-square w-full rounded-xl object-cover" alt="ภาพบัตรประชาชนที่ถ่าย" /></div>
