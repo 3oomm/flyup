@@ -56,7 +56,7 @@ export const usePioneerProfitStore = create<PioneerProfitStore>((set) => ({
                 total_amount: totalAmount,
                 transfer_ref: transferRef,
                 slip_image: slipImage ?? '',
-            })
+            }, { timeout: 30000 })
             toast.success(`แจ้งโอนกำไรไตรมาส ${quarterNo} เรียบร้อยแล้ว`)
             return true
         } catch (err: unknown) {

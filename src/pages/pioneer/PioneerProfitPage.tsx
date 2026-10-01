@@ -1,12 +1,12 @@
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
     Loader2, TrendingUp, CheckCircle2, Clock, Lock, X,
     Plus, Building2, SendHorizonal, Landmark, Copy, ChevronLeft,
-    ImagePlus, XCircle,
 } from 'lucide-react'
 import { usePioneerProfitStore, type PioneerProfitItem } from '../../store/usePioneerProfitStore'
 import { useMilestoneStore } from '../../store/useMilestoneStore'
 import toast from 'react-hot-toast'
+import SlipUpload from '../../components/SlipUpload'
 
 const PLATFORM_BANK_NAME     = import.meta.env.VITE_PLATFORM_BANK_NAME     ?? 'ธนาคารกสิกรไทย (KBANK)'
 const PLATFORM_ACCOUNT_NAME  = import.meta.env.VITE_PLATFORM_ACCOUNT_NAME  ?? 'บริษัท ฟลายอัพ จำกัด'
@@ -47,7 +47,7 @@ function BankAccountCard({ compact = false }: { compact?: boolean }) {
                 <Landmark size={20} className="text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-                <p className="text-[12px] text-blue-600 font-semibold mb-0.5">โอนกำไรมาที่บัญชีนี้ แล้วนำเลขอ้างอิงมากรอกด้านล่าง</p>
+                <p className="text-[12px] text-blue-600 font-semibold mb-0.5">โอนกำไรมาที่บัญชีนี้ แล้วแนบสลิปเพื่อตรวจสอบ</p>
                 <p className="text-[14px] font-bold text-blue-900">{PLATFORM_ACCOUNT_NAME}</p>
                 <p className="text-[12px] text-blue-700">{PLATFORM_BANK_NAME}</p>
             </div>
@@ -79,63 +79,36 @@ function SubmitProfitModal({
     onClose: () => void
     onSubmitted: () => void
 }) {
-    const { isSubmitting, submitProfit, uploadFile } = usePioneerProfitStore()
+    const { isSubmitting, submitProfit } = usePioneerProfitStore()
     const eligible = projects.filter(p =>
         (p.state === 'executing' || p.state === 'closed') && p.allMilestonesPaid === true
     )
     const [projectId, setProjectId]     = useState<number | ''>(eligible[0]?.id ?? '')
     const [quarterNo, setQuarterNo]     = useState<number | ''>('')
     const [amount, setAmount]           = useState('')
-    const [transferRef, setTransferRef] = useState('')
     const [slipImage, setSlipImage]     = useState<string>('')
-    const [slipPreview, setSlipPreview] = useState<string>('')
     const [isUploading, setIsUploading] = useState(false)
-    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const submittedQs  = projectId ? (submittedMap[Number(projectId)] ?? []) : []
     const hasAvailable = [1, 2, 3, 4].some(q => isQuarterAvailable(q, submittedQs))
     const valid = Boolean(projectId && quarterNo && Number(amount) > 0
-        && /^\d+$/.test(transferRef) && slipImage && !isUploading)
-
-    const handleSlipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-        setSlipImage('')
-        setSlipPreview(URL.createObjectURL(file))
-        setIsUploading(true)
-        try {
-            const uploaded = await uploadFile(file)
-            if (!uploaded?.url) throw new Error('upload failed')
-            setSlipImage(uploaded.url)
-        } catch (err: unknown) {
-            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-            const unsupportedFile = message === 'unsupported file type or extension does not match content'
-                || message === 'unsupported file type'
-            toast.error(unsupportedFile
-                ? 'ไฟล์สลิปไม่รองรับ หรือนามสกุลไฟล์ไม่ตรงกับเนื้อหา กรุณาเลือกไฟล์รูปภาพ JPG, PNG, GIF หรือ WebP ใหม่'
-                : 'อัปโหลดสลิปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง', { duration: 6000 })
-            setSlipPreview('')
-            if (fileInputRef.current) fileInputRef.current.value = ''
-        } finally {
-            setIsUploading(false)
-        }
-    }
+        && slipImage && !isUploading)
 
     const handleSubmit = async () => {
         if (!valid || isSubmitting) return
-        const ok = await submitProfit(Number(projectId), Number(quarterNo), Number(amount), transferRef, slipImage)
+        const ok = await submitProfit(Number(projectId), Number(quarterNo), Number(amount), '', slipImage)
         if (ok) { onSubmitted(); onClose() }
     }
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl w-full max-w-[460px] p-6 shadow-xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => { if (!isSubmitting && !isUploading) onClose() }}>
+            <div className="bg-white rounded-2xl w-full max-w-[460px] max-h-[90vh] overflow-y-auto p-6 shadow-xl" onClick={e => e.stopPropagation()}>
                 <div className="flex items-start justify-between mb-5">
                     <div>
                         <h2 className="text-[16px] font-bold text-foreground">แจ้งโอนกำไรนักลงทุน</h2>
-                        <p className="text-[12px] text-muted-foreground mt-0.5">ระบบจะแบ่งตามสัดส่วนทุนอัตโนมัติ</p>
+                        <p className="text-[12px] text-muted-foreground mt-0.5">ตรวจสลิปก่อนแบ่งกำไรตามสัดส่วนทุน</p>
                     </div>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer"><X size={18} /></button>
+                    <button disabled={isSubmitting || isUploading} onClick={onClose} className="text-muted-foreground hover:text-foreground cursor-pointer"><X size={18} /></button>
                 </div>
 
                 {eligible.length === 0 ? (
@@ -198,49 +171,12 @@ function SubmitProfitModal({
                                 placeholder="0.00" className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary" />
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-red-500">*</span></label>
-                            <input type="text" inputMode="numeric" pattern="[0-9]+" required
-                                value={transferRef} onChange={e => setTransferRef(e.target.value.replace(/\D/g, ''))}
-                                placeholder="เช่น 20260630001"
-                                className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary" />
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[13px] font-medium">สลิปการโอน <span className="text-red-500">*</span></label>
-                            <input ref={fileInputRef} type="file" accept="image/*" required disabled={isUploading} className="hidden" onChange={handleSlipChange} />
-                            {slipPreview ? (
-                                <div className="relative w-full rounded-xl overflow-hidden border border-border">
-                                    <img src={slipPreview} alt="slip" className="w-full max-h-45 object-contain bg-gray-50" />
-                                    {isUploading && (
-                                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                                            <Loader2 size={20} className="animate-spin text-primary" />
-                                        </div>
-                                    )}
-                                    <button
-                                        type="button"
-                                        disabled={isUploading}
-                                        onClick={() => { setSlipPreview(''); setSlipImage(''); if (fileInputRef.current) fileInputRef.current.value = '' }}
-                                        className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5 hover:bg-red-50 cursor-pointer"
-                                    >
-                                        <XCircle size={18} className="text-red-500" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="flex items-center justify-center gap-2 border border-dashed border-border rounded-xl py-4 text-[13px] text-muted-foreground hover:border-primary hover:text-primary transition-colors cursor-pointer"
-                                >
-                                    <ImagePlus size={16} /> แนบสลิปการโอน
-                                </button>
-                            )}
-                        </div>
+                        <SlipUpload value={slipImage} onChange={setSlipImage} onBusyChange={setIsUploading} disabled={isSubmitting} />
                     </div>
                 )}
 
                 <div className="flex gap-2 mt-5 justify-end">
-                    <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50 cursor-pointer">ยกเลิก</button>
+                    <button disabled={isSubmitting || isUploading} onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50 cursor-pointer">ยกเลิก</button>
                     {hasAvailable && (
                         <button onClick={handleSubmit} disabled={!valid || isSubmitting}
                             className="px-4 py-2 text-[13px] rounded-lg bg-primary hover:bg-primary/90 text-white disabled:opacity-50 flex items-center gap-2 cursor-pointer">

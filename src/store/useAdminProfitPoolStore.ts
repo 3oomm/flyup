@@ -22,6 +22,8 @@ export interface InvestorPayoutDetail {
   transfer_ref: string
   admin_note: string
   confirmed_at?: string
+  slip_image?: string
+  slip_verified_at?: string
   bank_account?: BankAccount
 }
 
@@ -37,6 +39,8 @@ export interface ProfitPoolDetail {
   admin_note: string
   quarter_no: number
   created_at: string
+  slip_image?: string
+  slip_verified_at?: string
   payouts: InvestorPayoutDetail[]
 }
 
@@ -62,7 +66,7 @@ interface AdminProfitPoolStore {
   fetchPools: () => Promise<void>
   fetchDetail: (id: number) => Promise<void>
   createPool: (projectId: number, totalAmount: number, transferRef: string, adminNote: string, quarterNo?: number) => Promise<boolean>
-  confirmPayout: (poolId: number, payoutId: number, transferRef: string, note: string) => Promise<boolean>
+  confirmPayout: (poolId: number, payoutId: number, slipImage: string, note: string) => Promise<boolean>
 }
 
 export const useAdminProfitPoolStore = create<AdminProfitPoolStore>((set) => ({
@@ -117,35 +121,17 @@ export const useAdminProfitPoolStore = create<AdminProfitPoolStore>((set) => ({
     }
   },
 
-  confirmPayout: async (poolId, payoutId, transferRef, note) => {
+  confirmPayout: async (poolId, payoutId, slipImage, note) => {
     set({ isConfirming: true })
     try {
       await api.patch(`/admin/profit-pools/${poolId}/payouts/${payoutId}/confirm`, {
-        transfer_ref: transferRef,
+        slip_image: slipImage,
         note,
-      })
-      toast.success('ยืนยันการโอนกำไรสำเร็จ')
-      set((state) => {
-        const updatedPayouts = (state.detail?.payouts ?? []).map((p) =>
-          p.id === payoutId
-            ? { ...p, status: 'confirmed' as const, transfer_ref: transferRef, admin_note: note, confirmed_at: new Date().toISOString() }
-            : p
-        )
-        const allConfirmed = updatedPayouts.length > 0 && updatedPayouts.every(p => p.status === 'confirmed')
-        const confirmedCount = updatedPayouts.filter(p => p.status === 'confirmed').length
-        return {
-          detail: state.detail ? {
-            ...state.detail,
-            payouts: updatedPayouts,
-            status: allConfirmed ? 'completed' : state.detail.status,
-          } : null,
-          pools: state.pools.map(pool =>
-            pool.id === poolId
-              ? { ...pool, confirmed_count: confirmedCount, status: allConfirmed ? 'completed' as const : pool.status }
-              : pool
-          ),
-        }
-      })
+      }, { timeout: 30000 })
+      toast.success('ตรวจสลิปและยืนยันการโอนกำไรสำเร็จ')
+      // Read canonical bank reference and verification time from the backend.
+      await useAdminProfitPoolStore.getState().fetchDetail(poolId)
+      await useAdminProfitPoolStore.getState().fetchPools()
       // refresh sidebar badge ทันที
       useAdminBadgeStore.getState().fetchBadges()
       return true

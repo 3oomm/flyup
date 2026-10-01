@@ -8,6 +8,7 @@ import PageHeader from '../../components/admin/PageHeader'
 import StatusBadge from '../../components/admin/StatusBadge'
 import SearchBar from '../../components/admin/SearchBar'
 import FilterTabs from '../../components/admin/FilterTabs'
+import SlipUpload from '../../components/SlipUpload'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -39,19 +40,20 @@ function ConfirmPayoutModal({
     onClose: () => void
 }) {
     const { confirmPayout, isConfirming } = useAdminProfitPoolStore()
-    const [transferRef, setTransferRef] = useState('')
+    const [slipImage, setSlipImage] = useState('')
+    const [isUploading, setIsUploading] = useState(false)
     const [note, setNote] = useState('')
     const hasBankAccount = !!(payout.bank_account?.bank_name?.trim() && payout.bank_account?.account_name?.trim() && payout.bank_account?.account_number?.trim())
 
     const handleConfirm = async () => {
-        if (!hasBankAccount || !transferRef.trim() || isConfirming) return
-        const ok = await confirmPayout(poolId, payout.id, transferRef, note)
+        if (!hasBankAccount || !slipImage || isUploading || isConfirming) return
+        const ok = await confirmPayout(poolId, payout.id, slipImage, note)
         if (ok) onClose()
     }
 
     return (
-        <div className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl w-full max-w-[480px] p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-y-0 left-0 right-0 lg:left-[230px] z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => { if (!isConfirming && !isUploading) onClose() }}>
+            <div className="bg-white rounded-2xl w-full max-w-[480px] max-h-[90vh] overflow-y-auto p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-start justify-between mb-4">
                     <div>
                         <h2 className="text-lg font-bold text-foreground">ยืนยันการโอนกำไร</h2>
@@ -59,7 +61,7 @@ function ConfirmPayoutModal({
                             {payout.first_name} {payout.last_name}
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
+                    <button disabled={isConfirming || isUploading} onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={18} /></button>
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4 mb-4 flex flex-col gap-2 text-[13px]">
@@ -100,19 +102,10 @@ function ConfirmPayoutModal({
                     )}
                 </div>
 
-                <p className="text-xs text-muted-foreground mb-4">โอนเงินเข้าบัญชีข้างต้นก่อน แล้วกรอกเลขอ้างอิงเพื่อยืนยัน ระบบจะส่งอีเมลแจ้งชื่อโปรเจกต์ ไตรมาส และยอดกำไรให้นักลงทุน ปุ่มนี้บันทึกการยืนยันการโอนด้วยตนเอง</p>
+                <p className="text-xs text-muted-foreground mb-4">โอนเงินเข้าบัญชีข้างต้นก่อน แล้วแนบสลิป ระบบจะตรวจยอด บัญชีผู้รับ และสลิปซ้ำก่อนยืนยันและแจ้งนักลงทุน</p>
 
                 <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-1">
-                        <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-red-500">*</span></label>
-                        <input
-                            type="text"
-                            value={transferRef}
-                            onChange={(e) => setTransferRef(e.target.value)}
-                            placeholder="กรอกเลขอ้างอิงการโอน"
-                            className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
-                        />
-                    </div>
+                    <SlipUpload value={slipImage} onChange={setSlipImage} onBusyChange={setIsUploading} disabled={isConfirming} />
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">หมายเหตุ</label>
                         <textarea
@@ -125,14 +118,14 @@ function ConfirmPayoutModal({
                 </div>
 
                 <div className="flex gap-2 mt-5 justify-end">
-                    <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
+                    <button disabled={isConfirming || isUploading} onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
                     <button
                         onClick={handleConfirm}
-                        disabled={!hasBankAccount || !transferRef.trim() || isConfirming}
+                        disabled={!hasBankAccount || !slipImage || isUploading || isConfirming}
                         className="px-4 py-2 text-[13px] rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center gap-2"
                     >
                         {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-                        ยืนยันการโอน
+                        ตรวจสลิปและยืนยัน
                     </button>
                 </div>
             </div>
@@ -206,6 +199,8 @@ function PoolDetailView({
                     <span className="min-w-0 break-all font-mono font-medium">{current.transfer_ref}</span>
                     <span>·</span>
                     <span>สร้าง {fmtDate(current.created_at)}</span>
+                    {current.slip_verified_at && <span className="text-green-700">EasySlip ตรวจแล้ว</span>}
+                    {current.slip_verified_at && current.slip_image && <a href={current.slip_image} target="_blank" rel="noopener noreferrer" className="text-primary underline">ดูสลิปจาก Pioneer</a>}
                 </div>
             </div>
 
@@ -259,7 +254,10 @@ function PoolDetailView({
                                             <CheckCircle size={12} /> ยืนยัน
                                         </button>
                                     ) : (
-                                        <span className="text-[11px] text-muted-foreground">{fmtDate(p.confirmed_at)}</span>
+                                        <div className="flex flex-col items-center gap-0.5">
+                                            <span className="text-[11px] text-muted-foreground">{fmtDate(p.confirmed_at)}</span>
+                                            {p.slip_verified_at && p.slip_image && <a href={p.slip_image} target="_blank" rel="noopener noreferrer" className="text-[10px] text-green-700 underline">สลิปตรวจแล้ว</a>}
+                                        </div>
                                     )}
                                 </div>
                             </div>
