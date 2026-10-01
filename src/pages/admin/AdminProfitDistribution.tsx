@@ -100,9 +100,12 @@ function ConfirmPayoutModal({
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-red-500">*</span></label>
                         <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             value={transferRef}
-                            onChange={(e) => setTransferRef(e.target.value)}
-                            placeholder="เช่น TXN-20260430-001"
+                            onChange={(e) => setTransferRef(e.target.value.replace(/[^0-9]/g, ''))}
+                            placeholder="กรอกเลขอ้างอิงการโอน"
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
                         />
                     </div>
