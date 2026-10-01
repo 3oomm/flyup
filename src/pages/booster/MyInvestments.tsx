@@ -142,7 +142,7 @@ function MultipleInvestmentsModal({ group, refundMode, onClose }: { group: Group
 
         {/* Table */}
         <div className="overflow-auto flex-1">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">
                 <th className="text-left px-5 py-3 font-semibold text-muted-foreground text-xs w-10">#</th>
@@ -192,7 +192,7 @@ function MultipleInvestmentsModal({ group, refundMode, onClose }: { group: Group
 function StatusBadge({ inv }: { inv: BoosterInvestment }) {
   const cfg = getEffectiveStatus(inv);
   return (
-    <span className={`text-xs font-semibold px-3 py-1 rounded-full ${cfg.color}`}>
+    <span className={`inline-flex whitespace-nowrap text-xs font-semibold px-3 py-1 rounded-full ${cfg.color}`}>
       {cfg.label}
     </span>
   );
