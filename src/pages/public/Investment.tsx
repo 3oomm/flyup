@@ -158,6 +158,17 @@ const Investment = () => {
           const status = response?.data?.investment?.status || response?.data?.status;
           if (status === 'verified') {
             if (pollingRef.current) clearInterval(pollingRef.current);
+            pollingRef.current = null;
+
+            // The payment webhook updates the investment and the project's
+            // current_funding atomically. Refresh the shared project store
+            // before showing success so returning to the project page cannot
+            // render the pre-payment amount from Zustand.
+            if (slug) {
+              if (/^\d+$/.test(slug)) await fetchPublicProjectById(Number(slug));
+              else await fetchPublicProjectBySlug(slug);
+            }
+
             setCompletedInvestmentId(investmentData.investment_id);
             setStep(4);
             clearInvestmentData();
@@ -177,7 +188,15 @@ const Investment = () => {
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
     };
-  }, [step, investmentData, getInvestmentById, clearInvestmentData]);
+  }, [
+    step,
+    investmentData,
+    slug,
+    getInvestmentById,
+    fetchPublicProjectById,
+    fetchPublicProjectBySlug,
+    clearInvestmentData,
+  ]);
 
   // Project data
   const projectTitle = project?.title || "กำลังโหลด...";
