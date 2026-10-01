@@ -5,6 +5,8 @@ import { useProjectStore } from "../../store/useProjectStore";
 import useCreateProjectGuard from "../../hooks/useCreateProjectGuard";
 import Swal from "../../lib/swal";
 import { getCurrentProjectPhase } from "../../lib/projectPhase";
+import api from "../../services/api";
+import type { PioneerProfitItem } from "../../store/usePioneerProfitStore";
 
 type StateType = "funding" | "pending_review" | "draft" | "closed" | "cancelled" | "executing" | "pending_cancel" | "suspended" | "pending_edit_review";
 
@@ -64,6 +66,8 @@ const MyProjects = () => {
   const { createWithGuard, isCreating } = useCreateProjectGuard();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [transferredQuarters, setTransferredQuarters] = useState<Record<number, number> | null>(null);
+  const [profitLoadFailed, setProfitLoadFailed] = useState(false);
   const [activeFilter, setActiveFilter] = useState<StateType | "all">("all");
   const [page, setPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false); // เปิด/ปิด dropdown filter สถานะ (กดเปิด แทนที่จะเป็น hover)
@@ -73,6 +77,26 @@ const MyProjects = () => {
   useEffect(() => {
     fetchMyProjects();
   }, [fetchMyProjects]);
+
+  useEffect(() => {
+    let active = true;
+    api.get('/pioneer/profit-pools').then(response => {
+      const pools: PioneerProfitItem[] = response.data?.data ?? [];
+      const quarters = new Map<number, Set<number>>();
+      pools.forEach(pool => {
+        if (!Number.isInteger(pool.quarter_no) || pool.quarter_no < 1 || pool.quarter_no > 4) return;
+        const projectQuarters = quarters.get(pool.project_id) ?? new Set<number>();
+        projectQuarters.add(pool.quarter_no);
+        quarters.set(pool.project_id, projectQuarters);
+      });
+      if (active) setTransferredQuarters(Object.fromEntries(
+        Array.from(quarters, ([projectId, values]) => [projectId, values.size])
+      ));
+    }).catch(() => {
+      if (active) setProfitLoadFailed(true);
+    });
+    return () => { active = false; };
+  }, []);
 
   // ปิด dropdown เมื่อคลิกนอกกล่อง
   useEffect(() => {
@@ -314,9 +338,14 @@ const MyProjects = () => {
                       )}
 
                       {(project.state === 'executing' || project.state === 'closed') && (
-                        <p className="text-[12px] font-medium text-primary">
-                          ต้องจ่ายปันผลให้นักลงทุนครบ 4 ไตรมาส (Q1–Q4)
-                        </p>
+                        <div className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[12px] font-medium text-primary">
+                          <span>ต้องจ่ายปันผลให้นักลงทุนครบ 4 ไตรมาส (Q1–Q4)</span>
+                          <span className="rounded-full bg-purple-50 px-[10px] py-[3px] font-semibold">
+                            {transferredQuarters !== null
+                              ? `โอนแล้ว ${transferredQuarters[project.id] ?? 0}/4 ไตรมาส`
+                              : profitLoadFailed ? 'โหลดจำนวนการโอนไม่สำเร็จ' : 'กำลังโหลดจำนวนการโอน...'}
+                          </span>
+                        </div>
                       )}
                       {/* Funding Progress */}
                       {project.state === 'funding' && project.funding_goal > 0 && (

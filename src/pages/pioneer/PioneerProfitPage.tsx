@@ -25,14 +25,14 @@ function BankAccountCard({ compact = false }: { compact?: boolean }) {
     const copy = () => { navigator.clipboard.writeText(PLATFORM_ACCOUNT_NUMBER); toast.success('คัดลอกเลขบัญชีแล้ว') }
     if (compact) {
         return (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center gap-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 sm:flex">
                 <Landmark size={16} className="text-blue-600 shrink-0" />
                 <div className="flex-1 min-w-0">
                     <p className="text-[11px] text-blue-600 font-semibold">โอนกำไรมาที่บัญชี FlyUp</p>
                     <p className="text-[12px] font-bold text-blue-800">{PLATFORM_ACCOUNT_NAME}</p>
                     <p className="text-[11px] text-blue-700">{PLATFORM_BANK_NAME}</p>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="col-start-2 flex items-center gap-1">
                     <span className="font-mono text-[13px] font-bold text-blue-800">{PLATFORM_ACCOUNT_NUMBER}</span>
                     <button onClick={copy} className="p-1 hover:bg-blue-100 rounded cursor-pointer">
                         <Copy size={13} className="text-blue-600" />
@@ -42,16 +42,16 @@ function BankAccountCard({ compact = false }: { compact?: boolean }) {
         )
     }
     return (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 sm:flex sm:gap-4">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
                 <Landmark size={20} className="text-blue-600" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
                 <p className="text-[12px] text-blue-600 font-semibold mb-0.5">โอนกำไรมาที่บัญชีนี้ แล้วนำเลขอ้างอิงมากรอกด้านล่าง</p>
                 <p className="text-[14px] font-bold text-blue-900">{PLATFORM_ACCOUNT_NAME}</p>
                 <p className="text-[12px] text-blue-700">{PLATFORM_BANK_NAME}</p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="col-start-2 flex items-center gap-2 shrink-0">
                 <span className="font-mono text-[15px] font-bold text-blue-800">{PLATFORM_ACCOUNT_NUMBER}</span>
                 <button onClick={copy} className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer">
                     <Copy size={15} className="text-blue-600" />
@@ -430,8 +430,8 @@ const PioneerProfitPage = () => {
 
     // ── List view ──
     return (
-        <div className="flex flex-col gap-6 pb-10">
-            <div className="flex items-start justify-between">
+        <div className="flex min-w-0 flex-col gap-6 pb-10">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
                 <div>
                     <h1 className="text-[22px] font-bold text-foreground">จ่ายปันผลนักลงทุน</h1>
                     <p className="text-[13px] text-muted-foreground mt-0.5">
@@ -448,7 +448,7 @@ const PioneerProfitPage = () => {
 
             <BankAccountCard />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white border border-border rounded-2xl p-5 flex items-center gap-4 shadow-sm">
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
                         <TrendingUp size={22} className="text-primary" />
@@ -482,8 +482,8 @@ const PioneerProfitPage = () => {
             ) : (
                 <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-[13px]">
-                            <thead>
+                        <table className="block w-full text-[13px] sm:table sm:min-w-[760px]">
+                            <thead className="hidden sm:table-header-group">
                                 <tr className="border-b border-border bg-gray-50/70">
                                     <th className="text-left px-4 py-3 font-semibold text-muted-foreground whitespace-nowrap">โปรเจกต์</th>
                                     <th className="text-left px-4 py-3 font-semibold text-muted-foreground whitespace-nowrap">ไตรมาส</th>
@@ -493,21 +493,28 @@ const PioneerProfitPage = () => {
                                     <th className="px-4 py-3" />
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="block sm:table-row-group">
                                 {grouped.slice(0, visibleCount).map((g, idx) => {
                                     const totalAmt  = g.items.reduce((s, p) => s + p.total_amount, 0)
                                     const doneCount = g.items.filter(p => p.status === 'completed').length
                                     const allDone   = doneCount === g.items.length && g.items.length > 0
                                     const latest    = [...g.items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
                                     return (
-                                        <tr key={g.id} className={`border-b border-border last:border-0 hover:bg-gray-50/50 transition-colors ${idx % 2 !== 0 ? 'bg-gray-50/30' : ''}`}>
-                                            <td className="px-4 py-3.5 font-semibold text-foreground">{g.title}</td>
-                                            <td className="px-4 py-3.5">
+                                        <tr key={g.id} className={`grid grid-cols-2 p-4 gap-x-4 gap-y-3 sm:table-row sm:p-0 border-b border-border last:border-0 hover:bg-gray-50/50 transition-colors ${idx % 2 !== 0 ? 'bg-gray-50/30' : ''}`}>
+                                            <td className="col-span-2 min-w-0 break-words sm:min-w-[200px] sm:px-4 sm:py-3.5 font-semibold text-foreground">{g.title}</td>
+                                            <td className="min-w-0 sm:px-4 sm:py-3.5">
+                                                <span className="block text-[11px] text-muted-foreground mb-1 sm:hidden">ไตรมาส</span>
                                                 <span className="font-bold text-foreground">{g.items.length}/4</span>
                                             </td>
-                                            <td className="px-4 py-3.5 font-semibold text-foreground whitespace-nowrap">{fmtBaht(totalAmt)}</td>
-                                            <td className="px-4 py-3.5 text-muted-foreground whitespace-nowrap">{latest ? fmtDate(latest.created_at) : '—'}</td>
-                                            <td className="px-4 py-3.5">
+                                            <td className="min-w-0 break-words sm:px-4 sm:py-3.5 font-semibold text-foreground sm:whitespace-nowrap">
+                                                <span className="block text-[11px] text-muted-foreground mb-1 sm:hidden">ยอดโอนรวม</span>
+                                                {fmtBaht(totalAmt)}
+                                            </td>
+                                            <td className="col-span-2 sm:px-4 sm:py-3.5 text-muted-foreground whitespace-nowrap">
+                                                <span className="block text-[11px] mb-1 sm:hidden">แจ้งล่าสุด</span>
+                                                {latest ? fmtDate(latest.created_at) : '—'}
+                                            </td>
+                                            <td className="col-span-2 sm:px-4 sm:py-3.5">
                                                 <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border whitespace-nowrap ${
                                                     allDone
                                                         ? 'bg-green-50 text-green-700 border-green-200'
@@ -523,7 +530,7 @@ const PioneerProfitPage = () => {
                                                     }
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3.5 text-right">
+                                            <td className="col-span-2 sm:px-4 sm:py-3.5 text-right">
                                                 <button
                                                     onClick={() => setSelectedId(g.id)}
                                                     className="text-[12px] text-primary hover:text-primary/70 font-medium whitespace-nowrap cursor-pointer transition-colors"
