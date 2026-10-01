@@ -384,7 +384,18 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
                 thumbnail_url: p.cover_image ?? undefined,
             }));
 
-            set({ projects });
+            const projectsWithMilestones = await Promise.all(projects.map(async project => {
+                if ((project.state !== 'executing' && project.state !== 'closed') || project.milestones?.length) {
+                    return project;
+                }
+                try {
+                    const milestoneResponse = await api.get(`/projects/${project.id}/milestones`);
+                    return { ...project, milestones: milestoneResponse.data?.data ?? [] };
+                } catch {
+                    return project;
+                }
+            }));
+            set({ projects: projectsWithMilestones });
         } catch (error) {
             console.error(error);
             toast.error('ไม่สามารถโหลดโปรเจกต์ได้');

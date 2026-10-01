@@ -117,7 +117,7 @@ const MyProjects = () => {
   const handleView = (id: number, state: StateType, slug?: string) => {
     // pending_edit_review ไม่ใช่ public state (backend GetPublicProjectByID ไม่รองรับ → 404)
     // เจ้าของโปรเจกต์เลยต้องดูผ่านหน้า preview ของตัวเองแทน จนกว่า Admin จะอนุมัติ/ปฏิเสธการแก้ไข
-    const useDetail = state === 'funding' || state === 'executing' || state === 'closed';
+    const useDetail = state === 'funding' || state === 'executing';
     if (useDetail) navigate(`/projects/${slug || id}`);
     else navigate(`/preview/${id}`, { state: { from: '/pioneer/dashboard/projects' } });
   };
@@ -269,9 +269,11 @@ const MyProjects = () => {
               ? Math.min(Math.round((project.current_funding / project.funding_goal) * 100), 100)
               : 0;
             const currentPhase = getCurrentProjectPhase(project.milestones);
-            const canPayDividends = (project.state === 'executing' || project.state === 'closed')
-              && (project.milestones?.length ?? 0) >= 4
-              && project.milestones!.every(milestone => milestone.status === 'paid');
+            // Closed projects have completed their phases; summaries may omit milestone details.
+            const canPayDividends = project.state === 'closed'
+              || (project.state === 'executing'
+                && (project.milestones?.length ?? 0) >= 4
+                && project.milestones?.every(milestone => milestone.status === 'paid') === true);
 
             return (
               <div
@@ -359,7 +361,7 @@ const MyProjects = () => {
                     {/* Right Actions */}
                     <div className="flex w-full flex-wrap items-center gap-[8px] mt-[10px] lg:mt-0 lg:w-auto lg:shrink-0">
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleView(project.id, project.state); }}
+                        onClick={(e) => { e.stopPropagation(); handleView(project.id, project.state, project.slug); }}
                         className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-surface-hover hover:bg-surface-raised transition-colors rounded-[8px] text-[13px] font-medium text-foreground cursor-pointer"
                       >
                         <Eye size={16} /> ดู
