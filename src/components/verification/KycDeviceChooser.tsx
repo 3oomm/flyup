@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, ExternalLink, Laptop, Loader2, QrCode, Smartphone, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, QrCode, Smartphone, X } from "lucide-react";
 import QRCode from "qrcode";
 import { useSelfVerificationStore, type KycSession } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
 
-export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = false }: { onComputer: () => void; onCompleted: () => void; liveOnly?: boolean }) {
+export default function KycDeviceChooser({ onCompleted, studentRequired = false }: { onCompleted: () => void; studentRequired?: boolean }) {
   const createKycSession = useSelfVerificationStore((state) => state.createKycSession);
   const getKycSessionStatus = useSelfVerificationStore((state) => state.getKycSessionStatus);
   const [step, setStep] = useState<"choose" | "qr">("choose");
@@ -25,6 +25,9 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
     setLoading(true);
     try {
       const data = await createKycSession();
+      const mobileUrl = new URL(data.mobile_url);
+      if (studentRequired) mobileUrl.searchParams.set("role", "pioneer");
+      data.mobile_url = mobileUrl.toString();
 
       // ถ้าเปิดหน้าโปรไฟล์อยู่บนมือถืออยู่แล้ว ให้เข้ากล้องโดยตรง
       // ไม่ต้องแสดง QR ที่ไม่สามารถสแกนจากอุปกรณ์เครื่องเดียวกันได้
@@ -32,6 +35,7 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       if (isMobileDevice) {
         const cameraUrl = new URL("/mobile-kyc", window.location.origin);
         cameraUrl.searchParams.set("token", data.token);
+        if (studentRequired) cameraUrl.searchParams.set("role", "pioneer");
         cameraUrl.searchParams.set("return_to", `${window.location.pathname}${window.location.search}`);
         window.location.assign(cameraUrl.toString());
         return;
@@ -62,25 +66,6 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
     return () => window.clearInterval(poll);
   }, [getKycSessionStatus, onCompleted, session, step]);
 
-  if (step === "choose" && liveOnly) return (
-    <div className="rounded-2xl border border-border bg-white p-6">
-      <div className="mx-auto max-w-xl">
-        <h3 className="text-xl font-semibold text-foreground">ยืนยันตัวตนของคุณ</h3>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">สแกนบัตรประชาชนและถ่ายภาพเซลฟี่แบบสดผ่านกล้องมือถือ เพื่อยืนยันว่าเป็นตัวคุณจริง ๆ</p>
-        <div className="mt-5 rounded-xl border border-border bg-slate-50 p-4">
-          <p className="text-xs font-medium text-muted-foreground">ข้อมูลต้องตรงกับบัญชีของคุณ</p>
-          <p className="mt-2 text-sm font-semibold">เอกสารประจำตัวที่มีรูปถ่าย</p>
-          <p className="mt-1 text-xs text-muted-foreground">เตรียมบัตรประชาชนตัวจริงและอยู่ในบริเวณที่มีแสงสว่างเพียงพอ</p>
-        </div>
-        <p className="mb-2 mt-5 text-sm font-medium">การยืนยันตัวตน</p>
-        <button onClick={startMobile} disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-semibold transition hover:border-primary hover:bg-primary/5 disabled:opacity-60">
-          {loading ? <Loader2 className="size-4 animate-spin" /> : <Smartphone className="size-4" />}
-          สแกนบัตรประชาชนด้วยมือถือ
-        </button>
-      </div>
-    </div>
-  );
-
   if (step === "choose") return (
     <div className="rounded-2xl border border-border bg-white p-6">
       <div className="mb-5 text-center">
@@ -93,12 +78,7 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
           <span className="font-semibold">สแกน QR Code</span>
           <span className="mt-1 text-xs text-muted-foreground">สแกน QR Code เพื่อใช้กล้อง</span>
         </button>
-        <button onClick={() => setShowOtherOptions(value => !value)} aria-expanded={showOtherOptions} className="text-sm font-medium text-primary underline underline-offset-4">Other option</button>
-        {showOtherOptions && <button onClick={onComputer} className="group flex min-h-36 flex-col items-center justify-center rounded-xl border-2 border-border p-5 transition hover:border-primary hover:bg-primary/5">
-          <Laptop className="mb-3 size-8 text-primary" />
-          <span className="font-semibold">ทำบนคอมพิวเตอร์นี้</span>
-          <span className="mt-1 text-xs text-muted-foreground">เลือกไฟล์รูปจากเครื่อง</span>
-        </button>}
+
       </div>
     </div>
   );
@@ -114,7 +94,6 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
       <button onClick={() => setShowOtherOptions(value => !value)} aria-expanded={showOtherOptions} className="mt-4 text-sm font-medium text-primary underline underline-offset-4">Other option</button>
       {showOtherOptions && session && (
         <div className="mx-auto mt-4 max-w-md rounded-xl border border-border bg-slate-50 p-3 text-left">
-          {!liveOnly && <button onClick={onComputer} className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-white py-2 text-xs font-medium hover:border-primary"><Laptop size={14} /> อัปโหลดรูปจากคอมพิวเตอร์</button>}
           <p className="mb-2 text-xs text-muted-foreground">หากสแกน QR Code ไม่ได้ ให้ส่งลิงก์นี้ไปเปิดบนมือถือ</p>
           <div className="flex gap-2">
             <input readOnly value={session.mobile_url} className="min-w-0 flex-1 rounded-lg border border-border bg-white px-3 py-2 text-xs" onFocus={event => event.currentTarget.select()} />

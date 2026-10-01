@@ -12,12 +12,16 @@ export default function MobileKyc() {
   const token = params.get("token") ?? "";
   const requestedReturnTo = params.get("return_to") ?? "";
   const authUser = useAuthStore(state => state.authUser);
-  const { uploadVerificationDocument, submitIdVerify } = useSelfVerificationStore();
+  const { uploadVerificationDocument, submitIdVerify, submitStudentVerify } = useSelfVerificationStore();
   const [idCard, setIdCard] = useState<File | null>(null);
+  const studentRequired = params.get("role") === "pioneer" || authUser?.role === "pioneer";
+  const totalSteps = studentRequired ? 3 : 2;
+  const [studentCard, setStudentCard] = useState<File | null>(null);
+  const [studentSubmitted, setStudentSubmitted] = useState(false);
   const [selfie, setSelfie] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
-  const [step, setStep] = useState<"id" | "selfie" | "review">("id");
+  const [step, setStep] = useState<"id" | "selfie" | "student" | "review">("id");
 
   const safeReturnTo = getSafeReturnTo(requestedReturnTo, window.location.origin)
     || (authUser?.role === "booster"
@@ -34,7 +38,7 @@ export default function MobileKyc() {
 
   const submit = async () => {
     if (!token) return toast.error("ลิงก์ยืนยันตัวตนไม่ถูกต้อง");
-    if (!idCard || !selfie) return toast.error("กรุณาถ่ายรูปให้ครบทั้ง 2 รายการ");
+    if (!idCard || !selfie || (studentRequired && !studentCard)) return toast.error(`กรุณาถ่ายรูปให้ครบทั้ง ${totalSteps} รายการ`);
     setSaving(true);
     try {
       const [idCardUrl, selfieUrl] = await Promise.all([
@@ -42,6 +46,13 @@ export default function MobileKyc() {
         uploadVerificationDocument(selfie),
       ]);
       if (!idCardUrl || !selfieUrl) return;
+      if (studentRequired && studentCard && !studentSubmitted) {
+        const url = await uploadVerificationDocument(studentCard);
+        if (!url) return;
+        const ok = await submitStudentVerify({ student_card_url: url, declare_truth: true, accept_pioneer_terms: true }, token);
+        if (!ok) return;
+        setStudentSubmitted(true);
+      }
       const result = await submitIdVerify({ id_card_url: idCardUrl, selfie_url: selfieUrl, declare_truth: true }, token);
       if (result) setDone(true);
     } finally { setSaving(false); }
@@ -54,17 +65,20 @@ export default function MobileKyc() {
       <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow-sm">
         <ShieldCheck className="mb-3 size-9 text-primary" />
         <h1 className="text-2xl font-bold">ยืนยันตัวตน</h1>
-        <p className="mt-1 text-sm text-muted-foreground">ใช้กล้องถ่ายบัตรประชาชนและเซลฟี่แบบสด ไม่รองรับการเลือกรูปจากคลังภาพ</p>
+        <p className="mt-1 text-sm text-muted-foreground">{studentRequired ? "ใช้กล้องถ่ายบัตรประชาชน เซลฟี่พร้อมถือบัตร และบัตรนักศึกษาแบบสด" : "ใช้กล้องถ่ายบัตรประชาชนและเซลฟี่แบบสด"}</p>
         {!token && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">ลิงก์นี้ไม่ถูกต้อง กรุณาสแกน QR Code ใหม่</p>}
         <div className="mt-6">
-          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก 2 — ถ่ายบัตรประชาชน</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
-          {step === "selfie" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 2 จาก 2 — ถ่ายเซลฟี่พร้อมถือบัตร</p><LiveCamera facingMode="user" label="ถ่ายรูปเซลฟี่" onCapture={file => { setSelfie(file); setStep("review"); }} /></>}
+          {step === "id" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 1 จาก {totalSteps} — ถ่ายบัตรประชาชน</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรประชาชน" onCapture={file => { setIdCard(file); setStep("selfie"); }} /></>}
+          {step === "selfie" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 2 จาก {totalSteps} — ถ่ายเซลฟี่พร้อมถือบัตร</p><LiveCamera facingMode="user" label="ถ่ายรูปเซลฟี่" onCapture={file => { setSelfie(file); setStep(studentRequired ? "student" : "review"); }} /></>}
+          {step === "student" && <><p className="mb-3 text-sm font-semibold">ขั้นตอนที่ 3 จาก 3 — ถ่ายบัตรนักศึกษา</p><LiveCamera facingMode="environment" mode="card" label="ถ่ายรูปบัตรนักศึกษา" onCapture={file => { setStudentCard(file); setStep("review"); }} /></>}
           {step === "review" && idCard && selfie && <div>
             <div className="grid grid-cols-2 gap-3">
               <div><p className="mb-2 text-xs font-medium">บัตรประชาชน</p><img src={URL.createObjectURL(idCard)} className="aspect-square w-full rounded-xl object-cover" alt="ภาพบัตรประชาชนที่ถ่าย" /></div>
               <div><p className="mb-2 text-xs font-medium">ภาพเซลฟี่</p><img src={URL.createObjectURL(selfie)} className="aspect-square w-full rounded-xl object-cover" alt="ภาพเซลฟี่ที่ถ่าย" /></div>
+              {studentRequired && studentCard && <div><p className="mb-2 text-xs font-medium">บัตรนักศึกษา</p><img src={URL.createObjectURL(studentCard)} className="aspect-square w-full rounded-xl object-cover" alt="ภาพบัตรนักศึกษาที่ถ่าย" /></div>}
             </div>
-            <button onClick={() => { setIdCard(null); setSelfie(null); setStep("id"); }} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium"><RotateCcw size={16} /> ถ่ายใหม่</button>
+            {studentRequired && <p className="mt-4 text-xs text-muted-foreground">เมื่อยืนยันและส่งข้อมูล คุณรับรองว่าข้อมูลเป็นความจริงและยอมรับเงื่อนไขการเป็น Pioneer</p>}
+            <button onClick={() => { setIdCard(null); setSelfie(null); setStudentCard(null); setStep("id"); }} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium"><RotateCcw size={16} /> ถ่ายใหม่</button>
             <button onClick={submit} disabled={saving || !token} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-medium text-white hover:bg-primary-hover disabled:opacity-50">
               {saving && <Loader2 size={18} className="animate-spin" />}{saving ? "กำลังส่งข้อมูล..." : "ยืนยันและส่งข้อมูล"}
             </button>

@@ -35,6 +35,7 @@ interface SelfVerificationStore {
     submitStudentVerify: (payload: StudentVerifyPayload, kycToken?: string) => Promise<boolean>
     addBankAccount: (form: BankAccountForm) => Promise<boolean>
     updateBankAccount: (id: number, form: BankAccountForm) => Promise<boolean>
+    deleteBankAccount: (id: number) => Promise<boolean>
     setDefaultBankAccount: (id: number) => Promise<boolean>
 }
 
@@ -110,6 +111,8 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
             if (!kycToken) await useAuthStore.getState().checkAuth()
             return true
         } catch (err) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            if (kycToken && (message === 'student is already verified' || message === 'verification is already pending')) return true
             toast.error(verificationErrorMessage(err))
             return false
         }
@@ -136,6 +139,19 @@ export const useSelfVerificationStore = create<SelfVerificationStore>(() => ({
             return true
         } catch (err) {
             toast.error(bankErrorMessage(err))
+            return false
+        }
+    },
+
+    deleteBankAccount: async (id) => {
+        try {
+            await api.delete(`/user/delete-bank/${id}`)
+            await useAuthStore.getState().checkAuth()
+            toast.success('ลบบัญชีธนาคารสำเร็จ')
+            return true
+        } catch (err) {
+            const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            toast.error(message === 'cannot delete default bank account' ? 'ไม่สามารถลบบัญชีหลักได้ กรุณาตั้งบัญชีอื่นเป็นหลักก่อน' : 'ลบบัญชีธนาคารไม่สำเร็จ กรุณาลองใหม่')
             return false
         }
     },

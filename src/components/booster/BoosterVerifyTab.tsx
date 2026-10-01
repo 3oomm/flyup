@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Lock, Upload, Clock, CheckCircle, XCircle, Pencil, X, Save, Loader2, Plus, Star } from "lucide-react";
+import { Lock, Upload, Clock, CheckCircle, XCircle, Pencil, X, Save, Loader2, Plus, Star, Trash2 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useSelfVerificationStore } from "../../store/useSelfVerificationStore";
 import toast from "react-hot-toast";
@@ -52,7 +52,7 @@ const BankFormFields = ({ form, setForm }: { form: BankFormState; setForm: React
 
 const BoosterVerifyTab = () => {
   const { authUser, checkAuth } = useAuthStore();
-  const { uploadVerificationDocument, submitIdVerify, addBankAccount, updateBankAccount, setDefaultBankAccount } = useSelfVerificationStore();
+  const { uploadVerificationDocument, submitIdVerify, addBankAccount, updateBankAccount, setDefaultBankAccount, deleteBankAccount } = useSelfVerificationStore();
 
   const idCardVerify = authUser?.id_card_verification;
   const storedIdCardUrl: string = idCardVerify?.document ?? "";
@@ -73,11 +73,11 @@ const BoosterVerifyTab = () => {
   const [editingBankId, setEditingBankId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState(emptyBankForm);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [deletingBankId, setDeletingBankId] = useState<number | null>(null);
   const [settingDefaultId, setSettingDefaultId] = useState<number | null>(null);
   const [acceptTerms, setAcceptTerms] = useState(idCardLocked);
   const [acceptAccuracy, setAcceptAccuracy] = useState(idCardLocked);
   const [isSavingVerify, setIsSavingVerify] = useState(false);
-  const [deviceChosen, setDeviceChosen] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
@@ -181,6 +181,12 @@ const BoosterVerifyTab = () => {
     } finally { setIsSavingEdit(false); }
   };
 
+  const handleDeleteBank = async (id: number, bankName: string, accountNumber: string) => {
+    if (deletingBankId !== null || !window.confirm(`ต้องการลบบัญชี ${bankName} เลขบัญชี ${accountNumber} ใช่หรือไม่?`)) return;
+    setDeletingBankId(id);
+    try { await deleteBankAccount(id); } finally { setDeletingBankId(null); }
+  };
+
   const handleSetDefault = async (id: number) => {
     setSettingDefaultId(id);
     try {
@@ -205,15 +211,13 @@ const BoosterVerifyTab = () => {
 
   return (
     <div className="flex flex-col gap-[16px]">
-      {!idCardLocked && !deviceChosen && (
+      {!idCardLocked && (
         <KycDeviceChooser
-          onComputer={() => setDeviceChosen(true)}
-          onCompleted={async () => { await checkAuth(); setDeviceChosen(true); }}
-          liveOnly
+          onCompleted={async () => { await checkAuth(); }}
         />
       )}
       {/* ยืนยันตัวตน */}
-      <div className={`${!idCardLocked && !deviceChosen ? "hidden" : ""} bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]`}>
+      <div className={`${!idCardLocked ? "hidden" : ""} bg-white border border-border rounded-[16px] p-[24px] flex flex-col gap-[20px]`}>
         <div className="flex items-center gap-[8px]">
           <Lock size={18} className="text-foreground" />
           <h2 className="font-semibold text-foreground">ยืนยันตัวตน</h2>
@@ -423,12 +427,12 @@ const BoosterVerifyTab = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-start justify-between gap-[12px]">
+              <div className="flex flex-col items-stretch justify-between gap-[12px] lg:flex-row lg:items-start">
                 <div className="flex flex-col gap-[4px] flex-1 min-w-0">
-                  <div className="flex items-center gap-[6px]">
+                  <div className="flex flex-wrap items-center gap-[6px]">
                     <span className="text-[14px] font-semibold text-foreground">{acc.bank_name}</span>
                     {acc.is_default && (
-                      <span className="flex items-center gap-[3px] text-[11px] text-yellow-600 bg-yellow-50 border border-yellow-200 px-[8px] py-[2px] rounded-full font-medium">
+                      <span className="inline-flex shrink-0 items-center gap-[3px] whitespace-nowrap text-[11px] text-yellow-600 bg-yellow-50 border border-yellow-200 px-[8px] py-[2px] rounded-full font-medium">
                         <Star size={10} fill="currentColor" /> บัญชีหลัก
                       </span>
                     )}
@@ -436,7 +440,7 @@ const BoosterVerifyTab = () => {
                   <span className="text-[13px] text-muted-foreground truncate max-w-full" title={acc.account_name}>{acc.account_name}</span>
                   <span className="text-[13px] text-muted-foreground">{acc.account_number}</span>
                 </div>
-                <div className="flex items-center gap-[6px] flex-shrink-0">
+                <div className="flex w-full flex-wrap items-center gap-[6px] lg:w-auto lg:shrink-0">
                   {!acc.is_default && (
                     <button
                       data-testid={`bank-set-default-btn-${acc.id}`}
@@ -455,6 +459,14 @@ const BoosterVerifyTab = () => {
                   >
                     <Pencil size={12} /> แก้ไข
                   </button>
+                  {!acc.is_default && <button
+                    data-testid={`bank-delete-btn-${acc.id}`}
+                    onClick={() => handleDeleteBank(acc.id!, acc.bank_name ?? "", acc.account_number ?? "")}
+                    disabled={deletingBankId !== null}
+                    className="flex items-center gap-[5px] px-[10px] py-[6px] rounded-[8px] border border-red-200 text-[12px] font-medium text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    {deletingBankId === acc.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} ลบบัญชี
+                  </button>}
                 </div>
               </div>
             )}
