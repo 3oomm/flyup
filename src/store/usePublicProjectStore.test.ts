@@ -51,3 +51,23 @@ describe('public project detail requests', () => {
     expect(usePublicProjectStore.getState().currentPublicProject?.id).toBe(2);
   });
 });
+
+describe('completed home projects', () => {
+  it('loads successful projects separately from executing and failed projects', async () => {
+    vi.mocked(api.get).mockImplementation(async url => ({
+      data: { data: url === '/projects/completed' ? [
+        { id: 35, state: 'closed', status: 'completed', cover_image: '/completed.jpg' },
+        { id: 36, state: 'closed', status: 'failed' },
+        { id: 37, state: 'executing', status: 'active' },
+      ] : [] },
+    }));
+
+    await usePublicProjectStore.getState().fetchHomeProjects();
+
+    expect(api.get).toHaveBeenCalledWith('/projects/completed');
+    expect(usePublicProjectStore.getState().completedProjects).toEqual([
+      expect.objectContaining({ id: 35, thumbnail_url: '/completed.jpg' }),
+    ]);
+    expect(usePublicProjectStore.getState().executingProjects).toEqual([]);
+  });
+});

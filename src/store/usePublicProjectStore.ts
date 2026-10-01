@@ -96,6 +96,7 @@ interface PublicProjectState {
   newProjects: PublicProject[];
   endingProjects: PublicProject[];
   executingProjects: PublicProject[];
+  completedProjects: PublicProject[];
   currentPublicProject: PublicProject | null;
   categories: Category[];
   platformStats: PlatformStats | null;
@@ -120,6 +121,7 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
   newProjects: [],
   endingProjects: [],
   executingProjects: [],
+  completedProjects: [],
   currentPublicProject: null,
   categories: [],
   platformStats: null,
@@ -148,11 +150,12 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
   fetchHomeProjects: async () => {
     set({ isLoading: true, isFetchError: false });
     try {
-      const [recRes, newRes, endRes, execRes] = await Promise.all([
+      const [recRes, newRes, endRes, execRes, completedRes] = await Promise.all([
         api.get('/projects/recommend'),
         api.get('/projects/new'),
         api.get('/projects/ending'),
         api.get('/projects/executing'),
+        api.get('/projects/completed'),
       ]);
 
       const processProjects = (projectsRaw: PublicProject[]) =>
@@ -168,6 +171,7 @@ export const usePublicProjectStore = create<PublicProjectState>((set) => ({
         newProjects: newP,
         endingProjects: ending,
         executingProjects: executing,
+        completedProjects: processProjects(completedRes.data?.data ?? []).filter(p => p.state === 'closed' && p.status === 'completed'),
       });
     } catch (error) {
       console.error('fetchHomeProjects:', error);

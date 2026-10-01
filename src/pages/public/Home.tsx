@@ -39,6 +39,11 @@ const ProjectCard = ({ project }: { project: PublicProject & { isHot?: boolean; 
       <div className="relative h-48 w-full overflow-hidden bg-gray-100">
         <img src={project.thumbnail_url || PLACEHOLDER_IMG} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-3 right-3 flex gap-2">
+          {project.state === 'closed' && project.status === 'completed' && (
+            <div className="bg-emerald-500 text-white px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md">
+              <ShieldCheck size={14} /> สำเร็จแล้ว
+            </div>
+          )}
           {project.isHot && (
             <div className="bg-red-500 text-white px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md">
               <Flame size={14} fill="currentColor" /> {progress}%
@@ -106,6 +111,7 @@ const Home = () => {
     newProjects,
     endingProjects,
     executingProjects,
+    completedProjects,
     platformStats,
     isLoading,
     fetchHomeProjects,
@@ -206,6 +212,25 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {completedProjects.length > 0 && (
+        <section data-home-snap-section data-snap-key="completed" className="min-h-[100dvh] snap-start flex items-center py-16 bg-emerald-50/40">
+          <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+            <div className="flex justify-between items-end gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold mb-1">โปรเจกต์ที่สำเร็จแล้ว</h2>
+                <p className="text-sm text-gray-500">ผลงานที่พัฒนาสำเร็จจากการสนับสนุนของนักลงทุน</p>
+              </div>
+              <Link to="/projects?section=completed" className="text-purple-600 text-sm font-medium hover:underline flex items-center shrink-0">
+                ดูทั้งหมด <ChevronRight size={16} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {completedProjects.slice(0, 6).map(project => <ProjectCard key={project.id} project={project} />)}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Recommended Section ── */}
       <section data-home-snap-section data-snap-key="recommended" className="min-h-[100dvh] snap-start flex items-center py-16 bg-white">

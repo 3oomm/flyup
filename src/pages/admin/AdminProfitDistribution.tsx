@@ -41,8 +41,10 @@ function ConfirmPayoutModal({
     const { confirmPayout, isConfirming } = useAdminProfitPoolStore()
     const [transferRef, setTransferRef] = useState('')
     const [note, setNote] = useState('')
+    const hasBankAccount = !!(payout.bank_account?.bank_name?.trim() && payout.bank_account?.account_name?.trim() && payout.bank_account?.account_number?.trim())
 
     const handleConfirm = async () => {
+        if (!hasBankAccount || !transferRef.trim() || isConfirming) return
         const ok = await confirmPayout(poolId, payout.id, transferRef, note)
         if (ok) onClose()
     }
@@ -77,7 +79,7 @@ function ConfirmPayoutModal({
                         <span className="text-muted-foreground">จำนวนที่ได้รับ</span>
                         <span className="font-bold text-primary text-[15px]">{fmtBaht(payout.amount)}</span>
                     </div>
-                    {payout.bank_account && (
+                    {hasBankAccount && payout.bank_account ? (
                         <>
                             <hr className="border-border" />
                             <div className="flex justify-between">
@@ -93,18 +95,20 @@ function ConfirmPayoutModal({
                                 <span className="font-mono">{payout.bank_account.account_number}</span>
                             </div>
                         </>
+                    ) : (
+                        <p role="alert" className="text-red-600 bg-red-50 rounded-lg p-3">นักลงทุนยังไม่มีข้อมูลบัญชีรับกำไรที่ครบถ้วน กรุณาให้นักลงทุนเพิ่มบัญชีธนาคารในโปรไฟล์ก่อนยืนยันการโอน</p>
                     )}
                 </div>
+
+                <p className="text-xs text-muted-foreground mb-4">โอนเงินเข้าบัญชีข้างต้นก่อน แล้วกรอกเลขอ้างอิงเพื่อยืนยัน ระบบจะส่งอีเมลแจ้งชื่อโปรเจกต์ ไตรมาส และยอดกำไรให้นักลงทุน ปุ่มนี้บันทึกการยืนยันการโอนด้วยตนเอง</p>
 
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-1">
                         <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-red-500">*</span></label>
                         <input
                             type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
                             value={transferRef}
-                            onChange={(e) => setTransferRef(e.target.value.replace(/[^0-9]/g, ''))}
+                            onChange={(e) => setTransferRef(e.target.value)}
                             placeholder="กรอกเลขอ้างอิงการโอน"
                             className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary"
                         />
@@ -124,7 +128,7 @@ function ConfirmPayoutModal({
                     <button onClick={onClose} className="px-4 py-2 text-[13px] rounded-lg border border-border hover:bg-gray-50">ยกเลิก</button>
                     <button
                         onClick={handleConfirm}
-                        disabled={!transferRef.trim() || isConfirming}
+                        disabled={!hasBankAccount || !transferRef.trim() || isConfirming}
                         className="px-4 py-2 text-[13px] rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 flex items-center gap-2"
                     >
                         {isConfirming ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}

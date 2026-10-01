@@ -53,7 +53,7 @@ const Projects = () => {
   });
 
   const {
-    publicProjects, endingProjects, newProjects, executingProjects, recommendedProjects,
+    publicProjects, endingProjects, newProjects, executingProjects, completedProjects, recommendedProjects,
     categories, isLoading, isFetchError, fetchPublicProjects, fetchHomeProjects, fetchCategories,
   } = usePublicProjectStore();
 
@@ -85,6 +85,7 @@ const Projects = () => {
   }, [section, fetchPublicProjects, fetchHomeProjects]);
 
   const SECTION_OPTIONS = [
+    { key: 'completed', label: 'โปรเจกต์ที่สำเร็จแล้ว', icon: ShieldCheck, color: 'text-emerald-500' },
     { key: 'hot',         label: 'ใกล้สำเร็จแล้ว!',       icon: Flame,     color: 'text-red-500' },
     { key: 'new',         label: 'โปรเจกต์มาใหม่',         icon: Sparkles,  color: 'text-purple-500' },
     { key: 'executing',   label: 'กำลังดำเนินการ',          icon: Zap,       color: 'text-green-500' },
@@ -109,9 +110,10 @@ const Projects = () => {
     if (section === 'hot') return endingProjects;
     if (section === 'new') return newProjects;
     if (section === 'executing') return executingProjects;
+    if (section === 'completed') return completedProjects;
     if (section === 'recommended') return recommendedProjects;
     return publicProjects;
-  }, [section, publicProjects, endingProjects, newProjects, executingProjects, recommendedProjects]);
+  }, [section, publicProjects, endingProjects, newProjects, executingProjects, completedProjects, recommendedProjects]);
 
   const filteredProjects = useMemo(() => {
     let result = [...sourceProjects];

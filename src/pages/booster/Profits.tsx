@@ -134,6 +134,11 @@ const Profits = () => {
                                                             : `แจ้งเมื่อ ${fmtDate(item.created_at)} · รอ Admin โอน`
                                                         }
                                                     </p>
+                                                    {item.status === 'confirmed' && (
+                                                        <p className="text-[11px] text-muted-foreground mt-1 break-all">
+                                                            เลขอ้างอิงการโอน: <span className="font-mono text-foreground select-all">{item.transfer_ref?.trim() || 'ไม่ได้ระบุ'}</span>
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className="flex items-center gap-2 self-end min-[420px]:self-auto">
                                                     <span className={`font-bold text-[15px] ${item.status === 'confirmed' ? 'text-primary' : 'text-amber-500'}`}>

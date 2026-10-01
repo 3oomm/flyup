@@ -84,35 +84,37 @@ export default function KycDeviceChooser({ onComputer, onCompleted, liveOnly = f
   if (step === "choose") return (
     <div className="rounded-2xl border border-border bg-white p-6">
       <div className="mb-5 text-center">
-        <h3 className="text-lg font-semibold text-foreground">ยืนยันตัวตนผ่านอุปกรณ์ใด</h3>
-        <p className="mt-1 text-sm text-muted-foreground">เลือกวิธีที่สะดวก คุณสามารถถ่ายรูปด้วยกล้องมือถือหรืออัปโหลดจากคอมพิวเตอร์</p>
+        <h3 className="text-lg font-semibold text-foreground">ยืนยันตัวตนของคุณ</h3>
+        <p className="mt-1 text-sm text-muted-foreground">สแกน QR Code เพื่อยืนยันตัวตนด้วยกล้องมือถือ</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3">
         <button onClick={startMobile} disabled={loading} className="group flex min-h-36 flex-col items-center justify-center rounded-xl border-2 border-border p-5 transition hover:border-primary hover:bg-primary/5 disabled:opacity-60">
           {loading ? <Loader2 className="mb-3 size-8 animate-spin text-primary" /> : <Smartphone className="mb-3 size-8 text-primary" />}
-          <span className="font-semibold">ทำต่อบนมือถือ</span>
+          <span className="font-semibold">สแกน QR Code</span>
           <span className="mt-1 text-xs text-muted-foreground">สแกน QR Code เพื่อใช้กล้อง</span>
         </button>
-        <button onClick={onComputer} className="group flex min-h-36 flex-col items-center justify-center rounded-xl border-2 border-border p-5 transition hover:border-primary hover:bg-primary/5">
+        <button onClick={() => setShowOtherOptions(value => !value)} aria-expanded={showOtherOptions} className="text-sm font-medium text-primary underline underline-offset-4">Other option</button>
+        {showOtherOptions && <button onClick={onComputer} className="group flex min-h-36 flex-col items-center justify-center rounded-xl border-2 border-border p-5 transition hover:border-primary hover:bg-primary/5">
           <Laptop className="mb-3 size-8 text-primary" />
           <span className="font-semibold">ทำบนคอมพิวเตอร์นี้</span>
           <span className="mt-1 text-xs text-muted-foreground">เลือกไฟล์รูปจากเครื่อง</span>
-        </button>
+        </button>}
       </div>
     </div>
   );
 
   return (
     <div className="rounded-2xl border border-border bg-white p-6 text-center">
-      <button onClick={() => setStep("choose")} className="float-right rounded-full p-1 text-muted-foreground hover:bg-gray-100" aria-label="กลับไปเลือกอุปกรณ์"><X size={20} /></button>
+      <button onClick={() => { setStep("choose"); setShowOtherOptions(false); }} className="float-right rounded-full p-1 text-muted-foreground hover:bg-gray-100" aria-label="กลับไปหน้ายืนยันตัวตน"><X size={20} /></button>
       <QrCode className="mx-auto mb-2 size-7 text-primary" />
       <h3 className="text-lg font-semibold">ทำต่อบนมือถือ</h3>
       <p className="mt-1 text-sm text-muted-foreground">สแกน QR Code ด้วยกล้องมือถือ แล้วทำตามขั้นตอนบนหน้าจอ</p>
       {qrDataUrl && <img src={qrDataUrl} alt="QR Code สำหรับยืนยันตัวตนบนมือถือ" className="mx-auto my-5 size-56 rounded-lg border bg-white p-2" />}
       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 size={15} className="animate-spin" /> กำลังรอข้อมูลจากมือถือ</div>
-      <button onClick={() => setShowOtherOptions(value => !value)} className="mt-4 text-sm font-medium text-primary underline underline-offset-4">ตัวเลือกอื่น</button>
+      <button onClick={() => setShowOtherOptions(value => !value)} aria-expanded={showOtherOptions} className="mt-4 text-sm font-medium text-primary underline underline-offset-4">Other option</button>
       {showOtherOptions && session && (
         <div className="mx-auto mt-4 max-w-md rounded-xl border border-border bg-slate-50 p-3 text-left">
+          {!liveOnly && <button onClick={onComputer} className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-white py-2 text-xs font-medium hover:border-primary"><Laptop size={14} /> อัปโหลดรูปจากคอมพิวเตอร์</button>}
           <p className="mb-2 text-xs text-muted-foreground">หากสแกน QR Code ไม่ได้ ให้ส่งลิงก์นี้ไปเปิดบนมือถือ</p>
           <div className="flex gap-2">
             <input readOnly value={session.mobile_url} className="min-w-0 flex-1 rounded-lg border border-border bg-white px-3 py-2 text-xs" onFocus={event => event.currentTarget.select()} />
