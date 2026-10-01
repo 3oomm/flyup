@@ -295,8 +295,9 @@ const MyProjects = () => {
             const allPhasesPaid = (project.milestones?.length ?? 0) >= 4
               && project.milestones?.every(milestone => milestone.status === 'paid') === true;
             // Closed projects have completed their phases; summaries may omit milestone details.
-            const canPayDividends = project.state === 'closed'
-              || (project.state === 'executing' && allPhasesPaid);
+            const canPayDividends = (project.state === 'closed'
+              || (project.state === 'executing' && allPhasesPaid))
+              && (transferredQuarters?.[project.id] ?? 0) < 4;
             const hasCancelRequest = !canPayDividends && !allPhasesPaid && (
               project.state === 'funding' || project.state === 'executing' || project.state === 'pending_edit_review'
             );
