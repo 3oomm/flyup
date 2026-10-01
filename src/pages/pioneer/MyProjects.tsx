@@ -269,6 +269,9 @@ const MyProjects = () => {
               ? Math.min(Math.round((project.current_funding / project.funding_goal) * 100), 100)
               : 0;
             const currentPhase = getCurrentProjectPhase(project.milestones);
+            const canPayDividends = (project.state === 'executing' || project.state === 'closed')
+              && (project.milestones?.length ?? 0) >= 4
+              && project.milestones!.every(milestone => milestone.status === 'paid');
 
             return (
               <div
@@ -371,6 +374,14 @@ const MyProjects = () => {
                         </button>
                       )}
 
+                      {canPayDividends && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate('/pioneer/dashboard/profit'); }}
+                          className="flex items-center justify-center gap-[6px] px-[16px] py-[8px] bg-brand-violet hover:bg-brand-violet-hover transition-colors rounded-[8px] text-[13px] font-medium text-white shadow-sm cursor-pointer"
+                        >
+                          จ่ายเงินปันผล
+                        </button>
+                      )}
                       {hasMilestone && (
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/pioneer/dashboard/projects/${project.id}/milestones`); }}
