@@ -149,6 +149,9 @@ function SubmitProfitModal({
                             >
                                 {eligible.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
                             </select>
+                            <p className="text-[12px] font-medium text-primary">
+                                โปรเจกต์ต้องจ่ายปันผลครบ 4 ไตรมาส (Q1–Q4) โดยแจ้งโอนตามลำดับ
+                            </p>
                         </div>
 
                         <div className="flex flex-col gap-1">

@@ -308,6 +308,11 @@ const MyProjects = () => {
                         </p>
                       )}
 
+                      {(project.state === 'executing' || project.state === 'closed') && (
+                        <p className="text-[12px] font-medium text-primary">
+                          ต้องจ่ายปันผลให้นักลงทุนครบ 4 ไตรมาส (Q1–Q4)
+                        </p>
+                      )}
                       {/* Funding Progress */}
                       {project.state === 'funding' && project.funding_goal > 0 && (
                         <div className="flex flex-col gap-[6px] mt-[4px] max-w-[400px]">
