@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
     Loader2, TrendingUp, CheckCircle, Clock, X,
-    ChevronLeft, Users, Banknote, Building2,
+    ChevronLeft, Users, Banknote, Building2, ExternalLink,
 } from 'lucide-react'
 import { useAdminProfitPoolStore, type ProfitPoolDetail, type InvestorPayoutDetail } from '../../store/useAdminProfitPoolStore'
 import PageHeader from '../../components/admin/PageHeader'
@@ -142,6 +142,32 @@ function ConfirmPayoutModal({
 
 // ── Pool Detail View ──────────────────────────────────────────────────────────
 
+function PioneerSlip({ image }: { image?: string }) {
+    const [imageFailed, setImageFailed] = useState(false)
+
+    return (
+        <div className="border-t border-border pt-3">
+            <h3 className="text-[13px] font-semibold text-foreground mb-2">สลิปการโอนจาก Pioneer</h3>
+            {image ? (
+                <div className="flex flex-col items-start gap-2">
+                    {imageFailed ? (
+                        <p role="status" className="text-[12px] text-muted-foreground">โหลดภาพสลิปไม่สำเร็จ กรุณาเปิดภาพเต็มเพื่อตรวจสอบ</p>
+                    ) : (
+                        <a href={image} target="_blank" rel="noopener noreferrer" className="block rounded-lg border border-border bg-gray-50 p-2 hover:border-primary" aria-label="เปิดสลิปการโอนจาก Pioneer ขนาดเต็ม">
+                            <img src={image} alt="สลิปการโอนจาก Pioneer" className="max-h-56 max-w-full object-contain" onError={() => setImageFailed(true)} />
+                        </a>
+                    )}
+                    <a href={image} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:underline">
+                        <ExternalLink size={14} /> เปิดสลิปขนาดเต็ม
+                    </a>
+                </div>
+            ) : (
+                <p className="text-[12px] text-muted-foreground">ไม่มีสลิปแนบในรายการนี้</p>
+            )}
+        </div>
+    )
+}
+
 function PoolDetailView({
     pool,
     onBack,
@@ -207,6 +233,7 @@ function PoolDetailView({
                     <span>·</span>
                     <span>สร้าง {fmtDate(current.created_at)}</span>
                 </div>
+                <PioneerSlip key={`${current.id}:${current.slip_image ?? ''}`} image={current.slip_image} />
             </div>
 
             {/* investor table */}

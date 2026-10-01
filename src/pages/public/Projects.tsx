@@ -205,7 +205,7 @@ const Projects = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-3 md:gap-4 mb-4">
-          <div className="flex-1 flex items-center gap-2 bg-card border border-border h-12 md:h-11 rounded-lg px-4 focus-within:border-primary transition-all shadow-sm w-full">
+          <div className="flex-none lg:flex-1 min-w-0 flex items-center gap-2 bg-card border border-border h-12 md:h-11 rounded-lg px-4 focus-within:border-primary transition-all shadow-sm w-full">
             <Search size={18} className="text-muted-foreground flex-shrink-0" />
             <input
               data-testid="projects-search"
@@ -213,7 +213,7 @@ const Projects = () => {
               placeholder="ค้นหาชื่อโปรเจกต์..."
               value={searchQuery}
               onChange={(e) => setQueryParam('q', e.target.value, true)}
-              className="bg-transparent outline-none w-full text-sm placeholder:text-muted-foreground"
+              className="bg-transparent outline-none w-full min-w-0 text-sm placeholder:text-muted-foreground"
             />
           </div>
 

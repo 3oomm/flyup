@@ -33,6 +33,7 @@ export interface ProfitPoolDetail {
   pioneer_name: string
   total_amount: number
   transfer_ref: string
+  slip_image?: string
   status: 'pending' | 'completed'
   admin_note: string
   quarter_no: number
