@@ -25,6 +25,15 @@ describe('admin notification destinations', () => {
         expect(getNotifPath(notification, 'admin')).toBe('/admin/disbursements')
     })
 
+    it('opens profit distribution when a pioneer transfers profit', () => {
+        expect(getNotifPath({
+            ...notification,
+            type: 'profit',
+            title: 'Pioneer โอนกำไรเข้าระบบ',
+            related_type: 'profit_pool',
+        }, 'admin')).toBe('/admin/profit-distribution')
+    })
+
     it('opens the milestone detail for other milestone notifications', () => {
         expect(getNotifPath({ ...notification, title: 'Milestone ผ่านการโหวต' }, 'admin')).toBe('/admin/milestones/42')
     })

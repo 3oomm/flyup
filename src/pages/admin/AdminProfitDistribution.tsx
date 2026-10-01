@@ -162,21 +162,23 @@ function PoolDetailView({
 
             {/* pool summary */}
             <div className="bg-white border border-border rounded-2xl p-5 flex flex-col gap-3">
-                <div className="flex items-start justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                            <h2 className="text-[16px] font-bold text-foreground">{current.project_title}</h2>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start gap-2 mb-0.5">
+                            <h2 className="w-full sm:w-auto sm:min-w-0 sm:flex-1 break-words text-[16px] font-bold text-foreground">{current.project_title}</h2>
                             {current.quarter_no > 0 && (
-                                <span className="text-[11px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">Q{current.quarter_no}</span>
+                                <span className="shrink-0 text-[11px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">Q{current.quarter_no}</span>
                             )}
                         </div>
-                        <p className="text-[12px] text-muted-foreground">Pioneer: {current.pioneer_name}</p>
+                        <p className="break-words text-[12px] text-muted-foreground">Pioneer: {current.pioneer_name}</p>
                     </div>
-                    <StatusBadge
-                        label={STATUS_POOL[current.status]?.label ?? current.status}
-                        className={STATUS_POOL[current.status]?.className ?? ''}
-                        icon={STATUS_POOL[current.status]?.icon}
-                    />
+                    <div className="shrink-0 self-start">
+                        <StatusBadge
+                            label={STATUS_POOL[current.status]?.label ?? current.status}
+                            className={STATUS_POOL[current.status]?.className ?? ''}
+                            icon={STATUS_POOL[current.status]?.icon}
+                        />
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="bg-gray-50 rounded-xl p-3 text-center">
@@ -194,7 +196,7 @@ function PoolDetailView({
                 </div>
                 <div className="text-[12px] text-muted-foreground flex items-center gap-2 flex-wrap">
                     <span>Ref จาก Pioneer: </span>
-                    <span className="font-mono font-medium">{current.transfer_ref}</span>
+                    <span className="min-w-0 break-all font-mono font-medium">{current.transfer_ref}</span>
                     <span>·</span>
                     <span>สร้าง {fmtDate(current.created_at)}</span>
                 </div>
@@ -202,7 +204,7 @@ function PoolDetailView({
 
             {/* investor table */}
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] bg-surface-table px-2 xl:px-4 py-3 text-[11px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[44px_minmax(0,2fr)_minmax(100px,1fr)_70px_minmax(100px,1fr)_100px_100px] xl:gap-x-2 bg-surface-table px-2 xl:px-4 py-3 text-[11px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>นักลงทุน</div>
                     <div className="hidden xl:block text-center">ทุนที่ลงทุน</div>
@@ -221,7 +223,7 @@ function PoolDetailView({
                     current.payouts.map((p, index) => {
                         const payStatus = STATUS_PAYOUT[p.status] ?? STATUS_PAYOUT['pending']
                         return (
-                            <div key={p.id} className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[60px_2fr_1fr_90px_1fr_100px_80px] px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                            <div key={p.id} className="grid grid-cols-[40px_minmax(0,1fr)_82px_84px] xl:grid-cols-[44px_minmax(0,2fr)_minmax(100px,1fr)_70px_minmax(100px,1fr)_100px_100px] xl:gap-x-2 px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                 <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
                                 <div className="h-14 min-w-0 flex flex-col justify-center pr-2 xl:px-4">
                                     <span className="block min-w-0 font-medium truncate">{p.first_name} {p.last_name}</span>
@@ -323,7 +325,7 @@ const AdminProfitDistribution = () => {
             </div>
 
             <div className="bg-white rounded-xl border border-border overflow-hidden text-[13px]">
-                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] bg-surface-table px-2 xl:px-4 py-3 text-[12px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
+                <div className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[44px_minmax(0,2fr)_minmax(0,1.3fr)_60px_minmax(100px,1fr)_80px_140px_112px] xl:gap-x-2 bg-surface-table px-2 xl:px-4 py-3 text-[12px] xl:text-[13px] font-medium text-gray-500 border-b border-border">
                     <div className="text-center">ลำดับ</div>
                     <div>โปรเจกต์</div>
                     <div className="hidden xl:block text-center">Pioneer</div>
@@ -347,14 +349,14 @@ const AdminProfitDistribution = () => {
                     filtered.map((pool, index) => {
                         const st = STATUS_POOL[pool.status] ?? STATUS_POOL['pending']
                         return (
-                            <div key={pool.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[60px_2fr_1fr_80px_1fr_1fr_100px_80px] px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                            <div key={pool.id} className="grid grid-cols-[44px_minmax(0,1fr)_86px_96px] xl:grid-cols-[44px_minmax(0,2fr)_minmax(0,1.3fr)_60px_minmax(100px,1fr)_80px_140px_112px] xl:gap-x-2 px-2 xl:px-4 border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
                                 <div className="h-14 flex items-center justify-center text-[12px] text-muted-foreground">{index + 1}</div>
                                 <div className="h-14 min-w-0 flex flex-col justify-center pr-2 xl:px-4">
                                     <span className="block min-w-0 font-medium text-[12px] xl:text-[13px] truncate">{pool.project_title}</span>
                                     <span className="hidden xl:block text-[11px] text-muted-foreground">{fmtDate(pool.created_at)}</span>
                                 </div>
-                                <div className="hidden xl:flex h-14 items-center justify-center">
-                                    <span className="text-[13px]">{pool.pioneer_name}</span>
+                                <div className="hidden xl:flex min-w-0 min-h-14 items-center justify-center py-2">
+                                    <span className="break-words text-[13px]">{pool.pioneer_name}</span>
                                 </div>
                                 <div className="hidden xl:flex h-14 items-center justify-center">
                                     {pool.quarter_no > 0 ? (

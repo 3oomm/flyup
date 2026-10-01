@@ -94,11 +94,13 @@ function SubmitProfitModal({
 
     const submittedQs  = projectId ? (submittedMap[Number(projectId)] ?? []) : []
     const hasAvailable = [1, 2, 3, 4].some(q => isQuarterAvailable(q, submittedQs))
-    const valid = projectId && quarterNo && Number(amount) > 0 && transferRef.trim()
+    const valid = Boolean(projectId && quarterNo && Number(amount) > 0
+        && /^\d+$/.test(transferRef) && slipImage && !isUploading)
 
     const handleSlipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
+        setSlipImage('')
         setSlipPreview(URL.createObjectURL(file))
         setIsUploading(true)
         try {
@@ -108,14 +110,15 @@ function SubmitProfitModal({
         } catch {
             toast.error('อัปโหลดสลิปไม่สำเร็จ')
             setSlipPreview('')
+            if (fileInputRef.current) fileInputRef.current.value = ''
         } finally {
             setIsUploading(false)
         }
     }
 
     const handleSubmit = async () => {
-        if (!projectId || !quarterNo) return
-        const ok = await submitProfit(Number(projectId), Number(quarterNo), Number(amount), transferRef.trim(), slipImage || undefined)
+        if (!valid || isSubmitting) return
+        const ok = await submitProfit(Number(projectId), Number(quarterNo), Number(amount), transferRef, slipImage)
         if (ok) { onSubmitted(); onClose() }
     }
 
@@ -192,14 +195,15 @@ function SubmitProfitModal({
 
                         <div className="flex flex-col gap-1">
                             <label className="text-[13px] font-medium">เลขอ้างอิงการโอน <span className="text-red-500">*</span></label>
-                            <input value={transferRef} onChange={e => setTransferRef(e.target.value)}
-                                placeholder="เช่น TXN-20260630-001"
+                            <input type="text" inputMode="numeric" pattern="[0-9]+" required
+                                value={transferRef} onChange={e => setTransferRef(e.target.value.replace(/\D/g, ''))}
+                                placeholder="เช่น 20260630001"
                                 className="border border-border rounded-lg px-3 py-2 text-[14px] outline-none focus:border-primary" />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-[13px] font-medium">สลิปการโอน</label>
-                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleSlipChange} />
+                            <label className="text-[13px] font-medium">สลิปการโอน <span className="text-red-500">*</span></label>
+                            <input ref={fileInputRef} type="file" accept="image/*" required disabled={isUploading} className="hidden" onChange={handleSlipChange} />
                             {slipPreview ? (
                                 <div className="relative w-full rounded-xl overflow-hidden border border-border">
                                     <img src={slipPreview} alt="slip" className="w-full max-h-45 object-contain bg-gray-50" />
@@ -210,6 +214,7 @@ function SubmitProfitModal({
                                     )}
                                     <button
                                         type="button"
+                                        disabled={isUploading}
                                         onClick={() => { setSlipPreview(''); setSlipImage(''); if (fileInputRef.current) fileInputRef.current.value = '' }}
                                         className="absolute top-2 right-2 bg-white rounded-full shadow p-0.5 hover:bg-red-50 cursor-pointer"
                                     >

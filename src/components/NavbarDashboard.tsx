@@ -12,7 +12,7 @@ const NavbarDashboard = ({ onOpenSidebar }: NavbarProps) => {
     const displayName = [authUser?.first_name, authUser?.last_name].filter(Boolean).join(' ') || authUser?.name || ''
 
     return (
-        <header className="h-16 min-w-0 bg-white border-b border-border flex items-center justify-between px-3 sm:px-4 xl:px-8 sticky top-0 z-10 font-kanit">
+        <header className="h-16 min-w-0 bg-white border-b border-border flex items-center justify-between px-3 sm:px-4 xl:px-8 sticky top-0 z-30 font-kanit">
             <div className="flex items-center">
                 <button
                     onClick={onOpenSidebar}

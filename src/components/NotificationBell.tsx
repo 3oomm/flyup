@@ -77,6 +77,7 @@ export function getNotifPath(notif: Notification, role: string): string {
 
     if (role === 'admin') {
         switch (type) {
+            case 'profit': return '/admin/profit-distribution'
             case 'milestone':
                 if (notif.title.includes('รอโอนเงิน')) return '/admin/disbursements'
                 return related_type === 'milestone' && related_id
